@@ -18,16 +18,19 @@ esphome:
     - priority: -100
       then:
         - lambda: |-
-            // --- Button 1: custom colors ---
-            std::string on_hex = id(button_1_on_color).state;
-            std::string off_hex = id(button_1_off_color).state;
-            if (on_hex.length() == 6) {
-              uint32_t on_val = strtoul(on_hex.c_str(), nullptr, 16);
-              lv_obj_set_style_bg_color(id(button_1), lv_color_hex(on_val), LV_PART_MAIN | LV_STATE_CHECKED);
-            }
-            if (off_hex.length() == 6) {
-              uint32_t off_val = strtoul(off_hex.c_str(), nullptr, 16);
-              lv_obj_set_style_bg_color(id(button_1), lv_color_hex(off_val), LV_PART_MAIN | LV_STATE_DEFAULT);
+            // --- Universal button colors ---
+            std::string on_hex = id(button_on_color).state;
+            std::string off_hex = id(button_off_color).state;
+            lv_obj_t *buttons[] = { id(button_1) };
+            for (auto *btn : buttons) {
+              if (on_hex.length() == 6) {
+                uint32_t on_val = strtoul(on_hex.c_str(), nullptr, 16);
+                lv_obj_set_style_bg_color(btn, lv_color_hex(on_val), LV_PART_MAIN | LV_STATE_CHECKED);
+              }
+              if (off_hex.length() == 6) {
+                uint32_t off_val = strtoul(off_hex.c_str(), nullptr, 16);
+                lv_obj_set_style_bg_color(btn, lv_color_hex(off_val), LV_PART_MAIN | LV_STATE_DEFAULT);
+              }
             }
 
             // --- Button 1: entity state subscription ---
