@@ -46,44 +46,46 @@ esphome:
                 );
               }
 
-              // Set icon based on selection or auto-detect from entity domain
-              std::string icon_choice = id(button_1_icon).current_option();
-              if (icon_choice == "Auto") {
+              // Icon codepoints indexed to match "Button: Icon" select options
+              static const char* icon_codepoints[] = {
+                "\U000F0493",  //  0: Auto (cog fallback)
+                "\U000F0335",  //  1: Lightbulb
+                "\U000F0654",  //  2: Power Plug
+                "\U000F0210",  //  3: Fan
+                "\U000F033E",  //  4: Lock
+                "\U000F0372",  //  5: Garage
+                "\U000F1011",  //  6: Blinds Open
+                "\U000F00AC",  //  7: Blinds Closed
+                "\U000F050F",  //  8: Thermometer
+                "\U000F04C3",  //  9: Speaker
+                "\U000F0502",  // 10: Television
+                "\U000F0213",  // 11: Camera
+                "\U000F0D91",  // 12: Motion Sensor
+                "\U000F081A",  // 13: Door
+                "\U000F111C",  // 14: Window
+                "\U000F0F92",  // 15: Water Heater
+                "\U000F0D43",  // 16: Air Conditioner
+                "\U000F089E",  // 17: Battery
+                "\U000F07D6",  // 18: LED Strip
+                "\U000F0425",  // 19: Power
+              };
+
+              size_t i = id(button_1_icon).active_index().value_or(0);
+
+              if (i == 0) {
                 std::string domain = entity_id.substr(0, entity_id.find('.'));
-                const char *icon_text = "\U000F0493"; // default: cog
-                if (domain == "light") icon_text = "\U000F0335";       // lightbulb
-                else if (domain == "switch") icon_text = "\U000F0654"; // power-plug
-                else if (domain == "fan") icon_text = "\U000F0210";    // fan
-                else if (domain == "lock") icon_text = "\U000F033E";   // lock
-                else if (domain == "cover") icon_text = "\U000F1011";  // blinds-open
-                else if (domain == "climate") icon_text = "\U000F0D43"; // air-filter
-                else if (domain == "media_player") icon_text = "\U000F04C3"; // speaker
-                else if (domain == "camera") icon_text = "\U000F0213"; // camera
-                else if (domain == "binary_sensor") icon_text = "\U000F0D91"; // motion-sensor
-                lv_label_set_text(id(button_1_icon_label), icon_text);
-              } else {
-                const char *icon_text = "\U000F0493"; // default: cog
-                if (icon_choice == "Lightbulb") icon_text = "\U000F0335";
-                else if (icon_choice == "Power Plug") icon_text = "\U000F0654";
-                else if (icon_choice == "Fan") icon_text = "\U000F0210";
-                else if (icon_choice == "Lock") icon_text = "\U000F033E";
-                else if (icon_choice == "Garage") icon_text = "\U000F0372";
-                else if (icon_choice == "Blinds Open") icon_text = "\U000F1011";
-                else if (icon_choice == "Blinds Closed") icon_text = "\U000F00AC";
-                else if (icon_choice == "Thermometer") icon_text = "\U000F050F";
-                else if (icon_choice == "Speaker") icon_text = "\U000F04C3";
-                else if (icon_choice == "Television") icon_text = "\U000F0502";
-                else if (icon_choice == "Camera") icon_text = "\U000F0213";
-                else if (icon_choice == "Motion Sensor") icon_text = "\U000F0D91";
-                else if (icon_choice == "Door") icon_text = "\U000F081A";
-                else if (icon_choice == "Window") icon_text = "\U000F111C";
-                else if (icon_choice == "Water Heater") icon_text = "\U000F0F92";
-                else if (icon_choice == "Air Conditioner") icon_text = "\U000F0D43";
-                else if (icon_choice == "Battery") icon_text = "\U000F089E";
-                else if (icon_choice == "LED Strip") icon_text = "\U000F07D6";
-                else if (icon_choice == "Power") icon_text = "\U000F0425";
-                lv_label_set_text(id(button_1_icon_label), icon_text);
+                if (domain == "light")              i = 1;
+                else if (domain == "switch")        i = 2;
+                else if (domain == "fan")           i = 3;
+                else if (domain == "lock")          i = 4;
+                else if (domain == "cover")         i = 6;
+                else if (domain == "climate")       i = 16;
+                else if (domain == "media_player")  i = 9;
+                else if (domain == "camera")        i = 11;
+                else if (domain == "binary_sensor") i = 12;
               }
+
+              lv_label_set_text(id(button_1_icon_label), icon_codepoints[i]);
 
               // Subscribe to entity state for checked/unchecked
               api::global_api_server->subscribe_home_assistant_state(
