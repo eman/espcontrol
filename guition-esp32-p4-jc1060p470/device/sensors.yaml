@@ -21,9 +21,9 @@ esphome:
         - lambda: |-
             // --- Button slot descriptor ---
             struct BtnSlot {
-              esphome::template_::TemplateTextComponent *entity;
-              esphome::template_::TemplateTextComponent *label;
-              esphome::template_::TemplateSelectComponent *icon;
+              esphome::text::Text *entity;
+              esphome::text::Text *label;
+              esphome::select::Select *icon;
               lv_obj_t *btn;
               lv_obj_t *icon_lbl;
               lv_obj_t *text_lbl;
