@@ -14,6 +14,15 @@ esp32:
     sdkconfig_options:
       CONFIG_SDMMC_HOST_DEFAULT: "y"
 
+# External components (sun_calc for sunrise/sunset calculation)
+external_components:
+  - source:
+      type: local
+      path: ../components
+    components: [espcontrol]
+
+espcontrol:
+
 # Esphome
 esphome:
   name: ${name}
@@ -68,6 +77,9 @@ web_server:
     - id: sg_display
       name: "Display Configuration"
       sorting_weight: 20
+    - id: sg_brightness
+      name: "Brightness"
+      sorting_weight: 25
     - id: sg_screensaver
       name: "Screensaver"
       sorting_weight: 30

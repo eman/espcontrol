@@ -53,10 +53,8 @@ script:
             - script.stop: screensaver_idle_check
             - lvgl.resume:
             - delay: 100ms
-            - light.turn_on:
-                id: display_backlight
-                brightness: 90%
             - globals.set:
                 id: display_asleep
                 value: 'false'
+            - script.execute: backlight_apply_brightness
       - script.execute: screensaver_idle_check

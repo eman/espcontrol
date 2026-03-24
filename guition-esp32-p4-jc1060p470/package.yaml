@@ -47,6 +47,7 @@ packages:
   connectivity:    !include addon/connectivity.yaml
   time_sync:       !include addon/time.yaml
   backlight:       !include addon/backlight.yaml
+  bl_schedule:     !include addon/backlight_schedule.yaml
   network:         !include addon/network.yaml
   fw_update:       !include addon/firmware_update.yaml
   # ---------------------------------------------------------------------------

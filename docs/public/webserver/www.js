@@ -401,7 +401,20 @@
     "padding:10px 16px;border:none;border-radius:6px;font-size:13px;font-weight:500;" +
     "cursor:pointer;font-family:inherit;transition:filter .15s;background:#333;color:#e0e0e0}" +
     ".sp-backup-btn:hover{filter:brightness(1.15)}" +
-    ".sp-backup-btn .mdi{font-size:16px}";
+    ".sp-backup-btn .mdi{font-size:16px}" +
+
+    // Sun info
+    ".sp-sun-info{font-size:13px;color:#888;padding:8px 0 2px}" +
+
+    // Firmware
+    ".sp-fw-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0}" +
+    ".sp-fw-version{font-size:14px;color:#e0e0e0}" +
+    ".sp-fw-label{font-size:12px;color:#888}" +
+    ".sp-fw-btn{background:#333;color:#e0e0e0;border:none;border-radius:6px;" +
+    "padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;" +
+    "transition:filter .15s;white-space:nowrap}" +
+    ".sp-fw-btn:hover{filter:brightness(1.15)}" +
+    ".sp-fw-btn:disabled{opacity:.5;cursor:default}";
 
   var state = {
     order: [],
@@ -417,6 +430,16 @@
     presenceEntity: "",
     screensaverTimeout: 300,
     backlight: 255,
+    timezone: "Europe/London (GMT+0)",
+    timezoneOptions: [],
+    brightnessDayVal: 100,
+    brightnessNightVal: 75,
+    sunrise: "",
+    sunset: "",
+    firmwareVersion: "",
+    autoUpdate: true,
+    updateFrequency: "Daily",
+    updateFreqOptions: ["Hourly", "Daily", "Weekly", "Monthly"],
   };
 
   for (var i = 0; i < NUM_SLOTS; i++) {
@@ -672,13 +695,78 @@
 
     config.appendChild(appearPanel);
 
-    // --- Backlight ---
-    config.appendChild(sectionTitle("Backlight"));
+    // --- Brightness ---
+    config.appendChild(sectionTitle("Brightness"));
 
     var blPanel = document.createElement("div");
     blPanel.className = "sp-panel";
 
-    blPanel.appendChild(fieldLabel("Display Backlight"));
+    // Timezone
+    blPanel.appendChild(fieldLabel("Timezone"));
+    var tzSelect = document.createElement("select");
+    tzSelect.className = "sp-select";
+    tzSelect.id = "sp-set-timezone";
+    tzSelect.addEventListener("change", function () {
+      postSelect("Clock: Timezone", this.value);
+    });
+    blPanel.appendChild(tzSelect);
+    els.setTimezone = tzSelect;
+
+    // Daytime Brightness
+    blPanel.appendChild(fieldLabel("Daytime Brightness"));
+    var dayRow = document.createElement("div");
+    dayRow.className = "sp-range-row";
+    var dayRange = document.createElement("input");
+    dayRange.type = "range";
+    dayRange.className = "sp-range";
+    dayRange.min = "10";
+    dayRange.max = "100";
+    dayRange.step = "5";
+    dayRange.value = String(state.brightnessDayVal);
+    var dayVal = document.createElement("span");
+    dayVal.className = "sp-range-val";
+    dayVal.textContent = state.brightnessDayVal + "%";
+    dayRange.addEventListener("input", function () { dayVal.textContent = this.value + "%"; });
+    dayRange.addEventListener("change", function () { postNumber("Screen: Daytime Brightness", this.value); });
+    dayRow.appendChild(dayRange);
+    dayRow.appendChild(dayVal);
+    blPanel.appendChild(dayRow);
+    els.setDayBrightness = dayRange;
+    els.setDayBrightnessVal = dayVal;
+
+    // Nighttime Brightness
+    blPanel.appendChild(fieldLabel("Nighttime Brightness"));
+    var nightRow = document.createElement("div");
+    nightRow.className = "sp-range-row";
+    var nightRange = document.createElement("input");
+    nightRange.type = "range";
+    nightRange.className = "sp-range";
+    nightRange.min = "10";
+    nightRange.max = "100";
+    nightRange.step = "5";
+    nightRange.value = String(state.brightnessNightVal);
+    var nightVal = document.createElement("span");
+    nightVal.className = "sp-range-val";
+    nightVal.textContent = state.brightnessNightVal + "%";
+    nightRange.addEventListener("input", function () { nightVal.textContent = this.value + "%"; });
+    nightRange.addEventListener("change", function () { postNumber("Screen: Nighttime Brightness", this.value); });
+    nightRow.appendChild(nightRange);
+    nightRow.appendChild(nightVal);
+    blPanel.appendChild(nightRow);
+    els.setNightBrightness = nightRange;
+    els.setNightBrightnessVal = nightVal;
+
+    // Sun info
+    var sunInfo = document.createElement("div");
+    sunInfo.className = "sp-sun-info";
+    sunInfo.id = "sp-sun-info";
+    sunInfo.style.display = "none";
+    blPanel.appendChild(sunInfo);
+    els.sunInfo = sunInfo;
+    updateSunInfo();
+
+    // Manual override
+    blPanel.appendChild(fieldLabel("Display Backlight Override"));
     var blRow = document.createElement("div");
     blRow.className = "sp-range-row";
     var blRange = document.createElement("input");
@@ -801,6 +889,61 @@
 
     backupPanel.appendChild(backupRow);
     config.appendChild(backupPanel);
+
+    // --- Firmware ---
+    config.appendChild(sectionTitle("Firmware"));
+
+    var fwPanel = document.createElement("div");
+    fwPanel.className = "sp-panel";
+
+    var fwVersionRow = document.createElement("div");
+    fwVersionRow.className = "sp-fw-row";
+    var fwVersionLabel = document.createElement("span");
+    fwVersionLabel.className = "sp-fw-version";
+    fwVersionLabel.innerHTML = '<span class="sp-fw-label">Installed </span>' + escHtml(state.firmwareVersion || "dev");
+    fwVersionRow.appendChild(fwVersionLabel);
+    els.fwVersionLabel = fwVersionLabel;
+
+    var fwCheckBtn = document.createElement("button");
+    fwCheckBtn.className = "sp-fw-btn";
+    fwCheckBtn.textContent = "Check for Update";
+    fwCheckBtn.addEventListener("click", function () {
+      fwCheckBtn.disabled = true;
+      fwCheckBtn.textContent = "Checking\u2026";
+      postButtonPress("Firmware: Check for Update");
+      setTimeout(function () {
+        fwCheckBtn.disabled = false;
+        fwCheckBtn.textContent = "Check for Update";
+      }, 10000);
+    });
+    fwVersionRow.appendChild(fwCheckBtn);
+    fwPanel.appendChild(fwVersionRow);
+
+    var autoUpdateToggle = toggleRow("Auto Update", "sp-set-auto-update", state.autoUpdate);
+    fwPanel.appendChild(autoUpdateToggle.row);
+    autoUpdateToggle.input.addEventListener("change", function () {
+      postSwitch("Firmware: Auto Update", this.checked);
+    });
+    els.setAutoUpdate = autoUpdateToggle.input;
+
+    fwPanel.appendChild(fieldLabel("Update Frequency"));
+    var freqSelect = document.createElement("select");
+    freqSelect.className = "sp-select";
+    freqSelect.id = "sp-set-update-freq";
+    state.updateFreqOptions.forEach(function (opt) {
+      var o = document.createElement("option");
+      o.value = opt;
+      o.textContent = opt;
+      if (opt === state.updateFrequency) o.selected = true;
+      freqSelect.appendChild(o);
+    });
+    freqSelect.addEventListener("change", function () {
+      postSelect("Firmware: Update Frequency", this.value);
+    });
+    fwPanel.appendChild(freqSelect);
+    els.setUpdateFreq = freqSelect;
+
+    config.appendChild(fwPanel);
 
     page.appendChild(config);
     page.appendChild(buildApplyBar());
@@ -1768,8 +1911,75 @@
         var br = d.brightness != null ? d.brightness : 255;
         var pct = Math.round(br * 100 / 255);
         state.backlight = br;
-        els.setBacklight.value = pct;
-        els.setBacklightVal.textContent = pct + "%";
+        if (els.setBacklight) {
+          els.setBacklight.value = pct;
+          els.setBacklightVal.textContent = pct + "%";
+        }
+        return;
+      }
+
+      // --- Brightness day/night ---
+      if (id === "number-screen__daytime_brightness") {
+        state.brightnessDayVal = parseFloat(val) || 100;
+        if (els.setDayBrightness) {
+          els.setDayBrightness.value = state.brightnessDayVal;
+          els.setDayBrightnessVal.textContent = Math.round(state.brightnessDayVal) + "%";
+        }
+        return;
+      }
+      if (id === "number-screen__nighttime_brightness") {
+        state.brightnessNightVal = parseFloat(val) || 75;
+        if (els.setNightBrightness) {
+          els.setNightBrightness.value = state.brightnessNightVal;
+          els.setNightBrightnessVal.textContent = Math.round(state.brightnessNightVal) + "%";
+        }
+        return;
+      }
+
+      // --- Sunrise / Sunset ---
+      if (id === "text_sensor-screen__sunrise") {
+        state.sunrise = val;
+        updateSunInfo();
+        return;
+      }
+      if (id === "text_sensor-screen__sunset") {
+        state.sunset = val;
+        updateSunInfo();
+        return;
+      }
+
+      // --- Timezone ---
+      if (id === "select-clock__timezone") {
+        state.timezone = val;
+        if (d.option) state.timezone = d.option;
+        if (els.setTimezone) els.setTimezone.value = state.timezone;
+        if (d.options && Array.isArray(d.options)) {
+          state.timezoneOptions = d.options;
+          populateTimezoneSelect();
+        }
+        return;
+      }
+
+      // --- Firmware ---
+      if (id === "text_sensor-firmware__version") {
+        state.firmwareVersion = val;
+        if (els.fwVersionLabel) {
+          els.fwVersionLabel.innerHTML = '<span class="sp-fw-label">Installed </span>' + escHtml(val || "dev");
+        }
+        return;
+      }
+      if (id === "switch-firmware__auto_update") {
+        state.autoUpdate = d.value === true || val === "ON";
+        if (els.setAutoUpdate) els.setAutoUpdate.checked = state.autoUpdate;
+        return;
+      }
+      if (id === "select-firmware__update_frequency") {
+        state.updateFrequency = val;
+        if (d.option) state.updateFrequency = d.option;
+        if (els.setUpdateFreq) els.setUpdateFreq.value = state.updateFrequency;
+        if (d.options && Array.isArray(d.options)) {
+          state.updateFreqOptions = d.options;
+        }
         return;
       }
 
@@ -1804,6 +2014,33 @@
         postText("Button Order", autoOrder.join(","));
       }
     }, 2000);
+  }
+
+  function updateSunInfo() {
+    var el = els.sunInfo;
+    if (!el) return;
+    if (!state.sunrise && !state.sunset) {
+      el.style.display = "none";
+      return;
+    }
+    el.style.display = "";
+    var t = "";
+    if (state.sunrise) t += "Sunrise: " + escHtml(state.sunrise);
+    if (state.sunrise && state.sunset) t += " \u00a0/\u00a0 ";
+    if (state.sunset) t += "Sunset: " + escHtml(state.sunset);
+    el.innerHTML = t;
+  }
+
+  function populateTimezoneSelect() {
+    if (!els.setTimezone || !state.timezoneOptions.length) return;
+    els.setTimezone.innerHTML = "";
+    state.timezoneOptions.forEach(function (opt) {
+      var o = document.createElement("option");
+      o.value = opt;
+      o.textContent = opt;
+      if (opt === state.timezone) o.selected = true;
+      els.setTimezone.appendChild(o);
+    });
   }
 
   function updateTempPreview() {
