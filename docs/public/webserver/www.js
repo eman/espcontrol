@@ -79,7 +79,7 @@
     ".sp-clock{position:absolute;left:50%;transform:translateX(-50%);" +
     "color:#fff;font-size:1.95cqw;white-space:nowrap}" +
     ".sp-main{position:absolute;top:4.1cqw;left:0.49cqw;right:0.49cqw;bottom:0.49cqw;" +
-    "display:flex;flex-wrap:wrap;align-content:flex-start;gap:0.98cqw;padding:0.49cqw}" +
+    "display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-start;gap:0.98cqw;padding:0.49cqw}" +
 
     // Preview buttons
     ".sp-btn{width:19cqw;height:12.7cqw;border-radius:0.78cqw;padding:1.37cqw;" +
@@ -105,7 +105,7 @@
 
     // Button list
     ".sp-list{list-style:none;margin:0;padding:0}" +
-    ".sp-list-item{display:flex;align-items:center;padding:10px 12px;" +
+    ".sp-list-item{display:flex;align-items:center;flex-wrap:wrap;padding:10px 12px;" +
     "background:#1e1e1e;border-radius:6px;margin-bottom:6px;cursor:pointer;" +
     "border:1px solid #2a2a2a;transition:all .15s}" +
     ".sp-list-item:hover{border-color:#444}" +
@@ -122,10 +122,12 @@
     ".sp-drop-before{border-top:2px solid #03a9f4 !important}" +
     ".sp-drop-after{border-bottom:2px solid #03a9f4 !important}" +
 
-    // Settings panel
+    // Inline settings (expanded inside selected list item)
+    ".sp-list-expand{width:100%;padding-top:12px;cursor:default}" +
+
+    // Settings page panels
     ".sp-panel{background:#1e1e1e;border-radius:8px;padding:16px;margin-top:12px;" +
     "border:1px solid #2a2a2a}" +
-    ".sp-panel-title{font-size:14px;font-weight:500;margin-bottom:12px}" +
 
     // Form fields
     ".sp-field{margin-bottom:12px}" +
@@ -286,6 +288,11 @@
       .replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
+  function isExpandFocused() {
+    var ae = document.activeElement;
+    return ae && ae.closest && ae.closest(".sp-list-expand");
+  }
+
   // ── Init ─────────────────────────────────────────────────────────────
 
   function init() {
@@ -396,12 +403,6 @@
     list.className = "sp-list";
     config.appendChild(list);
     els.buttonList = list;
-
-    var panel = document.createElement("div");
-    panel.className = "sp-panel";
-    panel.style.display = "none";
-    config.appendChild(panel);
-    els.settingsPanel = panel;
 
     page.appendChild(config);
     page.appendChild(buildApplyBar());
@@ -707,10 +708,10 @@
       var b = state.buttons[slot - 1];
       var iconName = resolveIcon(slot);
       var name = btnDisplayName(slot);
+      var isSelected = state.selectedSlot === slot;
 
       var item = document.createElement("li");
-      item.className = "sp-list-item" +
-        (state.selectedSlot === slot ? " sp-list-selected" : "");
+      item.className = "sp-list-item" + (isSelected ? " sp-list-selected" : "");
       item.dataset.pos = pos;
       item.draggable = true;
       item.innerHTML =
@@ -722,13 +723,89 @@
         "</div>";
 
       item.addEventListener("click", function (e) {
-        if (e.target.closest(".sp-list-handle")) return;
-        selectButton(slot);
+        if (e.target.closest(".sp-list-handle") || e.target.closest(".sp-list-expand")) return;
+        selectButton(state.selectedSlot === slot ? -1 : slot);
       });
+
+      if (isSelected) {
+        var expand = document.createElement("div");
+        expand.className = "sp-list-expand";
+        expand.innerHTML =
+          '<div class="sp-field">' +
+          '<label class="sp-field-label">Entity ID</label>' +
+          '<input class="sp-input" id="sp-inp-entity" type="text" ' +
+          'placeholder="e.g. light.kitchen" value="' + escAttr(b.entity) + '">' +
+          "</div>" +
+          '<div class="sp-field">' +
+          '<label class="sp-field-label">Label</label>' +
+          '<input class="sp-input" id="sp-inp-label" type="text" ' +
+          'placeholder="Optional custom label" value="' + escAttr(b.label) + '">' +
+          "</div>" +
+          '<div class="sp-field">' +
+          '<label class="sp-field-label">Icon</label>' +
+          '<select class="sp-select" id="sp-inp-icon">' +
+          ICON_OPTIONS.map(function (opt) {
+            return '<option value="' + opt + '"' + (opt === b.icon ? " selected" : "") + ">" + opt + "</option>";
+          }).join("") +
+          "</select></div>" +
+          '<div class="sp-btn-row">' +
+          '<button class="sp-action-btn sp-delete-btn">Delete Button</button></div>';
+
+        expand.querySelector("#sp-inp-entity").addEventListener("blur", function () {
+          state.buttons[slot - 1].entity = this.value;
+          postText("button_" + slot + "_entity", this.value);
+          renderPreview();
+          updateListItemHeader(item, slot);
+        });
+        expand.querySelector("#sp-inp-entity").addEventListener("keydown", function (e) {
+          if (e.key === "Enter") this.blur();
+        });
+        expand.querySelector("#sp-inp-label").addEventListener("blur", function () {
+          state.buttons[slot - 1].label = this.value;
+          postText("button_" + slot + "_label", this.value);
+          renderPreview();
+          updateListItemHeader(item, slot);
+        });
+        expand.querySelector("#sp-inp-label").addEventListener("keydown", function (e) {
+          if (e.key === "Enter") this.blur();
+        });
+        expand.querySelector("#sp-inp-icon").addEventListener("change", function () {
+          state.buttons[slot - 1].icon = this.value;
+          postSelect("button_" + slot + "_icon", this.value);
+          renderPreview();
+          updateListItemHeader(item, slot);
+        });
+        expand.querySelector(".sp-delete-btn").addEventListener("click", function () {
+          deleteButton(slot);
+        });
+
+        item.appendChild(expand);
+      }
 
       setupDrag(item, pos);
       list.appendChild(item);
     });
+  }
+
+  function updateListItemHeader(item, slot) {
+    var iconEl = item.querySelector(".sp-list-icon");
+    var nameEl = item.querySelector(".sp-list-name");
+    var entityEl = item.querySelector(".sp-list-entity");
+    var b = state.buttons[slot - 1];
+    var iconName = resolveIcon(slot);
+
+    iconEl.className = "sp-list-icon mdi mdi-" + iconName;
+    nameEl.textContent = btnDisplayName(slot);
+    if (b.entity) {
+      if (!entityEl) {
+        entityEl = document.createElement("div");
+        entityEl.className = "sp-list-entity";
+        item.querySelector(".sp-list-info").appendChild(entityEl);
+      }
+      entityEl.textContent = b.entity;
+    } else if (entityEl) {
+      entityEl.remove();
+    }
   }
 
   // ── Drag and drop ───────────────────────────────────────────────────
@@ -785,60 +862,6 @@
     state.selectedSlot = slot;
     renderPreview();
     renderButtonList();
-    renderSettingsPanel();
-  }
-
-  function renderSettingsPanel() {
-    var panel = els.settingsPanel;
-    var slot = state.selectedSlot;
-
-    if (slot < 1 || state.order.indexOf(slot) === -1) {
-      panel.style.display = "none";
-      return;
-    }
-
-    var b = state.buttons[slot - 1];
-    panel.style.display = "block";
-    panel.innerHTML =
-      '<div class="sp-panel-title">Button ' + slot + " Settings</div>" +
-      '<div class="sp-field">' +
-      '<label class="sp-field-label">Entity ID</label>' +
-      '<input class="sp-input" id="sp-inp-entity" type="text" ' +
-      'placeholder="e.g. light.kitchen" value="' + escAttr(b.entity) + '">' +
-      "</div>" +
-      '<div class="sp-field">' +
-      '<label class="sp-field-label">Label</label>' +
-      '<input class="sp-input" id="sp-inp-label" type="text" ' +
-      'placeholder="Optional custom label" value="' + escAttr(b.label) + '">' +
-      "</div>" +
-      '<div class="sp-field">' +
-      '<label class="sp-field-label">Icon</label>' +
-      '<select class="sp-select" id="sp-inp-icon">' +
-      ICON_OPTIONS.map(function (opt) {
-        return '<option value="' + opt + '"' + (opt === b.icon ? " selected" : "") + ">" + opt + "</option>";
-      }).join("") +
-      "</select></div>" +
-      '<div class="sp-btn-row">' +
-      '<button class="sp-action-btn sp-delete-btn">Delete Button</button></div>';
-
-    panel.querySelector("#sp-inp-entity").addEventListener("blur", function () {
-      postText("button_" + slot + "_entity", this.value);
-    });
-    panel.querySelector("#sp-inp-entity").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") this.blur();
-    });
-    panel.querySelector("#sp-inp-label").addEventListener("blur", function () {
-      postText("button_" + slot + "_label", this.value);
-    });
-    panel.querySelector("#sp-inp-label").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") this.blur();
-    });
-    panel.querySelector("#sp-inp-icon").addEventListener("change", function () {
-      postSelect("button_" + slot + "_icon", this.value);
-    });
-    panel.querySelector(".sp-delete-btn").addEventListener("click", function () {
-      deleteButton(slot);
-    });
   }
 
   // ── Add / Delete buttons ────────────────────────────────────────────
@@ -861,7 +884,6 @@
     if (state.selectedSlot === slot) state.selectedSlot = -1;
     renderPreview();
     renderButtonList();
-    renderSettingsPanel();
     postText("button_order", state.order.join(","));
     postText("button_" + slot + "_entity", "");
     postText("button_" + slot + "_label", "");
@@ -897,7 +919,6 @@
         renderButtonList();
         if (state.selectedSlot > 0 && state.order.indexOf(state.selectedSlot) === -1)
           state.selectedSlot = -1;
-        renderSettingsPanel();
         return;
       }
 
@@ -923,9 +944,10 @@
         if (slot >= 1 && slot <= NUM_SLOTS) {
           state.buttons[slot - 1][field] = val;
           renderPreview();
-          renderButtonList();
-          if (state.selectedSlot === slot) {
+          if (state.selectedSlot === slot && isExpandFocused()) {
             syncInput(document.getElementById(field === "entity" ? "sp-inp-entity" : "sp-inp-label"), val);
+          } else {
+            renderButtonList();
           }
           scheduleMigration();
         }
@@ -939,9 +961,10 @@
         if (slot >= 1 && slot <= NUM_SLOTS) {
           state.buttons[slot - 1].icon = val;
           renderPreview();
-          renderButtonList();
-          if (state.selectedSlot === slot) {
+          if (state.selectedSlot === slot && isExpandFocused()) {
             syncInput(document.getElementById("sp-inp-icon"), val);
+          } else {
+            renderButtonList();
           }
         }
         return;
