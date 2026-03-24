@@ -54,6 +54,8 @@ api:
 
 # Enable logging
 logger:
+  logs:
+    light: WARN
 
 # HTTP request client (for firmware updates)
 http_request:

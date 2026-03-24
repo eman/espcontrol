@@ -453,6 +453,11 @@
     updateClock();
     setInterval(updateClock, 30000);
 
+    document.addEventListener("click", hideContextMenu);
+    document.addEventListener("scroll", hideContextMenu, true);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") hideContextMenu();
+    });
   }
 
   // ── Build UI ─────────────────────────────────────────────────────────
@@ -894,6 +899,9 @@
         if (didDrag) { didDrag = false; return; }
         selectButton(state.selectedSlot === slot ? -1 : slot);
       });
+      btn.addEventListener("contextmenu", function (e) {
+        showContextMenu(e, slot);
+      });
       setupPreviewDrag(btn, idx);
       main.appendChild(btn);
     });
@@ -1301,6 +1309,36 @@
     state.order = state.order.concat(slot);
     postText("button_order", state.order.join(","));
     selectButton(slot);
+  }
+
+  function duplicateButton(srcSlot) {
+    var used = {};
+    state.order.forEach(function (s) { used[s] = true; });
+    var newSlot = -1;
+    for (var i = 1; i <= NUM_SLOTS; i++) {
+      if (!used[i]) { newSlot = i; break; }
+    }
+    if (newSlot < 0) return;
+
+    var src = state.buttons[srcSlot - 1];
+    state.buttons[newSlot - 1] = {
+      entity: src.entity,
+      label: src.label,
+      icon: src.icon,
+      sensor: src.sensor,
+    };
+
+    var srcIdx = state.order.indexOf(srcSlot);
+    var newOrder = state.order.slice();
+    newOrder.splice(srcIdx + 1, 0, newSlot);
+    state.order = newOrder;
+
+    postText("button_order", state.order.join(","));
+    postText("button_" + newSlot + "_entity", src.entity);
+    postText("button_" + newSlot + "_label", src.label);
+    postText("button_" + newSlot + "_sensor", src.sensor);
+    postSelect("button_" + newSlot + "_icon", src.icon || "Auto");
+    selectButton(newSlot);
   }
 
   function deleteButton(slot) {
