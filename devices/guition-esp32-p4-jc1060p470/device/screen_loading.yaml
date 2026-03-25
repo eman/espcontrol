@@ -1,10 +1,9 @@
 # =============================================================================
 # SCREEN: LOADING
 # =============================================================================
-# Boot screen with progress bar. Must be the first page included in
-# package.yaml so LVGL shows it at startup. on_boot advances the bar and
-# status text; after a grace period, if WiFi is not connected, switches to
-# wifi_setup_page.
+# Boot screen. Must be the first page included in package.yaml so LVGL
+# shows it at startup. on_boot updates status text; after a grace period,
+# if WiFi is not connected, switches to wifi_setup_page.
 # =============================================================================
 
 globals:
@@ -46,19 +45,6 @@ lvgl:
                   text_color: 0x888888
                   width: 550
                   text_align: center
-              - bar:
-                  id: loading_progress_bar
-                  width: 75
-                  height: 4
-                  bg_color: 0x333333
-                  bg_opa: 100%
-                  radius: 3
-                  min_value: 0
-                  max_value: 100
-                  value: 0
-                  indicator:
-                    bg_color: 0xFFFFFF
-                    radius: 3
 
 esphome:
   on_boot:
@@ -67,7 +53,6 @@ esphome:
         - lambda: |-
             lv_obj_add_flag(id(temperatures), LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(id(display_time), LV_OBJ_FLAG_HIDDEN);
-            lv_bar_set_value(id(loading_progress_bar), 25, LV_ANIM_OFF);
         - delay: 100ms
         - light.turn_on:
             id: display_backlight
@@ -76,7 +61,6 @@ esphome:
     - priority: -100
       then:
         - lambda: |-
-            lv_bar_set_value(id(loading_progress_bar), 50, LV_ANIM_OFF);
             lv_label_set_text(id(loading_status_label), "Connecting to WiFi");
         - lambda: |-
             std::string name = App.get_name();
