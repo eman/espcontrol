@@ -41,9 +41,10 @@ Adjust the look and behaviour of your panel.
 
 ### Brightness
 
+- **Timezone** — select your timezone so the panel can calculate sunrise and sunset for your location. Sunrise and sunset times are calculated on-device — no internet or Home Assistant dependency.
 - **Daytime brightness** — how bright the screen should be during the day (10%–100%).
 - **Nighttime brightness** — how bright the screen should be at night (10%–100%).
-- **Sunrise / Sunset** — shown for reference so you know when the brightness will change.
+- **Sunrise / Sunset** — shown for reference so you know when the brightness will change. Updates automatically each day based on your timezone.
 
 ### Screensaver
 
