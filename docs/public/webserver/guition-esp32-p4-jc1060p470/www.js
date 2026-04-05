@@ -1250,18 +1250,6 @@
     var panel = document.createElement("div");
     panel.className = "sp-panel";
 
-    var ef = document.createElement("div");
-    ef.className = "sp-field";
-    ef.appendChild(fieldLabel("Entity ID"));
-    var entityInp = textInput("sp-inp-entity", b.entity, "e.g. light.kitchen");
-    ef.appendChild(entityInp);
-    panel.appendChild(ef);
-
-    bindTextPost(entityInp, "Button " + slot + " Entity", {
-      onBlur: function (v) { state.buttons[slot - 1].entity = v; },
-      rerender: true,
-    });
-
     var lf = document.createElement("div");
     lf.className = "sp-field";
     lf.appendChild(fieldLabel("Label"));
@@ -1271,6 +1259,18 @@
 
     bindTextPost(labelInp, "Button " + slot + " Label", {
       onBlur: function (v) { state.buttons[slot - 1].label = v; },
+      rerender: true,
+    });
+
+    var ef = document.createElement("div");
+    ef.className = "sp-field";
+    ef.appendChild(fieldLabel("Entity ID"));
+    var entityInp = textInput("sp-inp-entity", b.entity, "e.g. light.kitchen");
+    ef.appendChild(entityInp);
+    panel.appendChild(ef);
+
+    bindTextPost(entityInp, "Button " + slot + " Entity", {
+      onBlur: function (v) { state.buttons[slot - 1].entity = v; },
       rerender: true,
     });
 
@@ -1467,7 +1467,7 @@
     function openPicker() {
       buildOptions("");
       picker.classList.add("sp-open");
-      input.select();
+      input.value = "";
     }
 
     function closePicker() {
