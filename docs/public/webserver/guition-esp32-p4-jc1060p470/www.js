@@ -1470,7 +1470,7 @@
         buildOptions("");
       } else {
         buildOptions(currentIcon);
-        input.select();
+        setTimeout(function () { input.select(); }, 0);
       }
       picker.classList.add("sp-open");
     }
