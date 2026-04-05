@@ -267,7 +267,7 @@
     "overflow-x:auto;overflow-y:hidden}" +
 
     // Preview buttons
-    ".sp-btn{width:22cqw;height:12.5cqw;border-radius:0.78cqw;padding:1.37cqw;" +
+    ".sp-btn{width:20.02cqw;height:12.7cqw;border-radius:0.78cqw;padding:1.37cqw;" +
     "display:flex;flex-direction:column;justify-content:space-between;" +
     "cursor:pointer;transition:all .2s;box-sizing:border-box;border:2px solid transparent;" +
     "position:relative}" +
