@@ -83,17 +83,6 @@ esphome:
               if (v >= 1 && v <= NUM_SLOTS) order.push_back(v);
             }
 
-            // --- Panel color warmth correction (compensates for cool cast) ---
-            float warmth = id(color_warmth).state;
-            auto warm_color = [warmth](uint32_t hex) -> uint32_t {
-              float r_gain = 1.0f + (warmth / 100.0f) * 0.12f;
-              float b_gain = 1.0f - (warmth / 100.0f) * 0.30f;
-              int r = std::min(255, static_cast<int>(((hex >> 16) & 0xFF) * r_gain));
-              int g = static_cast<int>(((hex >> 8) & 0xFF));
-              int b = std::min(255, static_cast<int>((hex & 0xFF) * b_gain));
-              return (r << 16) | (g << 8) | b;
-            };
-
             // --- Universal button colors ---
             std::string on_hex = id(button_on_color).state;
             std::string off_hex = id(button_off_color).state;
@@ -325,13 +314,13 @@ esphome:
               lv_obj_clear_flag(s.btn, LV_OBJ_FLAG_HIDDEN);
               lv_obj_move_to_index(s.btn, pos++);
 
-              // Apply colors (warmed to compensate for panel cool cast)
+              // Apply colors
               if (has_on) {
-                lv_obj_set_style_bg_color(s.btn, lv_color_hex(warm_color(on_val)),
+                lv_obj_set_style_bg_color(s.btn, lv_color_hex(on_val),
                   static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_CHECKED));
               }
               if (has_off) {
-                lv_obj_set_style_bg_color(s.btn, lv_color_hex(warm_color(off_val)),
+                lv_obj_set_style_bg_color(s.btn, lv_color_hex(off_val),
                   static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_DEFAULT));
               }
 
@@ -527,66 +516,3 @@ esphome:
                 })
               );
             }
-
-            // --- Apply warmth to top-bar label text colors ---
-            lv_color_t warm_text = lv_color_hex(warm_color(0xFFFFFF));
-            lv_obj_set_style_text_color(id(temperatures), warm_text,
-              static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_DEFAULT));
-            lv_obj_set_style_text_color(id(display_time), warm_text,
-              static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_DEFAULT));
-
-# ---------------------------------------------------------------------------
-# Color Warmth control (runtime adjustment for panel cool-cast compensation)
-# ---------------------------------------------------------------------------
-number:
-  - platform: template
-    name: "Color Warmth"
-    id: color_warmth
-    optimistic: true
-    restore_value: true
-    initial_value: 50
-    min_value: 0
-    max_value: 100
-    step: 5
-    unit_of_measurement: "%"
-    icon: "mdi:thermometer"
-    entity_category: config
-    web_server:
-      sorting_group_id: sg_display
-    set_action:
-      - lambda: |-
-          auto wc = [](uint32_t hex, float w) -> uint32_t {
-            float r_gain = 1.0f + (w / 100.0f) * 0.12f;
-            float b_gain = 1.0f - (w / 100.0f) * 0.30f;
-            int r = std::min(255, static_cast<int>(((hex >> 16) & 0xFF) * r_gain));
-            int g = static_cast<int>(((hex >> 8) & 0xFF));
-            int b = std::min(255, static_cast<int>((hex & 0xFF) * b_gain));
-            return (r << 16) | (g << 8) | b;
-          };
-
-          std::string on_hex = id(button_on_color).state;
-          std::string off_hex = id(button_off_color).state;
-          uint32_t on_val = 0, off_val = 0;
-          bool has_on = on_hex.length() == 6;
-          bool has_off = off_hex.length() == 6;
-          if (has_on) on_val = strtoul(on_hex.c_str(), nullptr, 16);
-          if (has_off) off_val = strtoul(off_hex.c_str(), nullptr, 16);
-
-          int cnt = lv_obj_get_child_cnt(id(main_page)->obj);
-          for (int i = 0; i < cnt; i++) {
-            lv_obj_t *btn = lv_obj_get_child(id(main_page)->obj, i);
-            if (has_on) {
-              lv_obj_set_style_bg_color(btn, lv_color_hex(wc(on_val, x)),
-                static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_CHECKED));
-            }
-            if (has_off) {
-              lv_obj_set_style_bg_color(btn, lv_color_hex(wc(off_val, x)),
-                static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_DEFAULT));
-            }
-          }
-
-          lv_color_t warm_text = lv_color_hex(wc(0xFFFFFF, x));
-          lv_obj_set_style_text_color(id(temperatures), warm_text,
-            static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_DEFAULT));
-          lv_obj_set_style_text_color(id(display_time), warm_text,
-            static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_DEFAULT));
