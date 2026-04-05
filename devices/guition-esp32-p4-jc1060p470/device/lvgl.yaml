@@ -40,6 +40,7 @@ lvgl:
   # ---------------------------------------------------------------------------
   pages:
     - id: main_page
+      scrollbar_mode: "off"
       layout:
         type: flex
         flex_flow: column_wrap
