@@ -1917,6 +1917,9 @@
           showBanner("Invalid config file \u2014 missing required fields", "error");
           return;
         }
+        if (data.device && data.device !== DEVICE_ID) {
+          showBanner("Config was exported from a different panel (" + data.device + ") \u2014 layout may look different", "warning");
+        }
         var importedCount = data.buttons.length;
         if (importedCount !== NUM_SLOTS) {
           showBanner("Backup has " + importedCount + " slots, current config has " + NUM_SLOTS + " \u2014 adapting", "warning");

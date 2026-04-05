@@ -8,6 +8,7 @@
 // Custom UI: three-page layout (Screen / Settings / Logs)
 (function () {
   var NUM_SLOTS = 30;
+  var DEVICE_ID = "guition-esp32-p4-jc4880p443";
 
   var ICON_MAP = {
     Auto: "cog",
@@ -1854,6 +1855,7 @@
   function exportConfig() {
     var data = {
       version: 1,
+      device: DEVICE_ID,
       exported_at: new Date().toISOString(),
       button_order: state.order.join(","),
       button_on_color: state.onColor,
@@ -1914,6 +1916,9 @@
         if (!data.version || !Array.isArray(data.buttons)) {
           showBanner("Invalid config file \u2014 missing required fields", "error");
           return;
+        }
+        if (data.device && data.device !== DEVICE_ID) {
+          showBanner("Config was exported from a different panel (" + data.device + ") \u2014 layout may look different", "warning");
         }
         var importedCount = data.buttons.length;
         if (importedCount !== NUM_SLOTS) {
