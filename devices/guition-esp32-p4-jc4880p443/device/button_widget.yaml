@@ -48,11 +48,13 @@ button:
               id: button_${num}_unit_label
               text: ""
               pad_bottom: 6
-    # Entity name label (bottom of button)
+    # Entity name label (bottom of button, wraps to two lines)
     - label:
         align: bottom_left
         id: button_${num}_text_label
         text: "Configure"
+        long_mode: wrap
+        width: 100%
   # Toggle the bound HA entity on press
   on_short_click:
     - if:
