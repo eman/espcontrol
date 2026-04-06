@@ -35,6 +35,14 @@ description:
 - **4-inch square panel (4848S040):** [AliExpress](https://s.click.aliexpress.com/e/_c3sIhvBv) (~£16)
 - **Desk stand for 7-inch** (3D printable): [MakerWorld](https://makerworld.com/en/models/2387421-guition-esp32p4-jc1060p470-7inch-screen-desk-mount#profileId-2614995)
 
+## Support This Project
+
+If you find this project useful, consider buying me a coffee to support ongoing development!
+
+<a href="https://www.buymeacoffee.com/jtenniswood">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50" />
+</a>
+
 ## Next steps
 
 - [Install](/install) — what you need, how to flash, and first-time setup

@@ -28,6 +28,18 @@ export default defineConfig({
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:locale', content: 'en_US' }],
     ['meta', { property: 'og:site_name', content: 'Espcontrol' }],
+    ['script', {
+      'data-name': 'BMC-Widget',
+      'data-cfasync': 'false',
+      src: 'https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js',
+      'data-id': 'jtenniswood',
+      'data-description': 'Support me on Buy me a coffee!',
+      'data-message': '',
+      'data-color': '#FFDD00',
+      'data-position': 'Right',
+      'data-x_margin': '18',
+      'data-y_margin': '18',
+    }],
     [
       'script',
       { type: 'application/ld+json' },

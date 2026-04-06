@@ -34,6 +34,14 @@ Turn a 7-inch touchscreen into a control panel for your smart home. Espcontrol i
 - **Panel:** [AliExpress](https://s.click.aliexpress.com/e/_c335W0r5) (~£40)
 - **Desk stand** (3D printable): [MakerWorld](https://makerworld.com/en/models/2387421-guition-esp32p4-jc1060p470-7inch-screen-desk-mount#profileId-2614995)
 
+## Support This Project
+
+If you find this project useful, consider buying me a coffee to support ongoing development!
+
+<a href="https://www.buymeacoffee.com/jtenniswood">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50" />
+</a>
+
 ## Links
 
 - [Documentation](https://jtenniswood.github.io/espcontrol/)
