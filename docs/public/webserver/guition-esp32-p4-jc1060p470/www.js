@@ -550,7 +550,17 @@
         if (dbl) state.sizes[n] = 2;
       }
     }
+    applySpans(grid);
     return grid;
+  }
+
+  function applySpans(grid) {
+    for (var i = 0; i < NUM_SLOTS; i++) {
+      if (grid[i] > 0 && state.sizes[grid[i]] === 2) {
+        var below = i + GRID_COLS;
+        if (below < NUM_SLOTS) grid[below] = -1;
+      }
+    }
   }
 
   function serializeGrid(grid) {
@@ -560,7 +570,7 @@
     }
     if (last < 0) return "";
     return grid.slice(0, last + 1).map(function (slot) {
-      if (slot === 0) return "";
+      if (slot <= 0) return "";
       return slot + (state.sizes[slot] === 2 ? "d" : "");
     }).join(",");
   }
@@ -1229,6 +1239,8 @@
     for (var pos = 0; pos < NUM_SLOTS; pos++) {
       var slot = state.grid[pos];
 
+      if (slot === -1) continue;
+
       if (slot > 0) {
         var b = state.buttons[slot - 1];
         var iconName = resolveIcon(slot);
@@ -1627,9 +1639,17 @@
     return row * GRID_COLS + col;
   }
 
+  function clearSpans(grid) {
+    for (var i = 0; i < NUM_SLOTS; i++) {
+      if (grid[i] === -1) grid[i] = 0;
+    }
+  }
+
   function moveToCell(fromPos, toPos) {
+    if (state.grid[toPos] === -1) return;
     var grid = state.grid.slice();
     var movingSlot = grid[fromPos];
+    clearSpans(grid);
     grid[fromPos] = 0;
     if (grid[toPos] > 0) {
       var displaced = grid[toPos];
@@ -1640,6 +1660,7 @@
       }
     }
     grid[toPos] = movingSlot;
+    applySpans(grid);
     state.grid = grid;
   }
 
@@ -1762,7 +1783,22 @@
       dblItem.addEventListener("mousedown", function (ev) {
         ev.preventDefault();
         hideContextMenu();
-        if (state.sizes[slot] === 2) { delete state.sizes[slot]; } else { state.sizes[slot] = 2; }
+        var slotPos = state.grid.indexOf(slot);
+        var belowPos = slotPos + GRID_COLS;
+        if (state.sizes[slot] === 2) {
+          delete state.sizes[slot];
+          if (belowPos < NUM_SLOTS && state.grid[belowPos] === -1) state.grid[belowPos] = 0;
+        } else {
+          if (belowPos >= NUM_SLOTS) return;
+          if (state.grid[belowPos] > 0) {
+            var displaced = state.grid[belowPos];
+            state.grid[belowPos] = 0;
+            var freeCell = firstFreeCell(belowPos + 1);
+            if (freeCell >= 0) state.grid[freeCell] = displaced;
+          }
+          state.sizes[slot] = 2;
+          state.grid[belowPos] = -1;
+        }
         renderPreview();
         renderButtonSettings();
         postText("Button Order", serializeGrid(state.grid));
@@ -1863,6 +1899,10 @@
     var newPos = firstFreeCell(srcPos + 1);
     if (newPos < 0) return;
     state.grid[newPos] = newSlot;
+    if (state.sizes[newSlot] === 2) {
+      var belowNew = newPos + GRID_COLS;
+      if (belowNew < NUM_SLOTS && state.grid[belowNew] === 0) state.grid[belowNew] = -1;
+    }
 
     postText("Button Order", serializeGrid(state.grid));
     postText("Button " + newSlot + " Entity", src.entity);
@@ -1876,7 +1916,13 @@
 
   function deleteButton(slot) {
     for (var i = 0; i < NUM_SLOTS; i++) {
-      if (state.grid[i] === slot) { state.grid[i] = 0; break; }
+      if (state.grid[i] === slot) {
+        state.grid[i] = 0;
+        if (state.sizes[slot] === 2 && i + GRID_COLS < NUM_SLOTS && state.grid[i + GRID_COLS] === -1) {
+          state.grid[i + GRID_COLS] = 0;
+        }
+        break;
+      }
     }
     delete state.sizes[slot];
     var pos = state.selectedSlots.indexOf(slot);
@@ -1894,7 +1940,12 @@
 
   function deleteButtons(slots) {
     for (var i = 0; i < NUM_SLOTS; i++) {
-      if (slots.indexOf(state.grid[i]) !== -1) state.grid[i] = 0;
+      if (slots.indexOf(state.grid[i]) !== -1) {
+        if (state.sizes[state.grid[i]] === 2 && i + GRID_COLS < NUM_SLOTS && state.grid[i + GRID_COLS] === -1) {
+          state.grid[i + GRID_COLS] = 0;
+        }
+        state.grid[i] = 0;
+      }
     }
     slots.forEach(function (slot) { delete state.sizes[slot]; });
     state.selectedSlots = [];
