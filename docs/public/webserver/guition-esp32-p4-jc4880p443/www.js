@@ -1519,6 +1519,8 @@
     backBtn.innerHTML =
       '<span class="sp-btn-icon mdi mdi-arrow-left"></span>' +
       '<span class="sp-btn-label">Back</span>';
+    backBtn.style.cursor = "pointer";
+    backBtn.addEventListener("click", exitSubpage);
     main.appendChild(backBtn);
 
     // Subpage buttons
