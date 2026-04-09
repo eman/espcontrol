@@ -57,6 +57,7 @@ ota:
     on_end:
       then:
         - lambda: |-
+            #include "esp_sleep.h"
             esp_sleep_enable_timer_wakeup(100000);
             esp_deep_sleep_start();
   - platform: http_request

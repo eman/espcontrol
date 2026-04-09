@@ -61,17 +61,25 @@ esphome:
     - priority: -100
       then:
         - lambda: |-
-            lv_label_set_text(id(loading_status_label), "Connecting to WiFi");
-        - lambda: |-
             std::string name = App.get_name();
             std::string wifi_text = "Connect to the WiFi hotspot\n'" + name + "'\nto configure your network";
             lv_label_set_text(id(wifi_setup_instructions), wifi_text.c_str());
-        - delay: 15s
-        - lambda: 'id(boot_grace_period) = false;'
         - if:
             condition:
-              not:
-                wifi.connected:
+              lambda: 'return wifi::global_wifi_component->has_sta();'
             then:
+              - lambda: |-
+                  lv_label_set_text(id(loading_status_label), "Connecting to WiFi");
+              - delay: 15s
+              - lambda: 'id(boot_grace_period) = false;'
+              - if:
+                  condition:
+                    not:
+                      wifi.connected:
+                  then:
+                    - lvgl.page.show: wifi_setup_page
+                    - script.execute: setup_screen_dim
+            else:
+              - lambda: 'id(boot_grace_period) = false;'
               - lvgl.page.show: wifi_setup_page
               - script.execute: setup_screen_dim
