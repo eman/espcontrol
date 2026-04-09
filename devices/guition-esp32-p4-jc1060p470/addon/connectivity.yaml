@@ -54,8 +54,6 @@ api:
         then:
           - script.stop: setup_screen_dim
           - lvgl.page.show: ha_actions_page
-          - delay: 8s
-          - script.execute: navigate_after_api
 
 script:
   - id: navigate_after_api
