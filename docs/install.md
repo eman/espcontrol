@@ -32,9 +32,7 @@ Connect the display to your computer with the USB-C cable, then click the button
 
 **4-inch square (4848S040):**
 
-::: info Coming soon
-Web install for the 4848S040 is not yet available. Use the [ESPHome Manual Setup](/esphome-manual-setup) guide to flash this device.
-:::
+<EspInstallButton slug="guition-esp32-s3-4848s040" />
 
 ::: tip Which cable?
 If the install button doesn't detect your device, try a different USB-C cable. Charge-only cables (often thinner and cheaper) won't work — you need one that supports data transfer.
