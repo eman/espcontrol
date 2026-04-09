@@ -41,7 +41,7 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   platformio_options:
-    build_flags:
+    build_src_flags:
       - "-include esp_sleep.h"
   on_boot:
     - priority: 800
