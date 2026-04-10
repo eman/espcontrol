@@ -1,10 +1,10 @@
 ---
-title: Backlight Schedule
+title: Backlight
 description:
   How the Espcontrol panel automatically adjusts screen brightness during the day and night based on sunrise and sunset.
 ---
 
-# Backlight Schedule
+# Backlight
 
 Your panel can automatically adjust its screen brightness based on the time of day — brighter during daylight hours and dimmer at night. This is especially useful for panels in bedrooms or hallways where a bright screen at night would be distracting.
 
