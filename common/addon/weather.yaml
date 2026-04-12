@@ -183,7 +183,6 @@ script:
                 snprintf(buf, sizeof(buf), "%.1f", val);
               }
               if (i < sensors.size() && sensors[i]) lv_label_set_text(sensors[i], buf);
-              if (i < texts.size() && texts[i]) lv_label_set_text(texts[i], id(weather_label).c_str());
             }
           }
 

@@ -47,6 +47,7 @@ packages:
   network:         !include ../../common/addon/network.yaml
   fw_update:       !include ../../common/addon/firmware_update.yaml
   weather:         !include ../../common/addon/weather.yaml
+
   # ---------------------------------------------------------------------------
   # Screens (loading must be first page for LVGL startup)
   # ---------------------------------------------------------------------------

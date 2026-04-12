@@ -74,7 +74,7 @@ registerButtonType("weather", {
     return {
       iconHtml:
         '<span class="sp-sensor-preview">' +
-          '<span class="sp-sensor-value">--</span>' +
+          '<span class="sp-sensor-value">0</span>' +
           '<span class="sp-sensor-unit">' + unit + '</span>' +
         '</span>',
       labelHtml:
