@@ -369,8 +369,6 @@ esphome:
               if (has_on) {
                 lv_obj_set_style_bg_color(s.btn, lv_color_hex(on_val),
                   static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_CHECKED));
-                lv_obj_set_style_bg_color(s.btn, lv_color_hex(on_val),
-                  static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_PRESSED));
               }
               if (has_off) {
                 lv_obj_set_style_bg_color(s.btn, lv_color_hex(off_val),
@@ -451,7 +449,7 @@ esphome:
                   static lv_style_transition_dsc_t push_trans;
                   static bool push_trans_inited = false;
                   if (!push_trans_inited) {
-                    lv_style_transition_dsc_init(&push_trans, push_props, lv_anim_path_ease_out, 1000, 0, NULL);
+                    lv_style_transition_dsc_init(&push_trans, push_props, lv_anim_path_ease_out, 400, 0, NULL);
                     push_trans_inited = true;
                   }
                   lv_obj_set_style_transition(s.btn, &push_trans, static_cast<lv_style_selector_t>(LV_PART_MAIN) | LV_STATE_DEFAULT);
@@ -1027,12 +1025,8 @@ esphome:
                 lv_obj_set_style_shadow_width(sb_btn, 0, LV_PART_MAIN);
                 if (has_off) lv_obj_set_style_bg_color(sb_btn, lv_color_hex(off_val),
                   static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_DEFAULT));
-                if (has_on) {
-                  lv_obj_set_style_bg_color(sb_btn, lv_color_hex(on_val),
-                    static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_CHECKED));
-                  lv_obj_set_style_bg_color(sb_btn, lv_color_hex(on_val),
-                    static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_PRESSED));
-                }
+                if (has_on) lv_obj_set_style_bg_color(sb_btn, lv_color_hex(on_val),
+                  static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_CHECKED));
                 lv_obj_set_grid_cell(sb_btn, LV_GRID_ALIGN_STRETCH, col, 1, LV_GRID_ALIGN_STRETCH, row, rs);
 
                 lv_obj_t *sil = lv_label_create(sb_btn);
