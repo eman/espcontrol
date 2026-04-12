@@ -154,21 +154,10 @@
       b.icon = "Radar"; b.icon_on = "Auto";
     },
     renderSettings: function (panel, b, slot, helpers) {
-      var lf = document.createElement("div");
-      lf.className = "sp-field";
-      lf.appendChild(helpers.fieldLabel("Latitude", helpers.idPrefix + "lat"));
-      var latInp = helpers.textInput(helpers.idPrefix + "lat", b.lat || "", "e.g. 40.71");
-      lf.appendChild(latInp);
-      panel.appendChild(lf);
-      helpers.bindField(latInp, "lat", true);
-
-      var lnf = document.createElement("div");
-      lnf.className = "sp-field";
-      lnf.appendChild(helpers.fieldLabel("Longitude", helpers.idPrefix + "lon"));
-      var lonInp = helpers.textInput(helpers.idPrefix + "lon", b.lon || "", "e.g. -74.01");
-      lnf.appendChild(lonInp);
-      panel.appendChild(lnf);
-      helpers.bindField(lonInp, "lon", true);
+      var hint = document.createElement("div");
+      hint.className = "sp-field-hint";
+      hint.textContent = "Uses the location from Settings \u203A Weather.";
+      panel.appendChild(hint);
 
       var zf = document.createElement("div");
       zf.className = "sp-field";
@@ -181,14 +170,10 @@
     },
     renderPreview: function (b, helpers) {
       var label = b.label || "Radar";
-      var lat = b.lat || "";
-      var lon = b.lon || "";
       var zoom = b.zoom || "6";
       return {
         iconHtml:
-          '<div class="sp-radar-tile" data-lat="' + helpers.escHtml(lat) +
-          '" data-lon="' + helpers.escHtml(lon) +
-          '" data-zoom="' + helpers.escHtml(zoom) + '">' +
+          '<div class="sp-radar-tile" data-zoom="' + helpers.escHtml(zoom) + '">' +
             '<span class="sp-radar-placeholder mdi mdi-radar"></span>' +
           '</div>',
         labelHtml:
@@ -294,6 +279,52 @@
       b.icon_on = "Auto";
     },
     renderSettings: function (panel, b, slot, helpers) {
+      var feeds = [
+        ["condition", "Condition"],
+        ["temperature", "Temperature"],
+        ["feels_like", "Feels Like"],
+        ["humidity", "Humidity"],
+        ["wind", "Wind Speed"],
+        ["precip", "Precipitation"],
+        ["cloud", "Cloud Cover"],
+      ];
+      var ff = document.createElement("div");
+      ff.className = "sp-field";
+      ff.appendChild(helpers.fieldLabel("Data Feed", helpers.idPrefix + "sensor"));
+      var feedSelect = document.createElement("select");
+      feedSelect.className = "sp-select";
+      feedSelect.id = helpers.idPrefix + "sensor";
+      feeds.forEach(function (f) {
+        var opt = document.createElement("option");
+        opt.value = f[0];
+        opt.textContent = f[1];
+        if ((b.sensor || "condition") === f[0]) opt.selected = true;
+        feedSelect.appendChild(opt);
+      });
+      var unitDefaults = {
+        condition: "", temperature: "\u00B0C", feels_like: "\u00B0C",
+        humidity: "%", wind: "km/h", precip: "mm", cloud: "%",
+      };
+      feedSelect.addEventListener("change", function () {
+        b.sensor = this.value;
+        b.unit = unitDefaults[this.value] || "";
+        helpers.saveField("sensor", this.value);
+        var unitInput = document.getElementById(helpers.idPrefix + "unit");
+        if (unitInput) unitInput.value = b.unit;
+        renderPreview();
+      });
+      ff.appendChild(feedSelect);
+      panel.appendChild(ff);
+
+      var uf = document.createElement("div");
+      uf.className = "sp-field";
+      uf.appendChild(helpers.fieldLabel("Unit", helpers.idPrefix + "unit"));
+      var unitInp = helpers.textInput(helpers.idPrefix + "unit", b.unit, "e.g. \u00B0C");
+      unitInp.className = "sp-input sp-input--narrow";
+      uf.appendChild(unitInp);
+      panel.appendChild(uf);
+      helpers.bindField(unitInp, "unit", true);
+
       var hint = document.createElement("div");
       hint.className = "sp-hint";
       hint.textContent = "Set location in Settings \u2192 Weather";
@@ -301,9 +332,22 @@
     },
     renderPreview: function (b, helpers) {
       var label = b.label || "Weather";
+      var feed = b.sensor || "condition";
+      if (feed === "condition") {
+        return {
+          iconHtml: '<span class="sp-btn-icon mdi mdi-weather-partly-cloudy"></span>',
+          labelHtml: '<span class="sp-btn-label">' + helpers.escHtml(label) + '</span>',
+        };
+      }
+      var unit = b.unit ? helpers.escHtml(b.unit) : "";
       return {
-        iconHtml: '<span class="sp-btn-icon mdi mdi-weather-partly-cloudy"></span>',
-        labelHtml: '<span class="sp-btn-label">' + helpers.escHtml(label) + '</span>',
+        iconHtml:
+          '<span class="sp-sensor-preview">' +
+            '<span class="sp-sensor-value">--</span>' +
+            '<span class="sp-sensor-unit">' + unit + '</span>' +
+          '</span>',
+        labelHtml:
+          '<span class="sp-btn-label">' + helpers.escHtml(label) + '</span>',
       };
     },
   });
@@ -1864,11 +1908,14 @@
   var _radarCache = { host: "", path: "", ts: 0 };
 
   function loadRadarTiles() {
-    var tiles = els.previewMain.querySelectorAll(".sp-radar-tile[data-lat]");
+    var tiles = els.previewMain.querySelectorAll(".sp-radar-tile");
     if (!tiles.length) return;
+    var lat = state.weatherLat;
+    var lon = state.weatherLon;
+    if (!lat || !lon) return;
     var now = Date.now();
     if (_radarCache.path && now - _radarCache.ts < 5 * 60 * 1000) {
-      applyRadarImages(tiles, _radarCache.host, _radarCache.path);
+      applyRadarImages(tiles, _radarCache.host, _radarCache.path, lat, lon);
       return;
     }
     fetch("https://api.rainviewer.com/public/weather-maps.json")
@@ -1880,19 +1927,16 @@
         _radarCache.host = data.host;
         _radarCache.path = latest.path;
         _radarCache.ts = Date.now();
-        var current = els.previewMain.querySelectorAll(".sp-radar-tile[data-lat]");
-        applyRadarImages(current, data.host, latest.path);
+        var current = els.previewMain.querySelectorAll(".sp-radar-tile");
+        applyRadarImages(current, data.host, latest.path, lat, lon);
       })
       .catch(function () {});
   }
 
-  function applyRadarImages(tiles, host, path) {
+  function applyRadarImages(tiles, host, path, lat, lon) {
     for (var i = 0; i < tiles.length; i++) {
       var tile = tiles[i];
-      var lat = tile.getAttribute("data-lat");
-      var lon = tile.getAttribute("data-lon");
       var zoom = tile.getAttribute("data-zoom") || "6";
-      if (!lat || !lon) continue;
       var url = host + path + "/512/" + zoom + "/" + lat + "/" + lon + "/2/1_1.png";
       var existing = tile.querySelector(".sp-radar-img");
       if (existing) {

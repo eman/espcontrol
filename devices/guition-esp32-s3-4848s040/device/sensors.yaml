@@ -86,6 +86,7 @@ esphome:
 
             int positions[NUM_SLOTS] = {};
             bool is_double[NUM_SLOTS] = {};
+            bool is_quad[NUM_SLOTS] = {};
             std::string order_str = id(button_order).state;
             if (!order_str.empty()) {
               size_t gpos = 0, start = 0;
@@ -95,16 +96,30 @@ esphome:
                 if (comma > start) {
                   std::string token = order_str.substr(start, comma - start);
                   bool dbl = !token.empty() && token.back() == 'd';
-                  if (dbl) token.pop_back();
+                  bool qd = !token.empty() && token.back() == 'q';
+                  if (dbl || qd) token.pop_back();
                   int v = atoi(token.c_str());
-                  if (v >= 1 && v <= NUM_SLOTS) { positions[gpos] = v; is_double[v - 1] = dbl; }
+                  if (v >= 1 && v <= NUM_SLOTS) {
+                    positions[gpos] = v;
+                    if (qd) is_quad[v - 1] = true;
+                    else if (dbl) is_double[v - 1] = true;
+                  }
                 }
                 gpos++;
                 start = comma + 1;
               }
             }
             for (int p = 0; p < NUM_SLOTS; p++) {
-              if (positions[p] > 0 && is_double[positions[p] - 1] && p + COLS < NUM_SLOTS) {
+              int si = positions[p];
+              if (si < 1) continue;
+              if (is_quad[si - 1]) {
+                int col = p % COLS;
+                if (col + 1 < COLS && p + COLS < NUM_SLOTS) {
+                  positions[p + 1] = 0;
+                  positions[p + COLS] = 0;
+                  if (p + COLS + 1 < NUM_SLOTS) positions[p + COLS + 1] = 0;
+                }
+              } else if (is_double[si - 1] && p + COLS < NUM_SLOTS) {
                 positions[p + COLS] = 0;
               }
             }
@@ -340,9 +355,10 @@ esphome:
               lv_obj_clear_flag(s.btn, LV_OBJ_FLAG_HIDDEN);
               int col = p % COLS;
               int row = p / COLS;
-              int row_span = is_double[idx - 1] ? 2 : 1;
+              int row_span = (is_quad[idx - 1] || is_double[idx - 1]) ? 2 : 1;
+              int col_span = is_quad[idx - 1] ? 2 : 1;
               lv_obj_set_grid_cell(s.btn,
-                LV_GRID_ALIGN_STRETCH, col, 1,
+                LV_GRID_ALIGN_STRETCH, col, col_span,
                 LV_GRID_ALIGN_STRETCH, row, row_span);
 
               if (has_on) {
@@ -382,11 +398,26 @@ esphome:
                     static_cast<lv_style_selector_t>(LV_PART_MAIN) | static_cast<lv_style_selector_t>(LV_STATE_DEFAULT));
                 }
                 lv_obj_clear_flag(s.btn, LV_OBJ_FLAG_CLICKABLE);
-                lv_label_set_text(s.icon_lbl, "\U000F0599");
+                std::string feed_key = cfg_field(cfg, 4);
                 std::string custom_label = cfg_field(cfg, 1);
                 lv_label_set_text(s.text_lbl, custom_label.empty() ? "Weather" : custom_label.c_str());
-                id(weather_icon_lbl_ptrs).push_back(s.icon_lbl);
+                if (feed_key.empty() || feed_key == "condition") {
+                  lv_label_set_text(s.icon_lbl, "\U000F0599");
+                  id(weather_icon_lbl_ptrs).push_back(s.icon_lbl);
+                  id(weather_sensor_lbl_ptrs).push_back(nullptr);
+                } else {
+                  lv_obj_add_flag(s.icon_lbl, LV_OBJ_FLAG_HIDDEN);
+                  lv_obj_clear_flag(s.sensor_container, LV_OBJ_FLAG_HIDDEN);
+                  lv_label_set_text(s.sensor_lbl, "--");
+                  std::string unit_str = cfg_field(cfg, 5);
+                  if (!unit_str.empty()) {
+                    lv_label_set_text(s.unit_lbl, unit_str.c_str());
+                  }
+                  id(weather_icon_lbl_ptrs).push_back(nullptr);
+                  id(weather_sensor_lbl_ptrs).push_back(s.sensor_lbl);
+                }
                 id(weather_text_lbl_ptrs).push_back(s.text_lbl);
+                id(weather_feed_keys).push_back(feed_key.empty() ? "condition" : feed_key);
                 continue;
               }
 
@@ -730,7 +761,7 @@ esphome:
                 if (comma == std::string::npos) comma = order_str.length();
                 if (comma > start) {
                   std::string token = order_str.substr(start, comma - start);
-                  if (!token.empty() && token.back() == 'd') token.pop_back();
+                  if (!token.empty() && (token.back() == 'd' || token.back() == 'q')) token.pop_back();
                   int v = atoi(token.c_str());
                   if (v >= 1 && v <= NUM_SLOTS) positions[gpos] = v;
                 }

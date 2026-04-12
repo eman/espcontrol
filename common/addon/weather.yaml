@@ -3,9 +3,10 @@
 # =============================================================================
 # Fetches current weather from the Open-Meteo API every 15 minutes using the
 # latitude/longitude stored in weather config entities. Parses the WMO weather
-# code and maps it to an MDI icon name and condition label. Device-specific
-# sensors.yaml registers weather card widgets during Phase 1 boot via the
-# weather_register_card() helper; this addon's interval updates them.
+# code and maps it to an MDI icon name and condition label. Also stores all
+# numeric feed values (temperature, humidity, wind, etc.) so each weather card
+# can display a user-selected data feed. Device-specific sensors.yaml registers
+# weather card widgets during Phase 1 boot; this addon's interval updates them.
 # =============================================================================
 
 json:
@@ -23,10 +24,35 @@ globals:
   - id: weather_url
     type: std::string
     initial_value: '""'
+  - id: weather_temperature
+    type: float
+    initial_value: 'NAN'
+  - id: weather_feels_like
+    type: float
+    initial_value: 'NAN'
+  - id: weather_humidity
+    type: float
+    initial_value: 'NAN'
+  - id: weather_wind
+    type: float
+    initial_value: 'NAN'
+  - id: weather_precip
+    type: float
+    initial_value: 'NAN'
+  - id: weather_cloud
+    type: float
+    initial_value: 'NAN'
+  - id: weather_is_day
+    type: int
+    initial_value: '1'
   - id: weather_icon_lbl_ptrs
     type: std::vector<lv_obj_t*>
   - id: weather_text_lbl_ptrs
     type: std::vector<lv_obj_t*>
+  - id: weather_sensor_lbl_ptrs
+    type: std::vector<lv_obj_t*>
+  - id: weather_feed_keys
+    type: std::vector<std::string>
 
 script:
   - id: weather_fetch
@@ -40,11 +66,11 @@ script:
             - lambda: |-
                 id(weather_url) = "https://api.open-meteo.com/v1/forecast?latitude=" +
                   id(weather_latitude).state + "&longitude=" + id(weather_longitude).state +
-                  "&current=weather_code,temperature_2m&timezone=auto";
+                  "&current=weather_code,temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,cloud_cover,is_day&timezone=auto";
             - http_request.get:
                 url: !lambda 'return id(weather_url);'
                 capture_response: true
-                max_response_buffer_size: 1024
+                max_response_buffer_size: 2048
                 on_response:
                   then:
                     - lambda: |-
@@ -61,6 +87,14 @@ script:
                           int code = current["weather_code"] | -1;
                           if (code < 0) return false;
                           id(weather_wmo_code) = code;
+
+                          id(weather_temperature) = current["temperature_2m"] | NAN;
+                          id(weather_feels_like) = current["apparent_temperature"] | NAN;
+                          id(weather_humidity) = current["relative_humidity_2m"] | NAN;
+                          id(weather_wind) = current["wind_speed_10m"] | NAN;
+                          id(weather_precip) = current["precipitation"] | NAN;
+                          id(weather_cloud) = current["cloud_cover"] | NAN;
+                          id(weather_is_day) = current["is_day"] | 1;
 
                           const char* label = "Unknown";
                           const char* icon = "Weather Sunny";
@@ -86,7 +120,7 @@ script:
                           }
                           id(weather_label) = label;
                           id(weather_icon_name) = icon;
-                          ESP_LOGI("weather", "WMO %d -> %s (%s)", code, label, icon);
+                          ESP_LOGI("weather", "WMO %d -> %s (%.1f°C)", code, label, id(weather_temperature));
                           return true;
                         });
                     - script.execute: weather_update_cards
@@ -121,10 +155,35 @@ script:
 
           auto &icons = id(weather_icon_lbl_ptrs);
           auto &texts = id(weather_text_lbl_ptrs);
-          for (size_t i = 0; i < icons.size(); i++) {
-            lv_label_set_text(icons[i], glyph);
-            if (i < texts.size()) {
-              lv_label_set_text(texts[i], id(weather_label).c_str());
+          auto &sensors = id(weather_sensor_lbl_ptrs);
+          auto &feeds = id(weather_feed_keys);
+
+          for (size_t i = 0; i < feeds.size(); i++) {
+            const std::string &key = feeds[i];
+            if (key.empty() || key == "condition") {
+              if (i < icons.size() && icons[i]) lv_label_set_text(icons[i], glyph);
+              if (i < texts.size() && texts[i]) lv_label_set_text(texts[i], id(weather_label).c_str());
+            } else {
+              float val = NAN;
+              if (key == "temperature")   val = id(weather_temperature);
+              else if (key == "feels_like") val = id(weather_feels_like);
+              else if (key == "humidity")  val = id(weather_humidity);
+              else if (key == "wind")     val = id(weather_wind);
+              else if (key == "precip")   val = id(weather_precip);
+              else if (key == "cloud")    val = id(weather_cloud);
+
+              char buf[16];
+              if (std::isnan(val)) {
+                strcpy(buf, "--");
+              } else if (key == "humidity" || key == "cloud") {
+                snprintf(buf, sizeof(buf), "%.0f", val);
+              } else if (key == "precip") {
+                snprintf(buf, sizeof(buf), "%.1f", val);
+              } else {
+                snprintf(buf, sizeof(buf), "%.1f", val);
+              }
+              if (i < sensors.size() && sensors[i]) lv_label_set_text(sensors[i], buf);
+              if (i < texts.size() && texts[i]) lv_label_set_text(texts[i], id(weather_label).c_str());
             }
           }
 

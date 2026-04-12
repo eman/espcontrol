@@ -1681,11 +1681,14 @@
   var _radarCache = { host: "", path: "", ts: 0 };
 
   function loadRadarTiles() {
-    var tiles = els.previewMain.querySelectorAll(".sp-radar-tile[data-lat]");
+    var tiles = els.previewMain.querySelectorAll(".sp-radar-tile");
     if (!tiles.length) return;
+    var lat = state.weatherLat;
+    var lon = state.weatherLon;
+    if (!lat || !lon) return;
     var now = Date.now();
     if (_radarCache.path && now - _radarCache.ts < 5 * 60 * 1000) {
-      applyRadarImages(tiles, _radarCache.host, _radarCache.path);
+      applyRadarImages(tiles, _radarCache.host, _radarCache.path, lat, lon);
       return;
     }
     fetch("https://api.rainviewer.com/public/weather-maps.json")
@@ -1697,19 +1700,16 @@
         _radarCache.host = data.host;
         _radarCache.path = latest.path;
         _radarCache.ts = Date.now();
-        var current = els.previewMain.querySelectorAll(".sp-radar-tile[data-lat]");
-        applyRadarImages(current, data.host, latest.path);
+        var current = els.previewMain.querySelectorAll(".sp-radar-tile");
+        applyRadarImages(current, data.host, latest.path, lat, lon);
       })
       .catch(function () {});
   }
 
-  function applyRadarImages(tiles, host, path) {
+  function applyRadarImages(tiles, host, path, lat, lon) {
     for (var i = 0; i < tiles.length; i++) {
       var tile = tiles[i];
-      var lat = tile.getAttribute("data-lat");
-      var lon = tile.getAttribute("data-lon");
       var zoom = tile.getAttribute("data-zoom") || "6";
-      if (!lat || !lon) continue;
       var url = host + path + "/512/" + zoom + "/" + lat + "/" + lon + "/2/1_1.png";
       var existing = tile.querySelector(".sp-radar-img");
       if (existing) {

@@ -7,21 +7,10 @@ registerButtonType("radar", {
     b.icon = "Radar"; b.icon_on = "Auto";
   },
   renderSettings: function (panel, b, slot, helpers) {
-    var lf = document.createElement("div");
-    lf.className = "sp-field";
-    lf.appendChild(helpers.fieldLabel("Latitude", helpers.idPrefix + "lat"));
-    var latInp = helpers.textInput(helpers.idPrefix + "lat", b.lat || "", "e.g. 40.71");
-    lf.appendChild(latInp);
-    panel.appendChild(lf);
-    helpers.bindField(latInp, "lat", true);
-
-    var lnf = document.createElement("div");
-    lnf.className = "sp-field";
-    lnf.appendChild(helpers.fieldLabel("Longitude", helpers.idPrefix + "lon"));
-    var lonInp = helpers.textInput(helpers.idPrefix + "lon", b.lon || "", "e.g. -74.01");
-    lnf.appendChild(lonInp);
-    panel.appendChild(lnf);
-    helpers.bindField(lonInp, "lon", true);
+    var hint = document.createElement("div");
+    hint.className = "sp-field-hint";
+    hint.textContent = "Uses the location from Settings \u203A Weather.";
+    panel.appendChild(hint);
 
     var zf = document.createElement("div");
     zf.className = "sp-field";
@@ -34,14 +23,10 @@ registerButtonType("radar", {
   },
   renderPreview: function (b, helpers) {
     var label = b.label || "Radar";
-    var lat = b.lat || "";
-    var lon = b.lon || "";
     var zoom = b.zoom || "6";
     return {
       iconHtml:
-        '<div class="sp-radar-tile" data-lat="' + helpers.escHtml(lat) +
-        '" data-lon="' + helpers.escHtml(lon) +
-        '" data-zoom="' + helpers.escHtml(zoom) + '">' +
+        '<div class="sp-radar-tile" data-zoom="' + helpers.escHtml(zoom) + '">' +
           '<span class="sp-radar-placeholder mdi mdi-radar"></span>' +
         '</div>',
       labelHtml:
