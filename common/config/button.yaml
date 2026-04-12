@@ -44,7 +44,7 @@ text:
     id: sensor_card_color
     optimistic: true
     restore_value: true
-    initial_value: "313131"
+    initial_value: "212121"
     min_length: 6
     max_length: 6
     mode: text

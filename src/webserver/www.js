@@ -398,7 +398,7 @@
     buttons: [],
     onColor: "FF8C00",
     offColor: "313131",
-    sensorColor: "313131",
+    sensorColor: "212121",
     selectedSlots: [],
     lastClickedSlot: -1,
     activeTab: "screen",
@@ -999,7 +999,7 @@
     els.setOffColor = offColor;
 
     appearBody.appendChild(fieldLabel("Tertiary"));
-    var sensorColor = colorField("sp-set-sensor-color", "313131", function (hex) {
+    var sensorColor = colorField("sp-set-sensor-color", "212121", function (hex) {
       postText("Sensor Card Color", hex);
     });
     appearBody.appendChild(sensorColor);
@@ -2690,7 +2690,7 @@
 
         postText("Button On Color", data.button_on_color || "FF8C00");
         postText("Button Off Color", data.button_off_color || "313131");
-        postText("Sensor Card Color", data.sensor_card_color || "313131");
+        postText("Sensor Card Color", data.sensor_card_color || "212121");
 
         var empty = { entity: "", label: "", icon: "Auto", icon_on: "Auto", sensor: "", unit: "", type: "" };
         var buttons, orderStr, spKeyMap;
@@ -2802,7 +2802,7 @@
         state.grid = parseOrder(orderStr);
         state.onColor = data.button_on_color || "FF8C00";
         state.offColor = data.button_off_color || "313131";
-        state.sensorColor = data.sensor_card_color || "313131";
+        state.sensorColor = data.sensor_card_color || "212121";
 
         if (els.setOnColor && els.setOnColor._syncColor) els.setOnColor._syncColor(state.onColor);
         if (els.setOffColor && els.setOffColor._syncColor) els.setOffColor._syncColor(state.offColor);
