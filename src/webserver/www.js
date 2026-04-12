@@ -393,8 +393,11 @@
     "justify-content:space-between;box-sizing:border-box;border:2px solid transparent;" +
     "position:relative;background:#222;opacity:.6;overflow:hidden;min-width:0}" +
     ".sp-back-btn .sp-btn-icon{font-size:var(--back-icon);line-height:1;color:#fff}" +
-    ".sp-back-btn .sp-btn-label{font-size:var(--back-label);line-height:1.2;color:#fff}" +
+    ".sp-back-btn .sp-btn-label{font-size:var(--back-label);line-height:1.2;color:#fff;" +
+    "display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:var(--back-lines);" +
+    "overflow:hidden;word-break:break-word;min-height:0}" +
     ".sp-back-btn.sp-btn-double{grid-row:span 2}" +
+    ".sp-back-btn.sp-btn-double .sp-btn-label{-webkit-line-clamp:var(--back-lines-dbl)}" +
 
     ".sp-btn-label-row{display:flex;align-items:baseline;width:100%;overflow:hidden}" +
     ".sp-btn-label-row .sp-btn-label{flex:1;min-width:0}" +
@@ -841,6 +844,8 @@
     r.setProperty("--btn-pad", CFG.btn.padding + "cqw");
     r.setProperty("--btn-icon", CFG.btn.iconSize + "cqw");
     r.setProperty("--btn-label", CFG.btn.labelSize + "cqw");
+    r.setProperty("--btn-lines", String(CFG.btn.labelLines || 1));
+    r.setProperty("--btn-lines-dbl", String(CFG.btn.labelLinesDouble || CFG.btn.labelLines || 1));
     r.setProperty("--sensor-top", CFG.sensorBadge.top + "cqw");
     r.setProperty("--sensor-right", CFG.sensorBadge.right + "cqw");
     r.setProperty("--sensor-fs", CFG.sensorBadge.fontSize + "cqw");
@@ -849,6 +854,8 @@
     r.setProperty("--back-pad", CFG.backBtn.padding + "cqw");
     r.setProperty("--back-icon", CFG.backBtn.iconSize + "cqw");
     r.setProperty("--back-label", CFG.backBtn.labelSize + "cqw");
+    r.setProperty("--back-lines", String(CFG.backBtn.labelLines || 1));
+    r.setProperty("--back-lines-dbl", String(CFG.backBtn.labelLinesDouble || CFG.backBtn.labelLines || 1));
     r.setProperty("--subpage-bottom", CFG.subpageBadge.bottom + "cqw");
     r.setProperty("--subpage-right", CFG.subpageBadge.right + "cqw");
     r.setProperty("--subpage-fs", CFG.subpageBadge.fontSize + "cqw");

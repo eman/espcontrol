@@ -9,7 +9,7 @@
 (function () {
   // __DEVICE_CONFIG_START__
   var DEVICE_ID = "guition-esp32-p4-jc4880p443";
-  var CFG = {"slots":15,"cols":3,"rows":5,"dragMode":"displace","dragAnimation":true,"screen":{"width":"66%","aspect":"480/800"},"topbar":{"height":7.5,"padding":"0.83cqw","fontSize":3.75},"grid":{"top":7.5,"left":1.04,"right":1.04,"bottom":0.83,"gap":2.08,"fr":"1fr"},"btn":{"radius":1.67,"padding":2.92,"iconSize":9.58,"labelSize":3.96},"emptyCell":{"radius":1.67},"sensorBadge":{"top":2.08,"right":2.08,"fontSize":3.33},"subpageBadge":{"bottom":2.08,"right":2.08,"fontSize":4},"backBtn":{"radius":1.67,"padding":2.92,"iconSize":9.58,"labelSize":3.96}};
+  var CFG = {"slots":15,"cols":3,"rows":5,"dragMode":"displace","dragAnimation":true,"screen":{"width":"66%","aspect":"480/800"},"topbar":{"height":7.5,"padding":"0.83cqw","fontSize":3.75},"grid":{"top":7.5,"left":1.04,"right":1.04,"bottom":0.83,"gap":2.08,"fr":"1fr"},"btn":{"radius":1.67,"padding":2.92,"iconSize":9.58,"labelSize":3.96,"labelLines":2,"labelLinesDouble":3},"emptyCell":{"radius":1.67},"sensorBadge":{"top":2.08,"right":2.08,"fontSize":3.33},"subpageBadge":{"bottom":2.08,"right":2.08,"fontSize":4},"backBtn":{"radius":1.67,"padding":2.92,"iconSize":9.58,"labelSize":3.96,"labelLines":2,"labelLinesDouble":3}};
   // __DEVICE_CONFIG_END__
   var NUM_SLOTS = CFG.slots;
   var GRID_COLS = CFG.cols;
@@ -259,9 +259,12 @@
     ".sp-btn.sp-selected{border-color:var(--accent)}" +
     ".sp-btn-icon{font-size:var(--btn-icon);line-height:1;color:#fff}" +
     ".sp-btn-label{font-size:var(--btn-label);line-height:1.2;color:#fff;" +
-    "white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+    "display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:var(--btn-lines);" +
+    "overflow:hidden;word-break:break-word;min-height:0}" +
     ".sp-sensor-badge{position:absolute;top:var(--sensor-top);right:var(--sensor-right);font-size:var(--sensor-fs);opacity:.5}" +
     ".sp-btn-double{grid-row:span 2}" +
+    ".sp-btn-double .sp-btn-label{-webkit-line-clamp:var(--btn-lines-dbl)}" +
+    ".sp-btn-double .sp-btn-label-row .sp-btn-label{-webkit-line-clamp:var(--btn-lines-dbl)}" +
     ".sp-empty-cell{border:2px dashed rgba(255,255,255,.15);background:transparent;" +
     "border-radius:var(--empty-r);display:flex;align-items:center;justify-content:center;" +
     "cursor:pointer;transition:border-color .2s}" +
@@ -460,8 +463,11 @@
     "justify-content:space-between;box-sizing:border-box;border:2px solid transparent;" +
     "position:relative;background:#222;opacity:.6;overflow:hidden;min-width:0}" +
     ".sp-back-btn .sp-btn-icon{font-size:var(--back-icon);line-height:1;color:#fff}" +
-    ".sp-back-btn .sp-btn-label{font-size:var(--back-label);line-height:1.2;color:#fff}" +
+    ".sp-back-btn .sp-btn-label{font-size:var(--back-label);line-height:1.2;color:#fff;" +
+    "display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:var(--back-lines);" +
+    "overflow:hidden;word-break:break-word;min-height:0}" +
     ".sp-back-btn.sp-btn-double{grid-row:span 2}" +
+    ".sp-back-btn.sp-btn-double .sp-btn-label{-webkit-line-clamp:var(--back-lines-dbl)}" +
 
     ".sp-btn-label-row{display:flex;align-items:baseline;width:100%;overflow:hidden}" +
     ".sp-btn-label-row .sp-btn-label{flex:1;min-width:0}" +
@@ -908,6 +914,8 @@
     r.setProperty("--btn-pad", CFG.btn.padding + "cqw");
     r.setProperty("--btn-icon", CFG.btn.iconSize + "cqw");
     r.setProperty("--btn-label", CFG.btn.labelSize + "cqw");
+    r.setProperty("--btn-lines", String(CFG.btn.labelLines || 1));
+    r.setProperty("--btn-lines-dbl", String(CFG.btn.labelLinesDouble || CFG.btn.labelLines || 1));
     r.setProperty("--sensor-top", CFG.sensorBadge.top + "cqw");
     r.setProperty("--sensor-right", CFG.sensorBadge.right + "cqw");
     r.setProperty("--sensor-fs", CFG.sensorBadge.fontSize + "cqw");
@@ -916,6 +924,8 @@
     r.setProperty("--back-pad", CFG.backBtn.padding + "cqw");
     r.setProperty("--back-icon", CFG.backBtn.iconSize + "cqw");
     r.setProperty("--back-label", CFG.backBtn.labelSize + "cqw");
+    r.setProperty("--back-lines", String(CFG.backBtn.labelLines || 1));
+    r.setProperty("--back-lines-dbl", String(CFG.backBtn.labelLinesDouble || CFG.backBtn.labelLines || 1));
     r.setProperty("--subpage-bottom", CFG.subpageBadge.bottom + "cqw");
     r.setProperty("--subpage-right", CFG.subpageBadge.right + "cqw");
     r.setProperty("--subpage-fs", CFG.subpageBadge.fontSize + "cqw");
