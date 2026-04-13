@@ -382,7 +382,9 @@
     ".sp-settings-overlay.sp-visible{display:flex}" +
     ".sp-settings-modal{position:relative;background:var(--bg);border:1px solid var(--border);" +
     "border-radius:var(--radius);width:90%;max-width:420px;max-height:80vh;" +
-    "overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.6);margin:24px}" +
+    "overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.6);margin:40px}" +
+    "@media(max-width:600px){.sp-settings-modal{width:100%;max-width:none;max-height:none;" +
+    "height:100%;margin:0;border-radius:0;border:none}}" +
     ".sp-settings-close{position:absolute;top:8px;right:12px;background:none;border:none;" +
     "color:var(--text2);font-size:1.4rem;cursor:pointer;z-index:1;line-height:1;padding:4px}" +
     ".sp-settings-close:hover{color:var(--text)}" +
