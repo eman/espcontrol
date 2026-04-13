@@ -95,6 +95,12 @@ button:
               lv_obj_clear_state(id(button_${num}), LV_STATE_CHECKED);
             else
               lv_obj_add_state(id(button_${num}), LV_STATE_CHECKED);
+            lv_obj_add_state(id(button_${num}), LV_STATE_USER_1);
+            lv_obj_t *guard_btn = id(button_${num});
+            lv_timer_create([](lv_timer_t *t) {
+              lv_obj_clear_state((lv_obj_t *)lv_timer_get_user_data(t), LV_STATE_USER_1);
+              lv_timer_delete(t);
+            }, 3000, guard_btn);
             api::HomeassistantActionRequest req;
             req.service = decltype(req.service)("homeassistant.toggle");
             req.is_event = false;

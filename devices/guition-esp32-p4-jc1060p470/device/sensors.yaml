@@ -851,6 +851,12 @@ esphome:
                 std::function<void(const std::string &)>([btn_ptr, icon_lbl, sensor_ctr, slot_has_sensor, slot_has_icon_on, slot_icon_off, slot_icon_on](const std::string &state) {
                   bool is_on = state == "on" || state == "open" || state == "playing" ||
                                state == "home" || state == "unlocked";
+                  if (lv_obj_has_state(btn_ptr, LV_STATE_USER_1)) {
+                    if (is_on == lv_obj_has_state(btn_ptr, LV_STATE_CHECKED))
+                      lv_obj_clear_state(btn_ptr, LV_STATE_USER_1);
+                    else
+                      return;
+                  }
                   if (is_on) {
                     lv_obj_add_state(btn_ptr, LV_STATE_CHECKED);
                   } else {
@@ -1094,6 +1100,12 @@ esphome:
                     std::function<void(const std::string &)>([bp, oc, pb](const std::string &state) {
                       bool on = state == "on" || state == "open" || state == "playing" ||
                                 state == "home" || state == "unlocked";
+                      if (lv_obj_has_state(bp, LV_STATE_USER_1)) {
+                        if (on == lv_obj_has_state(bp, LV_STATE_CHECKED))
+                          lv_obj_clear_state(bp, LV_STATE_USER_1);
+                        else
+                          return;
+                      }
                       bool was_on = lv_obj_has_state(bp, LV_STATE_CHECKED);
                       if (on) lv_obj_add_state(bp, LV_STATE_CHECKED);
                       else lv_obj_clear_state(bp, LV_STATE_CHECKED);
@@ -1115,6 +1127,11 @@ esphome:
                         lv_obj_clear_state(btn, LV_STATE_CHECKED);
                       else
                         lv_obj_add_state(btn, LV_STATE_CHECKED);
+                      lv_obj_add_state(btn, LV_STATE_USER_1);
+                      lv_timer_create([](lv_timer_t *t) {
+                        lv_obj_clear_state((lv_obj_t *)lv_timer_get_user_data(t), LV_STATE_USER_1);
+                        lv_timer_delete(t);
+                      }, 3000, btn);
                       api::HomeassistantActionRequest req;
                       req.service = decltype(req.service)("homeassistant.toggle");
                       req.is_event = false;
