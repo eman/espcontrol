@@ -12,9 +12,9 @@ substitutions:
   screen_width: "1024"
   screen_height: "600"
   content_width: "550"
-  icon_font: icon_font_lg
-  label_font: label_font_lg
-  unit_font: label_font_lg
+  icon_font: icon_font
+  label_font: label_font_lt
+  unit_font: label_font_lt
   padding: 16px
   radius: 10px
 
