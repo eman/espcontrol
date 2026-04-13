@@ -386,7 +386,7 @@
     ".sp-settings-overlay.sp-visible{display:flex}" +
     ".sp-settings-modal{position:relative;background:var(--bg);border:1px solid var(--border);" +
     "border-radius:var(--radius);width:90%;max-width:420px;max-height:80vh;" +
-    "overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.6)}" +
+    "overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.6);margin:24px}" +
     ".sp-settings-close{position:absolute;top:8px;right:12px;background:none;border:none;" +
     "color:var(--text2);font-size:1.4rem;cursor:pointer;z-index:1;line-height:1;padding:4px}" +
     ".sp-settings-close:hover{color:var(--text)}" +
@@ -394,7 +394,7 @@
     ".sp-section-title{font-size:.8rem;font-weight:600;color:var(--text2);" +
     "margin:var(--gap) 0 8px;text-transform:uppercase;letter-spacing:.5px}" +
     ".sp-settings-modal .sp-section-title{font-size:1.1rem;color:var(--text);" +
-    "margin:0 0 12px;letter-spacing:.3px}" +
+    "margin:0 0 20px;letter-spacing:.3px;text-transform:none}" +
     ".sp-settings-modal .sp-panel{background:none;border:none;padding:0;margin:0}" +
 
     ".card{background:var(--surface);border:1px solid var(--border);" +
@@ -455,7 +455,7 @@
     ".sp-delete-btn{background:var(--danger);color:#fff}" +
     ".sp-save-btn{background:var(--accent);color:#fff}" +
     ".sp-save-btn:hover{background:var(--accent-hover)}" +
-    ".sp-btn-row--save{margin-top:24px}" +
+    ".sp-btn-row--save{margin-top:24px;justify-content:flex-end}" +
 
     ".sp-toggle-row{display:flex;align-items:center;justify-content:space-between;" +
     "min-height:36px;margin-bottom:14px}" +
@@ -1866,7 +1866,7 @@
 
     var title = document.createElement("div");
     title.className = "sp-section-title";
-    title.textContent = c.isSub ? "Subpage Button Settings" : "Button Settings";
+    title.textContent = c.isSub ? "Subpage button settings" : "Button settings";
     container.appendChild(title);
 
     var panel = document.createElement("div");
