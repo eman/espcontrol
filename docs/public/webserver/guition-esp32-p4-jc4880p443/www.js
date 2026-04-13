@@ -1385,7 +1385,22 @@
     ssBody.appendChild(sensorPanel);
     els.setPresence = presInp;
 
-    ssBody.appendChild(fieldLabel("Home Screen Return"));
+    function setSsMode(mode) {
+      ssMode = mode;
+      timerBtn.className = mode === "timer" ? "active" : "";
+      sensorBtn.className = mode === "sensor" ? "active" : "";
+      timerPanel.style.display = mode === "timer" ? "" : "none";
+      sensorPanel.style.display = mode === "sensor" ? "" : "none";
+    }
+    timerBtn.addEventListener("click", function () { setSsMode("timer"); });
+    sensorBtn.addEventListener("click", function () { setSsMode("sensor"); });
+    els.setSsMode = setSsMode;
+    setSsMode(ssMode);
+
+    config.appendChild(makeCollapsibleCard("Screensaver", ssBody, true));
+
+    var idleBody = document.createElement("div");
+    idleBody.appendChild(fieldLabel("Return to home after"));
     var hsSelect = document.createElement("select");
     hsSelect.className = "sp-select";
     hsSelect.id = "sp-set-hs-timeout";
@@ -1393,6 +1408,7 @@
       { label: "Disabled", value: 0 },
       { label: "15 seconds", value: 15 },
       { label: "30 seconds", value: 30 },
+      { label: "45 seconds", value: 45 },
       { label: "1 minute", value: 60 },
       { label: "2 minutes", value: 120 },
       { label: "5 minutes", value: 300 },
@@ -1407,22 +1423,9 @@
     hsSelect.addEventListener("change", function () {
       postNumber("Home Screen Timeout", this.value);
     });
-    ssBody.appendChild(hsSelect);
+    idleBody.appendChild(hsSelect);
     els.setHSTimeout = hsSelect;
-
-    function setSsMode(mode) {
-      ssMode = mode;
-      timerBtn.className = mode === "timer" ? "active" : "";
-      sensorBtn.className = mode === "sensor" ? "active" : "";
-      timerPanel.style.display = mode === "timer" ? "" : "none";
-      sensorPanel.style.display = mode === "sensor" ? "" : "none";
-    }
-    timerBtn.addEventListener("click", function () { setSsMode("timer"); });
-    sensorBtn.addEventListener("click", function () { setSsMode("sensor"); });
-    els.setSsMode = setSsMode;
-    setSsMode(ssMode);
-
-    config.appendChild(makeCollapsibleCard("Screensaver", ssBody, true));
+    config.appendChild(makeCollapsibleCard("Idle", idleBody, true));
 
     var backupBody = document.createElement("div");
 
