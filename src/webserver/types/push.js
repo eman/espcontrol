@@ -23,7 +23,7 @@ registerButtonType("push", {
       iconHtml: '<span class="sp-btn-icon mdi mdi-' + iconName + '"></span>',
       labelHtml:
         '<span class="sp-btn-label-row"><span class="sp-btn-label">' + helpers.escHtml(label) + '</span>' +
-        '<span class="sp-subpage-badge mdi mdi-gesture-tap"></span></span>',
+        '<span class="sp-type-badge mdi mdi-gesture-tap"></span></span>',
     };
   },
 });

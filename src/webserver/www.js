@@ -432,7 +432,9 @@
     ".sp-btn-label-row .sp-btn-label{flex:1;min-width:0}" +
     ".sp-subpage-badge{font-size:var(--btn-label);line-height:1.2;opacity:.5;flex-shrink:0;" +
     "cursor:pointer;padding:2px 0 2px 4px;border-radius:4px;transition:opacity .15s}" +
-    ".sp-subpage-badge:hover{opacity:1}";
+    ".sp-subpage-badge:hover{opacity:1}" +
+    ".sp-type-badge{font-size:var(--btn-label);line-height:1.2;opacity:.35;flex-shrink:0;" +
+    "padding:2px 0 2px 4px;pointer-events:none}";
 
   // ── State ──────────────────────────────────────────────────────────────
 

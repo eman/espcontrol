@@ -150,7 +150,7 @@
         iconHtml: '<span class="sp-btn-icon mdi mdi-' + iconName + '"></span>',
         labelHtml:
           '<span class="sp-btn-label-row"><span class="sp-btn-label">' + helpers.escHtml(label) + '</span>' +
-          '<span class="sp-subpage-badge mdi mdi-gesture-tap"></span></span>',
+          '<span class="sp-type-badge mdi mdi-gesture-tap"></span></span>',
       };
     },
   });
@@ -193,7 +193,7 @@
           '</span>',
         labelHtml:
           '<span class="sp-btn-label-row"><span class="sp-btn-label">' + helpers.escHtml(label) + '</span>' +
-          '<span class="sp-subpage-badge mdi mdi-gauge"></span></span>',
+          '<span class="sp-type-badge mdi mdi-gauge"></span></span>',
       };
     },
   });
@@ -313,7 +313,7 @@
           '</span></span>',
         labelHtml:
           '<span class="sp-btn-label-row"><span class="sp-btn-label">' + helpers.escHtml(label) + '</span>' +
-          '<span class="sp-subpage-badge mdi mdi-tune-vertical-variant"></span></span>',
+          '<span class="sp-type-badge mdi mdi-tune-vertical-variant"></span></span>',
       };
     },
   });
@@ -435,7 +435,7 @@
       return {
         labelHtml:
           '<span class="sp-btn-label-row"><span class="sp-btn-label">' + helpers.escHtml(label) + '</span>' +
-          '<span class="sp-subpage-badge mdi mdi-toggle-switch-variant-off"></span></span>',
+          '<span class="sp-type-badge mdi mdi-toggle-switch-variant-off"></span></span>',
       };
     },
   });
@@ -747,7 +747,9 @@
     ".sp-btn-label-row .sp-btn-label{flex:1;min-width:0}" +
     ".sp-subpage-badge{font-size:var(--btn-label);line-height:1.2;opacity:.5;flex-shrink:0;" +
     "cursor:pointer;padding:2px 0 2px 4px;border-radius:4px;transition:opacity .15s}" +
-    ".sp-subpage-badge:hover{opacity:1}";
+    ".sp-subpage-badge:hover{opacity:1}" +
+    ".sp-type-badge{font-size:var(--btn-label);line-height:1.2;opacity:.35;flex-shrink:0;" +
+    "padding:2px 0 2px 4px;pointer-events:none}";
 
   // ── State ──────────────────────────────────────────────────────────────
 
