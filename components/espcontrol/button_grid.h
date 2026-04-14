@@ -280,6 +280,7 @@ inline lv_obj_t *setup_slider_widget(lv_obj_t *btn, uint32_t on_color, bool hori
 
   lv_obj_set_style_pad_all(btn, 0,
     static_cast<lv_style_selector_t>(LV_PART_MAIN));
+  lv_obj_clear_flag(btn, LV_OBJ_FLAG_CLICKABLE);
 
   lv_obj_t *slider = lv_slider_create(btn);
   lv_slider_set_range(slider, 0, 100);
