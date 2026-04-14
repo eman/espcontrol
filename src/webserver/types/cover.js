@@ -1,7 +1,7 @@
-registerButtonType("slider", {
-  label: "Slider",
+registerButtonType("cover", {
+  label: "Cover",
   allowInSubpage: true,
-  labelPlaceholder: "e.g. Living Room",
+  labelPlaceholder: "e.g. Office Blind",
   onSelect: function (b) {
     b.sensor = ""; b.unit = ""; b.icon_on = "Auto";
     b.icon = "Auto";
@@ -10,7 +10,7 @@ registerButtonType("slider", {
     var ef = document.createElement("div");
     ef.className = "sp-field";
     ef.appendChild(helpers.fieldLabel("Entity ID", helpers.idPrefix + "entity"));
-    var entityInp = helpers.textInput(helpers.idPrefix + "entity", b.entity, "e.g. light.living_room");
+    var entityInp = helpers.textInput(helpers.idPrefix + "entity", b.entity, "e.g. cover.office_blind");
     ef.appendChild(entityInp);
     panel.appendChild(ef);
     helpers.bindField(entityInp, "entity", true);
@@ -102,8 +102,8 @@ registerButtonType("slider", {
     });
   },
   renderPreview: function (b, helpers) {
-    var label = b.label || b.entity || "Slider";
-    var iconName = b.icon && b.icon !== "Auto" ? iconSlug(b.icon) : "lightbulb";
+    var label = b.label || b.entity || "Cover";
+    var iconName = b.icon && b.icon !== "Auto" ? iconSlug(b.icon) : "blinds-horizontal";
     var horizClass = b.sensor === "h" ? " sp-slider-horiz" : "";
     return {
       iconHtml:
@@ -113,7 +113,7 @@ registerButtonType("slider", {
         '</span></span>',
       labelHtml:
         '<span class="sp-btn-label-row"><span class="sp-btn-label">' + helpers.escHtml(label) + '</span>' +
-        '<span class="sp-type-badge mdi mdi-tune-vertical-variant"></span></span>',
+        '<span class="sp-type-badge mdi mdi-blinds-horizontal"></span></span>',
     };
   },
 });

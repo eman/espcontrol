@@ -84,7 +84,7 @@ esphome:
                 setup_sensor_card(s, cfg, has_sensor_color, sensor_val);
                 continue;
               }
-              if (btn_type == "slider") {
+              if (btn_type == "slider" || btn_type == "cover") {
                 setup_slider_visual(s, cfg, has_on ? on_val : 0xFF8C00);
               } else {
                 setup_toggle_visual(s, cfg);
@@ -145,7 +145,7 @@ esphome:
               std::string entity_id = cfg_field(cfg, 0);
               if (entity_id.empty()) continue;
 
-              if (btn_type == "slider") {
+              if (btn_type == "slider" || btn_type == "cover") {
                 lv_obj_t *slider = (lv_obj_t *)lv_obj_get_user_data(s.sensor_container);
                 std::string sl_icon_on_name = cfg_field(cfg, 3);
                 bool sl_has_icon_on = !sl_icon_on_name.empty() && sl_icon_on_name != "Auto";
@@ -371,7 +371,7 @@ esphome:
                     api::global_api_server->send_homeassistant_action(req);
                   }, LV_EVENT_CLICKED, lbl);
 
-                } else if (sb.type == "slider" && !sb.entity.empty()) {
+                } else if ((sb.type == "slider" || sb.type == "cover") && !sb.entity.empty()) {
                   if (!sb.label.empty()) {
                     lv_label_set_text(stl, sb.label.c_str());
                   } else {
@@ -387,6 +387,7 @@ esphome:
                   lctx->entity_id = sb.entity;
                   lctx->fill = sp_fill;
                   lctx->horizontal = sp_sl_horiz;
+                  lctx->inverted = is_cover_entity(sb.entity);
                   lctx->radius = sp_radius;
                   lv_obj_set_user_data(sl, (void *)lctx);
                   lv_obj_add_event_cb(sl, [](lv_event_t *e) {
@@ -394,7 +395,8 @@ esphome:
                     SliderCtx *c = (SliderCtx *)lv_obj_get_user_data(s);
                     if (!c) return;
                     int val = lv_slider_get_value(s);
-                    slider_update_fill(c->fill, lv_obj_get_parent(s), val, c->horizontal, c->inverted, c->radius);
+                    int fv = c->inverted ? 100 - val : val;
+                    slider_update_fill(c->fill, lv_obj_get_parent(s), fv, c->horizontal, c->inverted, c->radius);
                   }, LV_EVENT_VALUE_CHANGED, nullptr);
                   lv_obj_add_event_cb(sl, [](lv_event_t *e) {
                     lv_obj_t *s = lv_event_get_target(e);

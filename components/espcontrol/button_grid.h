@@ -372,7 +372,7 @@ inline void setup_slider_visual(BtnSlot &s, const std::string &cfg, uint32_t on_
   ctx->entity_id = cfg_field(cfg, 0);
   ctx->fill = fill;
   ctx->horizontal = horizontal;
-  ctx->inverted = cfg_field(cfg, 7) == "1";
+  ctx->inverted = is_cover_entity(cfg_field(cfg, 0));
   ctx->radius = lv_obj_get_style_radius(s.btn, LV_PART_MAIN);
   lv_obj_set_user_data(slider, (void *)ctx);
 
@@ -381,7 +381,8 @@ inline void setup_slider_visual(BtnSlot &s, const std::string &cfg, uint32_t on_
     SliderCtx *c = (SliderCtx *)lv_obj_get_user_data(sl);
     if (!c) return;
     int val = lv_slider_get_value(sl);
-    slider_update_fill(c->fill, lv_obj_get_parent(sl), val, c->horizontal, c->inverted, c->radius);
+    int fill_val = c->inverted ? 100 - val : val;
+    slider_update_fill(c->fill, lv_obj_get_parent(sl), fill_val, c->horizontal, c->inverted, c->radius);
   }, LV_EVENT_VALUE_CHANGED, nullptr);
 
   lv_obj_add_event_cb(slider, [](lv_event_t *e) {
@@ -389,7 +390,7 @@ inline void setup_slider_visual(BtnSlot &s, const std::string &cfg, uint32_t on_
     SliderCtx *c = (SliderCtx *)lv_obj_get_user_data(sl);
     if (c && !c->entity_id.empty()) {
       int val = lv_slider_get_value(sl);
-      send_slider_action(c->entity_id, c->inverted ? 100 - val : val);
+      send_slider_action(c->entity_id, val);
     }
   }, LV_EVENT_RELEASED, nullptr);
 }
@@ -411,9 +412,8 @@ inline void subscribe_slider_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
       [slider, btn_ptr, fill, horiz, inv, rad, icon_lbl, has_icon_on, icon_off, icon_on](const std::string &state) {
         bool on = is_entity_on(state);
         if (!on) {
-          int z = inv ? 100 : 0;
-          lv_slider_set_value(slider, z, LV_ANIM_OFF);
-          if (fill) slider_update_fill(fill, btn_ptr, z, horiz, inv, rad);
+          lv_slider_set_value(slider, 0, LV_ANIM_OFF);
+          if (fill) slider_update_fill(fill, btn_ptr, inv ? 100 : 0, horiz, inv, rad);
         }
         if (has_icon_on) {
           lv_label_set_text(icon_lbl, on ? icon_on : icon_off);
@@ -431,9 +431,9 @@ inline void subscribe_slider_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
             int pct = (int)(pos + 0.5f);
             if (pct < 0) pct = 0;
             if (pct > 100) pct = 100;
-            if (inv) pct = 100 - pct;
             lv_slider_set_value(slider, pct, LV_ANIM_OFF);
-            if (fill) slider_update_fill(fill, btn_ptr, pct, horiz, inv, rad);
+            int fill_pct = inv ? 100 - pct : pct;
+            if (fill) slider_update_fill(fill, btn_ptr, fill_pct, horiz, inv, rad);
           }
         })
     );
@@ -448,9 +448,9 @@ inline void subscribe_slider_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
             int pct = (int)((bri * 100.0f + 127.0f) / 255.0f);
             if (pct < 1) pct = 1;
             if (pct > 100) pct = 100;
-            if (inv) pct = 100 - pct;
             lv_slider_set_value(slider, pct, LV_ANIM_OFF);
-            if (fill) slider_update_fill(fill, btn_ptr, pct, horiz, inv, rad);
+            int fill_pct = inv ? 100 - pct : pct;
+            if (fill) slider_update_fill(fill, btn_ptr, fill_pct, horiz, inv, rad);
           }
         })
     );
