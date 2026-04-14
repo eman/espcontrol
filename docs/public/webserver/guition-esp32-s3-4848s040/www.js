@@ -454,8 +454,8 @@
     ".sp-delete-btn:hover{background:var(--border);color:var(--text)}" +
     ".sp-save-btn{background:var(--accent);color:#fff}" +
     ".sp-save-btn:hover{background:var(--accent-hover)}" +
-    ".sp-edit-subpage-btn{background:var(--surface2);color:var(--text)}" +
-    ".sp-edit-subpage-btn:hover{background:var(--border)}" +
+    ".sp-edit-subpage-btn{background:var(--accent);color:#fff}" +
+    ".sp-edit-subpage-btn:hover{background:var(--accent-hover)}" +
     ".sp-btn-row--save{margin-top:24px;justify-content:flex-end}" +
     ".sp-btn-row--save.sp-has-delete{justify-content:space-between}" +
 
