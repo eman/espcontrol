@@ -16,4 +16,14 @@ registerButtonType("push", {
       }
     ));
   },
+  renderPreview: function (b, helpers) {
+    var label = b.label || "Button";
+    var iconName = b.icon && b.icon !== "Auto" ? iconSlug(b.icon) : "gesture-tap";
+    return {
+      iconHtml: '<span class="sp-btn-icon mdi mdi-' + iconName + '"></span>',
+      labelHtml:
+        '<span class="sp-btn-label-row"><span class="sp-btn-label">' + helpers.escHtml(label) + '</span>' +
+        '<span class="sp-subpage-badge mdi mdi-gesture-tap"></span></span>',
+    };
+  },
 });
