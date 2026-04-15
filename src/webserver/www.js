@@ -2041,7 +2041,7 @@
       var precSel = document.createElement("select");
       precSel.className = "sp-input sp-input--narrow";
       precSel.id = idPrefix + "precision";
-      var precOpts = [["0", "10"], ["1", "10.3"], ["2", "10.35"]];
+      var precOpts = [["0", "10"], ["1", "10.2"], ["2", "10.21"]];
       for (var pi = 0; pi < precOpts.length; pi++) {
         var po = document.createElement("option");
         po.value = precOpts[pi][0];

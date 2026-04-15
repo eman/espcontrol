@@ -32,7 +32,7 @@ registerButtonType("sensor", {
     var precSel = document.createElement("select");
     precSel.className = "sp-input sp-input--narrow";
     precSel.id = helpers.idPrefix + "precision";
-    var precOpts = [["0", "10"], ["1", "10.3"], ["2", "10.35"]];
+    var precOpts = [["0", "10"], ["1", "10.2"], ["2", "10.21"]];
     for (var i = 0; i < precOpts.length; i++) {
       var opt = document.createElement("option");
       opt.value = precOpts[i][0];
@@ -50,10 +50,12 @@ registerButtonType("sensor", {
   renderPreview: function (b, helpers) {
     var label = b.label || b.sensor || "Sensor";
     var unit = b.unit ? helpers.escHtml(b.unit) : "";
+    var prec = parseInt(b.precision || "0", 10) || 0;
+    var sampleVal = (0).toFixed(prec);
     return {
       iconHtml:
         '<span class="sp-sensor-preview">' +
-          '<span class="sp-sensor-value">0</span>' +
+          '<span class="sp-sensor-value">' + sampleVal + '</span>' +
           '<span class="sp-sensor-unit">' + unit + '</span>' +
         '</span>',
       labelHtml:

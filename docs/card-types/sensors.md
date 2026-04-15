@@ -18,7 +18,7 @@ Sensor cards are read-only — tapping them does nothing.
 2. Enter a **Sensor Entity** — the Home Assistant entity ID of the sensor you want to display (for example, `sensor.living_room_temperature`).
 3. Set a **Unit** — the unit label shown next to the value (for example, `°C`, `%`, `W`, or `kWh`).
 4. Set a **Label** (optional) — shown below the value. If left blank, the entity ID is used.
-5. Set **Display precision** (optional) — choose how many decimal places to show. Options are `10` (whole number, the default), `10.3` (one decimal place), or `10.35` (two decimal places).
+5. Set **Display precision** (optional) — choose how many decimal places to show. Options are `10` (whole number, the default), `10.2` (one decimal place), or `10.21` (two decimal places).
 
 ## How it works on the panel
 
