@@ -21,7 +21,7 @@ struct SunCalcResult {
 
 inline SunCalcResult recalc_sunrise_sunset(
     int year, int month, int day,
-    const std::string &tz_option) {
+    const std::string &tz_option, bool use_12h = true) {
   SunCalcResult r = {};
 
   std::string tz_id = tz_option.substr(0, tz_option.find(" ("));
@@ -39,18 +39,26 @@ inline SunCalcResult recalc_sunrise_sunset(
   r.valid = true;
 
   int rh = r.rise_h, rm = r.rise_m;
-  snprintf(r.sunrise_str, sizeof(r.sunrise_str), "%d:%02d AM",
-           (rh == 0) ? 12 : (rh > 12 ? rh - 12 : rh), rm);
-  if (rh >= 12)
-    snprintf(r.sunrise_str, sizeof(r.sunrise_str), "%d:%02d PM",
-             (rh == 12) ? 12 : rh - 12, rm);
+  if (use_12h) {
+    snprintf(r.sunrise_str, sizeof(r.sunrise_str), "%d:%02d AM",
+             (rh == 0) ? 12 : (rh > 12 ? rh - 12 : rh), rm);
+    if (rh >= 12)
+      snprintf(r.sunrise_str, sizeof(r.sunrise_str), "%d:%02d PM",
+               (rh == 12) ? 12 : rh - 12, rm);
+  } else {
+    snprintf(r.sunrise_str, sizeof(r.sunrise_str), "%02d:%02d", rh, rm);
+  }
 
   int sh = r.set_h, sm = r.set_m;
-  snprintf(r.sunset_str, sizeof(r.sunset_str), "%d:%02d PM",
-           (sh == 12) ? 12 : (sh > 12 ? sh - 12 : sh), sm);
-  if (sh < 12)
-    snprintf(r.sunset_str, sizeof(r.sunset_str), "%d:%02d AM",
-             (sh == 0) ? 12 : sh, sm);
+  if (use_12h) {
+    snprintf(r.sunset_str, sizeof(r.sunset_str), "%d:%02d PM",
+             (sh == 12) ? 12 : (sh > 12 ? sh - 12 : sh), sm);
+    if (sh < 12)
+      snprintf(r.sunset_str, sizeof(r.sunset_str), "%d:%02d AM",
+               (sh == 0) ? 12 : sh, sm);
+  } else {
+    snprintf(r.sunset_str, sizeof(r.sunset_str), "%02d:%02d", sh, sm);
+  }
 
   int lat_c = (int)((lat >= 0 ? lat : -lat) * 100.0f + 0.5f);
   int lon_c = (int)((lon >= 0 ? lon : -lon) * 100.0f + 0.5f);

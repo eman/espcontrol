@@ -1,3 +1,17 @@
+// =============================================================================
+// ESPCONTROL WEB UI - Custom device configuration interface
+// =============================================================================
+// Replaces the default ESPHome webserver UI with a three-tab layout:
+//   Screen  - Live grid preview with drag-and-drop button arrangement
+//   Settings - Display, brightness, firmware, and entity configuration
+//   Logs    - Real-time device log viewer via SSE
+//
+// Per-device config (grid size, styling) is injected between __DEVICE_CONFIG__
+// markers by scripts/build.py. Button type plugins (switch, sensor, slider,
+// cover, push, subpage) are injected between __BUTTON_TYPES__ markers.
+// Icon data is generated between GENERATED:ICONS / GENERATED:DOMAIN_ICONS.
+// =============================================================================
+
 // Load the original ESPHome webserver v3 React app (used for API only)
 (function () {
   var s = document.createElement("script");
@@ -87,6 +101,7 @@
   ];
   // --- GENERATED:ICONS END ---
 
+  // Convert an icon display name to its MDI CSS class slug (e.g. "Lightbulb" → "lightbulb")
   function iconSlug(name) {
     return ICON_EXCEPTIONS[name] || name.toLowerCase().replace(/[^a-z0-9]/g, function (ch) {
       return ch === " " ? "-" : "";
@@ -125,6 +140,7 @@
   }
   // __BUTTON_TYPES_START__
   // --- type: push ---
+  // Momentary push button: fires an esphome.push_button_pressed event (no toggle state)
   registerButtonType("push", {
     label: "Button",
     allowInSubpage: true,
@@ -155,6 +171,7 @@
     },
   });
   // --- type: sensor ---
+  // Read-only sensor card: displays a HA sensor value and unit (non-clickable)
   registerButtonType("sensor", {
     label: "Sensor",
     allowInSubpage: true,
@@ -198,7 +215,9 @@
     },
   });
   // --- type: slider ---
-  // b.sensor stores orientation ("h" or "") for slider/cover, not a HA sensor entity
+  // Slider and cover button types: draggable brightness/position control.
+  // Factory creates both "slider" (light.turn_on w/ brightness) and "cover"
+  // (cover.set_cover_position) variants. b.sensor stores orientation ("h" or "").
   function sliderTypeFactory(opts) {
     return {
       label: opts.label,
@@ -348,6 +367,7 @@
     iconOnFieldLabel: "Icon When Open",
   }));
   // --- type: subpage ---
+  // Navigation folder: tap opens a nested grid screen with its own button layout
   registerButtonType("subpage", {
     label: "Subpage",
     allowInSubpage: false,
@@ -457,6 +477,7 @@
     },
   });
   // --- type: switch ---
+  // Default button type: HA entity toggle (on/off switch)
   registerButtonType("", {
     label: "Switch",
     allowInSubpage: true,
@@ -806,6 +827,8 @@
     brightnessNightVal: 75,
     timezone: "America/New_York (GMT-5)",
     timezoneOptions: [],
+    clockFormat: "12h",
+    clockFormatOptions: ["12h", "24h"],
     sunrise: "",
     sunset: "",
     firmwareVersion: "",
@@ -1515,6 +1538,26 @@
     tzField.appendChild(tzSelect);
     blBody.appendChild(tzField);
     els.setTimezone = tzSelect;
+
+    var cfField = document.createElement("div");
+    cfField.className = "sp-field";
+    cfField.appendChild(fieldLabel("Clock Format", "sp-set-clock-format"));
+    var cfSelect = document.createElement("select");
+    cfSelect.className = "sp-select";
+    cfSelect.id = "sp-set-clock-format";
+    state.clockFormatOptions.forEach(function (opt) {
+      var o = document.createElement("option");
+      o.value = opt;
+      o.textContent = opt === "12h" ? "12-hour (AM/PM)" : "24-hour";
+      cfSelect.appendChild(o);
+    });
+    cfSelect.value = state.clockFormat;
+    cfSelect.addEventListener("change", function () {
+      postSelect("Screen: Clock Format", this.value);
+    });
+    cfField.appendChild(cfSelect);
+    blBody.appendChild(cfField);
+    els.setClockFormat = cfSelect;
 
     var sunInfo = document.createElement("div");
     sunInfo.className = "sp-sun-info";
@@ -3581,9 +3624,16 @@
   function updateClock() {
     if (!els.clock) return;
     var now = new Date();
-    els.clock.textContent =
-      String(now.getHours()).padStart(2, "0") + ":" +
-      String(now.getMinutes()).padStart(2, "0");
+    var h = now.getHours();
+    var m = String(now.getMinutes()).padStart(2, "0");
+    if (state.clockFormat === "12h") {
+      var suffix = h >= 12 ? " PM" : " AM";
+      h = h % 12;
+      if (h === 0) h = 12;
+      els.clock.textContent = h + ":" + m + suffix;
+    } else {
+      els.clock.textContent = String(h).padStart(2, "0") + ":" + m;
+    }
     var msToNext = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
     setTimeout(updateClock, msToNext + 50);
   }
@@ -3707,6 +3757,23 @@
           }
         }
         if (els.setTimezone) els.setTimezone.value = state.timezone;
+      },
+      "select-screen__clock_format": function (val, d) {
+        state.clockFormat = d.value || d.option || val || state.clockFormat;
+        if (d.options && Array.isArray(d.options)) {
+          state.clockFormatOptions = d.options;
+          if (els.setClockFormat) {
+            els.setClockFormat.innerHTML = "";
+            d.options.forEach(function (opt) {
+              var o = document.createElement("option");
+              o.value = opt;
+              o.textContent = opt === "12h" ? "12-hour (AM/PM)" : "24-hour";
+              els.setClockFormat.appendChild(o);
+            });
+          }
+        }
+        if (els.setClockFormat) els.setClockFormat.value = state.clockFormat;
+        updateClock();
       },
       "text_sensor-screen__sunrise": function (val) {
         state.sunrise = val;

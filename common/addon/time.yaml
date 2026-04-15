@@ -154,6 +154,24 @@ select:
       then:
         - script.execute: backlight_recalc_sunrise_sunset
 
+  - platform: template
+    name: "Screen: Clock Format"
+    id: clock_format_select
+    entity_category: config
+    icon: "mdi:clock-outline"
+    optimistic: true
+    restore_value: true
+    initial_option: "12h"
+    options:
+      - "12h"
+      - "24h"
+    web_server:
+      sorting_group_id: sg_brightness
+    on_value:
+      then:
+        - script.execute: time_update
+        - script.execute: backlight_recalc_sunrise_sunset
+
 # ---------------------------------------------------------------------------
 # HA time source; sync triggers clock and sunrise/sunset recalculation
 # ---------------------------------------------------------------------------
@@ -177,5 +195,14 @@ script:
           text: !lambda |-
             static char time_buf[17];
             auto now = id(ha_time).now();
-            snprintf(time_buf, sizeof(time_buf), "%02d:%02d", now.hour, now.minute);
+            bool use_12h = id(clock_format_select).current_option() == "12h";
+            if (use_12h) {
+              int h = now.hour % 12;
+              if (h == 0) h = 12;
+              snprintf(time_buf, sizeof(time_buf), "%d:%02d %s",
+                       h, now.minute, now.hour >= 12 ? "PM" : "AM");
+            } else {
+              snprintf(time_buf, sizeof(time_buf), "%02d:%02d",
+                       now.hour, now.minute);
+            }
             return time_buf;

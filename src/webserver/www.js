@@ -476,6 +476,8 @@
     brightnessNightVal: 75,
     timezone: "America/New_York (GMT-5)",
     timezoneOptions: [],
+    clockFormat: "12h",
+    clockFormatOptions: ["12h", "24h"],
     sunrise: "",
     sunset: "",
     firmwareVersion: "",
@@ -1185,6 +1187,26 @@
     tzField.appendChild(tzSelect);
     blBody.appendChild(tzField);
     els.setTimezone = tzSelect;
+
+    var cfField = document.createElement("div");
+    cfField.className = "sp-field";
+    cfField.appendChild(fieldLabel("Clock Format", "sp-set-clock-format"));
+    var cfSelect = document.createElement("select");
+    cfSelect.className = "sp-select";
+    cfSelect.id = "sp-set-clock-format";
+    state.clockFormatOptions.forEach(function (opt) {
+      var o = document.createElement("option");
+      o.value = opt;
+      o.textContent = opt === "12h" ? "12-hour (AM/PM)" : "24-hour";
+      cfSelect.appendChild(o);
+    });
+    cfSelect.value = state.clockFormat;
+    cfSelect.addEventListener("change", function () {
+      postSelect("Screen: Clock Format", this.value);
+    });
+    cfField.appendChild(cfSelect);
+    blBody.appendChild(cfField);
+    els.setClockFormat = cfSelect;
 
     var sunInfo = document.createElement("div");
     sunInfo.className = "sp-sun-info";
@@ -3251,9 +3273,16 @@
   function updateClock() {
     if (!els.clock) return;
     var now = new Date();
-    els.clock.textContent =
-      String(now.getHours()).padStart(2, "0") + ":" +
-      String(now.getMinutes()).padStart(2, "0");
+    var h = now.getHours();
+    var m = String(now.getMinutes()).padStart(2, "0");
+    if (state.clockFormat === "12h") {
+      var suffix = h >= 12 ? " PM" : " AM";
+      h = h % 12;
+      if (h === 0) h = 12;
+      els.clock.textContent = h + ":" + m + suffix;
+    } else {
+      els.clock.textContent = String(h).padStart(2, "0") + ":" + m;
+    }
     var msToNext = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
     setTimeout(updateClock, msToNext + 50);
   }
@@ -3377,6 +3406,23 @@
           }
         }
         if (els.setTimezone) els.setTimezone.value = state.timezone;
+      },
+      "select-screen__clock_format": function (val, d) {
+        state.clockFormat = d.value || d.option || val || state.clockFormat;
+        if (d.options && Array.isArray(d.options)) {
+          state.clockFormatOptions = d.options;
+          if (els.setClockFormat) {
+            els.setClockFormat.innerHTML = "";
+            d.options.forEach(function (opt) {
+              var o = document.createElement("option");
+              o.value = opt;
+              o.textContent = opt === "12h" ? "12-hour (AM/PM)" : "24-hour";
+              els.setClockFormat.appendChild(o);
+            });
+          }
+        }
+        if (els.setClockFormat) els.setClockFormat.value = state.clockFormat;
+        updateClock();
       },
       "text_sensor-screen__sunrise": function (val) {
         state.sunrise = val;
