@@ -29,6 +29,9 @@
     "rows": 3,
     "dragMode": "displace",
     "dragAnimation": true,
+    "features": {
+      "screenRotation": true
+    },
     "screen": {
       "width": "44%",
       "aspect": "480/800"

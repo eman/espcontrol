@@ -29,6 +29,9 @@
     "rows": 3,
     "dragMode": "swap",
     "dragAnimation": true,
+    "features": {
+      "screenRotation": true
+    },
     "screen": {
       "width": "100%",
       "aspect": "1024/600"

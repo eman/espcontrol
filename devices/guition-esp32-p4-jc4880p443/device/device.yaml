@@ -43,6 +43,10 @@ esphome:
       - "-Wno-deprecated-declarations"
     build_src_flags:
       - "-Wno-literal-suffix"
+  on_boot:
+    - priority: -100
+      then:
+        - script.execute: apply_screen_rotation
 
 # ---------------------------------------------------------------------------
 # ESP32-C6 co-processor (provides WiFi/BLE via SDIO)
@@ -136,5 +140,47 @@ display:
 lvgl:
   buffer_size: 100%
   displays: my_display
+  rotation: 0
   byte_order: little_endian
   touchscreens: my_touchscreen
+
+script:
+  - id: apply_screen_rotation
+    then:
+      - if:
+          condition:
+            lambda: 'return id(screen_rotation_select).current_option() == "90";'
+          then:
+            - lvgl.display.set_rotation: 90
+          else:
+            - if:
+                condition:
+                  lambda: 'return id(screen_rotation_select).current_option() == "180";'
+                then:
+                  - lvgl.display.set_rotation: 180
+                else:
+                  - if:
+                      condition:
+                        lambda: 'return id(screen_rotation_select).current_option() == "270";'
+                      then:
+                        - lvgl.display.set_rotation: 270
+                      else:
+                        - lvgl.display.set_rotation: 0
+
+select:
+  - platform: template
+    name: "Screen: Rotation"
+    id: screen_rotation_select
+    entity_category: config
+    icon: "mdi:screen-rotation"
+    optimistic: true
+    restore_value: true
+    initial_option: "0"
+    options:
+      - "0"
+      - "90"
+      - "180"
+      - "270"
+    on_value:
+      then:
+        - script.execute: apply_screen_rotation
