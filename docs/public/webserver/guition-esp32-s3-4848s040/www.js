@@ -1009,6 +1009,10 @@
     ".sp-fw-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px;margin-bottom:12px}" +
     ".sp-fw-version{font-size:.875rem;color:var(--text)}" +
     ".sp-fw-label{font-size:.8rem;color:var(--text2)}" +
+    ".sp-fw-status{font-size:.8rem;color:var(--text2);line-height:1.4;margin:-4px 0 12px 0}" +
+    ".sp-fw-status.sp-update-available{color:#3dd68c}" +
+    ".sp-fw-status.sp-update-installing{color:#f9b44e}" +
+    ".sp-fw-status a{color:inherit;text-decoration:underline;text-underline-offset:2px}" +
     ".sp-fw-btn{background:var(--surface2);color:var(--text);border:1px solid var(--border);" +
     "border-radius:8px;padding:8px 14px;font-size:.8rem;font-weight:500;cursor:pointer;" +
     "font-family:inherit;transition:all .25s;white-space:nowrap}" +
@@ -1093,6 +1097,10 @@
     sunrise: "",
     sunset: "",
     firmwareVersion: "",
+    firmwareLatestVersion: "",
+    firmwareUpdateState: "",
+    firmwareReleaseUrl: "",
+    firmwareChecking: false,
     autoUpdate: true,
     updateFrequency: "Daily",
     updateFreqOptions: ["Hourly", "Daily", "Weekly", "Monthly"],
@@ -1157,6 +1165,60 @@
     if (isSpecificFirmwareVersion(state.firmwareVersion) && !isSpecificFirmwareVersion(version)) return;
     state.firmwareVersion = isSpecificFirmwareVersion(version) ? version : "Dev";
     renderFirmwareVersion();
+    renderFirmwareUpdateStatus();
+  }
+
+  function displayFirmwareVersion(version) {
+    return isSpecificFirmwareVersion(version) ? String(version).trim() : "Dev";
+  }
+
+  function firmwareUpdateAvailable() {
+    return state.firmwareUpdateState === "UPDATE AVAILABLE" &&
+      isSpecificFirmwareVersion(state.firmwareLatestVersion);
+  }
+
+  function renderFirmwareUpdateStatus() {
+    if (!els.fwStatus) return;
+    var cls = "sp-fw-status";
+    var status = "";
+    if (state.firmwareUpdateState === "INSTALLING") {
+      status = "Installing update\u2026";
+      cls += " sp-update-installing";
+    } else if (firmwareUpdateAvailable()) {
+      status = "Latest public version: " + escHtml(state.firmwareLatestVersion);
+      if (state.firmwareReleaseUrl) {
+        status += ' <a href="' + escAttr(state.firmwareReleaseUrl) + '" target="_blank" rel="noopener">release notes</a>';
+      }
+      cls += " sp-update-available";
+    } else if (state.firmwareUpdateState === "NO UPDATE") {
+      status = "Latest public version: " + escHtml(displayFirmwareVersion(state.firmwareVersion));
+    } else if (state.firmwareChecking) {
+      status = "Checking public firmware\u2026";
+    }
+    els.fwStatus.className = cls;
+    els.fwStatus.innerHTML = status;
+    if (els.fwCheckBtn) {
+      if (state.firmwareUpdateState === "INSTALLING") {
+        els.fwCheckBtn.disabled = true;
+        els.fwCheckBtn.textContent = "Installing\u2026";
+      } else if (firmwareUpdateAvailable()) {
+        els.fwCheckBtn.disabled = false;
+        els.fwCheckBtn.textContent = "Install Update";
+      } else {
+        els.fwCheckBtn.disabled = state.firmwareChecking;
+        els.fwCheckBtn.textContent = state.firmwareChecking ? "Checking\u2026" : "Check for Update";
+      }
+    }
+  }
+
+  function setFirmwareUpdateInfo(d) {
+    var latest = d.latest_version || d.value || "";
+    if (d.current_version) setFirmwareVersion(d.current_version);
+    if (latest) state.firmwareLatestVersion = String(latest).trim();
+    state.firmwareUpdateState = String(d.state || state.firmwareUpdateState || "").trim().toUpperCase();
+    state.firmwareReleaseUrl = d.release_url || state.firmwareReleaseUrl || "";
+    if (state.firmwareUpdateState) state.firmwareChecking = false;
+    renderFirmwareUpdateStatus();
   }
 
   function isFirmwareVersionEvent(id, d) {
@@ -1389,6 +1451,10 @@
     post("/button/" + encodeURIComponent(name) + "/press");
   }
 
+  function postUpdateInstall(name) {
+    post("/update/" + encodeURIComponent(name) + "/install");
+  }
+
   function postSwitch(name, on) {
     post("/switch/" + encodeURIComponent(name) + "/" + (on ? "turn_on" : "turn_off"));
   }
@@ -1411,7 +1477,7 @@
       setFirmwareVersion(d.state || d.value);
     });
     getJsonQuietly("/update/" + encodeURIComponent("Firmware: Update") + "?detail=all", function (d) {
-      setFirmwareVersion(d.current_version);
+      setFirmwareUpdateInfo(d);
     });
   }
 
@@ -2155,16 +2221,30 @@
     fwCheckBtn.className = "sp-fw-btn";
     fwCheckBtn.textContent = "Check for Update";
     fwCheckBtn.addEventListener("click", function () {
-      fwCheckBtn.disabled = true;
-      fwCheckBtn.textContent = "Checking\u2026";
+      if (firmwareUpdateAvailable()) {
+        state.firmwareUpdateState = "INSTALLING";
+        renderFirmwareUpdateStatus();
+        postUpdateInstall("Firmware: Update");
+        return;
+      }
+      state.firmwareChecking = true;
+      renderFirmwareUpdateStatus();
       postButtonPress("Firmware: Check for Update");
       setTimeout(function () {
-        fwCheckBtn.disabled = false;
-        fwCheckBtn.textContent = "Check for Update";
+        state.firmwareChecking = false;
+        refreshFirmwareVersion();
+        renderFirmwareUpdateStatus();
       }, 10000);
     });
     fwVersionRow.appendChild(fwCheckBtn);
+    els.fwCheckBtn = fwCheckBtn;
     fwBody.appendChild(fwVersionRow);
+
+    var fwStatus = document.createElement("div");
+    fwStatus.className = "sp-fw-status";
+    fwBody.appendChild(fwStatus);
+    els.fwStatus = fwStatus;
+    renderFirmwareUpdateStatus();
 
     var autoUpdateToggle = toggleRow("Auto Update", "sp-set-auto-update", state.autoUpdate);
     fwBody.appendChild(autoUpdateToggle.row);
@@ -4352,7 +4432,7 @@
         setFirmwareVersion(val);
       },
       "update-firmware__update": function (val, d) {
-        setFirmwareVersion(d.current_version);
+        setFirmwareUpdateInfo(d);
       },
       "switch-firmware__auto_update": function (val, d) {
         state.autoUpdate = d.value === true || val === "ON";
@@ -4422,7 +4502,7 @@
         return;
       }
       if (isFirmwareUpdateEvent(id, d)) {
-        setFirmwareVersion(d.current_version);
+        setFirmwareUpdateInfo(d);
         return;
       }
 
