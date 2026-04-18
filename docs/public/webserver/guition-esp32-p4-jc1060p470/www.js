@@ -34,7 +34,8 @@
       "screenRotationOptions": [
         "0",
         "180"
-      ]
+      ],
+      "screenRotationDisplayOffset": 180
     },
     "screen": {
       "width": "100%",
@@ -1126,6 +1127,20 @@
     return state.screenRotationOptions.indexOf(value) !== -1 ? value : "0";
   }
 
+  function displayScreenRotation(value) {
+    var offset = (CFG.features && parseInt(CFG.features.screenRotationDisplayOffset, 10)) || 0;
+    var n = parseInt(value, 10);
+    if (!isFinite(n)) return value;
+    return String((n + offset + 360) % 360);
+  }
+
+  function appendScreenRotationOption(select, opt) {
+    var o = document.createElement("option");
+    o.value = opt;
+    o.textContent = displayScreenRotation(opt) + " deg";
+    select.appendChild(o);
+  }
+
   var els = {};
   var dragSrcPos = -1;
   var didDrag = false;
@@ -2005,10 +2020,7 @@
       rotSelect.className = "sp-select";
       rotSelect.id = "sp-set-screen-rotation";
       state.screenRotationOptions.forEach(function (opt) {
-        var o = document.createElement("option");
-        o.value = opt;
-        o.textContent = opt + " deg";
-        rotSelect.appendChild(o);
+        appendScreenRotationOption(rotSelect, opt);
       });
       rotSelect.value = state.screenRotation;
       rotSelect.addEventListener("change", function () {
@@ -4409,10 +4421,7 @@
           if (els.setScreenRotation) {
             els.setScreenRotation.innerHTML = "";
             d.option.forEach(function (opt) {
-              var o = document.createElement("option");
-              o.value = opt;
-              o.textContent = opt + " deg";
-              els.setScreenRotation.appendChild(o);
+              appendScreenRotationOption(els.setScreenRotation, opt);
             });
           }
         }
