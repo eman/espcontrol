@@ -8,11 +8,7 @@ description:
 
 To save power and protect the display, the panel activates a screensaver when it's not being used. The screen shows a gentle snow animation and the backlight turns off. Touch the screen to wake it up.
 
-There are three mode options for the screensaver, configured in the **Settings** tab on the [Setup](/features/setup) page:
-
-## Disabled
-
-Choose **Disabled** when you want the screen to stay on and ignore the screensaver timer and presence sensor controls.
+There are two ways to control the screensaver, configured in the **Settings** tab on the [Setup](/features/setup) page:
 
 ## Timer
 
@@ -23,12 +19,11 @@ The screensaver turns on after the panel hasn't been touched for a set amount of
 - 10, 15, 20, 30, or 45 minutes
 - 1 hour
 
-### Then
+### Clock or Display Off
 
 When the screensaver activates, you can choose what happens:
 
 - **Clock** — shows a large drifting clock at reduced brightness (the default). The clock repositions itself periodically to prevent burn-in.
-- **Display Dimmed** — keeps the normal screen visible, but lowers the backlight to the selected brightness.
 - **Display Off** — turns the backlight off completely.
 
 ## Sensor
