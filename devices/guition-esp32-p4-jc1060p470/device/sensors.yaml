@@ -122,8 +122,8 @@ esphome:
               id(presence_sensor_entity).state,
               &id(presence_detected),
               []() {
-                if (id(screensaver_mode).state != "timer") id(screensaver_wake).execute();
+                if (id(screensaver_mode).state == "sensor") id(screensaver_wake).execute();
               },
               []() {
-                if (id(screensaver_mode).state != "timer") id(screensaver_sleep_sensor).execute();
+                if (id(screensaver_mode).state == "sensor") id(screensaver_sleep_sensor).execute();
               });

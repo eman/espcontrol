@@ -23,7 +23,7 @@ Sunrise and sunset times are derived from the timezone set in the [Clock](/featu
 
 ## Screensaver
 
-When the screensaver is active, the backlight turns off. On wake (touch or presence sensor), brightness returns to the correct level for the current time.
+When the screensaver is active, the backlight can turn off, dim to the selected screensaver brightness, or show the clock at that same reduced brightness. On wake (touch or presence sensor), brightness returns to the correct level for the current time.
 
 ## Before clock sync
 

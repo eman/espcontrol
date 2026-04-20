@@ -1090,6 +1090,8 @@
     presenceEntity: "",
     screensaverMode: "",
     _screensaverModeReceived: false,
+    screensaverAction: "",
+    _screensaverActionReceived: false,
     clockScreensaverOn: true,
     clockBrightness: 35,
     screensaverTimeout: 300,
@@ -1128,9 +1130,29 @@
   }
 
   function getActiveScreensaverMode() {
+    if (state.screensaverMode === "disabled") return "disabled";
     if (state.screensaverMode === "sensor") return "sensor";
     if (state.screensaverMode === "timer") return "timer";
     return state.presenceEntity ? "sensor" : "timer";
+  }
+
+  function normalizeScreensaverAction(value, legacyClockOn) {
+    value = String(value == null ? "" : value);
+    if (value === "off" || value === "dim" || value === "clock") return value;
+    if (legacyClockOn != null) return legacyClockOn ? "clock" : "off";
+    return state.clockScreensaverOn ? "clock" : "off";
+  }
+
+  function getActiveScreensaverAction() {
+    return normalizeScreensaverAction(state.screensaverAction);
+  }
+
+  function syncScreensaverActionControls() {
+    var action = getActiveScreensaverAction();
+    if (els.setClockSelect) els.setClockSelect.value = action;
+    if (els.setClockBrightnessField) {
+      els.setClockBrightnessField.style.display = (action === "clock" || action === "dim") ? "" : "none";
+    }
   }
 
   function normalizeScreenRotation(value) {
@@ -2217,12 +2239,16 @@
     ssBody.appendChild(fieldLabel("Mode"));
     var segment = document.createElement("div");
     segment.className = "sp-segment";
+    var disabledBtn = document.createElement("button");
+    disabledBtn.textContent = "Disabled";
+    disabledBtn.type = "button";
     var timerBtn = document.createElement("button");
     timerBtn.textContent = "Timer";
     timerBtn.type = "button";
     var sensorBtn = document.createElement("button");
     sensorBtn.textContent = "Sensor";
     sensorBtn.type = "button";
+    segment.appendChild(disabledBtn);
     segment.appendChild(timerBtn);
     segment.appendChild(sensorBtn);
     ssBody.appendChild(segment);
@@ -2267,24 +2293,31 @@
     var clockOff = document.createElement("option");
     clockOff.value = "off";
     clockOff.textContent = "Display Off";
+    var clockDim = document.createElement("option");
+    clockDim.value = "dim";
+    clockDim.textContent = "Display Dimmed";
     var clockOn = document.createElement("option");
     clockOn.value = "clock";
     clockOn.textContent = "Clock";
     clockSelect.appendChild(clockOff);
+    clockSelect.appendChild(clockDim);
     clockSelect.appendChild(clockOn);
-    clockSelect.value = state.clockScreensaverOn ? "clock" : "off";
+    clockSelect.value = getActiveScreensaverAction();
     clockSelect.addEventListener("change", function () {
-      state.clockScreensaverOn = this.value === "clock";
+      state.screensaverAction = normalizeScreensaverAction(this.value);
+      state._screensaverActionReceived = true;
+      state.clockScreensaverOn = state.screensaverAction === "clock";
+      postText("Screensaver Action", state.screensaverAction);
       postSwitch("Screen Saver: Clock", state.clockScreensaverOn);
-      clockBrightnessField.style.display = state.clockScreensaverOn ? "" : "none";
+      syncScreensaverActionControls();
     });
     clockField.appendChild(clockSelect);
     timerPanel.appendChild(clockField);
     els.setClockSelect = clockSelect;
 
     var clockBrightnessField = document.createElement("div");
-    clockBrightnessField.style.display = state.clockScreensaverOn ? "" : "none";
-    var clockSlider = createRangeSlider("Clock Brightness", state.clockBrightness, "Screen Saver: Clock Brightness");
+    clockBrightnessField.style.display = (getActiveScreensaverAction() === "clock" || getActiveScreensaverAction() === "dim") ? "" : "none";
+    var clockSlider = createRangeSlider("Brightness", state.clockBrightness, "Screen Saver: Clock Brightness");
     clockSlider.range.min = "1";
     clockSlider.range.step = "1";
     clockBrightnessField.appendChild(clockSlider.wrap);
@@ -2306,11 +2339,17 @@
 
     function setSsMode(mode) {
       ssMode = mode;
+      disabledBtn.className = mode === "disabled" ? "active" : "";
       timerBtn.className = mode === "timer" ? "active" : "";
       sensorBtn.className = mode === "sensor" ? "active" : "";
       timerPanel.style.display = mode === "timer" ? "" : "none";
       sensorPanel.style.display = mode === "sensor" ? "" : "none";
     }
+    disabledBtn.addEventListener("click", function () {
+      setSsMode("disabled");
+      state.screensaverMode = "disabled";
+      postText("Screensaver Mode", "disabled");
+    });
     timerBtn.addEventListener("click", function () {
       setSsMode("timer");
       state.screensaverMode = "timer";
@@ -4464,7 +4503,8 @@
         outdoor_temp_entity: state.outdoorEntity,
         screensaver_mode: getActiveScreensaverMode(),
         presence_sensor_entity: state.presenceEntity,
-        clock_screensaver: state.clockScreensaverOn,
+        screensaver_action: getActiveScreensaverAction(),
+        clock_screensaver: getActiveScreensaverAction() === "clock",
         clock_brightness: state.clockBrightness,
         screensaver_timeout: state.screensaverTimeout,
         home_screen_timeout: state.homeScreenTimeout,
@@ -4670,10 +4710,15 @@
           postText("Indoor Temp Entity", s.indoor_temp_entity || "");
           postText("Outdoor Temp Entity", s.outdoor_temp_entity || "");
           var importedScreensaverMode = s.screensaver_mode || (s.presence_sensor_entity ? "sensor" : "timer");
-          if (importedScreensaverMode !== "sensor") importedScreensaverMode = "timer";
+          if (importedScreensaverMode !== "disabled" && importedScreensaverMode !== "sensor") importedScreensaverMode = "timer";
+          var importedScreensaverAction = normalizeScreensaverAction(
+            s.screensaver_action,
+            s.clock_screensaver != null ? !!s.clock_screensaver : true
+          );
           postText("Screensaver Mode", importedScreensaverMode);
+          postText("Screensaver Action", importedScreensaverAction);
           postText("Presence Sensor Entity", s.presence_sensor_entity || "");
-          postSwitch("Screen Saver: Clock", s.clock_screensaver != null ? !!s.clock_screensaver : true);
+          postSwitch("Screen Saver: Clock", importedScreensaverAction === "clock");
           postNumber("Screen Saver: Clock Brightness", s.clock_brightness != null ? s.clock_brightness : 35);
           postNumber("Screensaver Timeout", s.screensaver_timeout || 300);
           postNumber("Home Screen Timeout", s.home_screen_timeout != null ? s.home_screen_timeout : 60);
@@ -4687,7 +4732,9 @@
           state.screensaverMode = importedScreensaverMode;
           state._screensaverModeReceived = true;
           state.presenceEntity = s.presence_sensor_entity || "";
-          state.clockScreensaverOn = s.clock_screensaver != null ? !!s.clock_screensaver : true;
+          state.screensaverAction = importedScreensaverAction;
+          state._screensaverActionReceived = true;
+          state.clockScreensaverOn = importedScreensaverAction === "clock";
           state.clockBrightness = s.clock_brightness != null ? s.clock_brightness : 35;
           state.screensaverTimeout = s.screensaver_timeout || 300;
           state.homeScreenTimeout = s.home_screen_timeout != null ? s.home_screen_timeout : 60;
@@ -4700,8 +4747,7 @@
           els.setOutdoorField.className = "sp-cond-field" + (state._outdoorOn ? " sp-visible" : "");
           syncInput(els.setOutdoorEntity, state.outdoorEntity);
           syncInput(els.setPresence, state.presenceEntity);
-          if (els.setClockSelect) els.setClockSelect.value = state.clockScreensaverOn ? "clock" : "off";
-          if (els.setClockBrightnessField) els.setClockBrightnessField.style.display = state.clockScreensaverOn ? "" : "none";
+          syncScreensaverActionControls();
           if (els.setClockBrightness) {
             els.setClockBrightness.value = state.clockBrightness;
             els.setClockBrightnessVal.textContent = Math.round(state.clockBrightness) + "%";
@@ -4849,8 +4895,10 @@
       },
       "switch-screen_saver__clock": function (val, d) {
         state.clockScreensaverOn = d.value === true || val === "ON";
-        if (els.setClockSelect) els.setClockSelect.value = state.clockScreensaverOn ? "clock" : "off";
-        if (els.setClockBrightnessField) els.setClockBrightnessField.style.display = state.clockScreensaverOn ? "" : "none";
+        if (!state._screensaverActionReceived && state.screensaverAction !== "dim") {
+          state.screensaverAction = state.clockScreensaverOn ? "clock" : "off";
+        }
+        syncScreensaverActionControls();
       },
       "number-screen_saver__clock_brightness": function (val) {
         state.clockBrightness = parseFloat(val) || 35;
@@ -4871,8 +4919,18 @@
       },
       "text-screensaver_mode": function (val) {
         state._screensaverModeReceived = true;
-        state.screensaverMode = val === "sensor" || val === "timer" ? val : "";
+        state.screensaverMode = val === "disabled" || val === "sensor" || val === "timer" ? val : "";
         if (els.setSsMode) els.setSsMode(getActiveScreensaverMode());
+      },
+      "text-screensaver_action": function (val) {
+        if (val === "off" || val === "dim" || val === "clock") {
+          state._screensaverActionReceived = true;
+          state.screensaverAction = val;
+          state.clockScreensaverOn = state.screensaverAction === "clock";
+        } else {
+          state.screensaverAction = "";
+        }
+        syncScreensaverActionControls();
       },
       "number-screen__daytime_brightness": function (val) {
         state.brightnessDayVal = parseFloat(val) || 100;

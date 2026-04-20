@@ -36,13 +36,21 @@ script:
           return (int)(val * 1000);
       - if:
           condition:
-            lambda: 'return id(screensaver_mode).state != "timer" && id(presence_detected);'
+            lambda: 'return id(screensaver_mode).state == "disabled";'
           then:
-            - script.execute: screensaver_idle_check
+            - globals.set:
+                id: display_asleep
+                value: 'false'
           else:
-            - script.execute: screensaver_sleep_timer
+            - if:
+                condition:
+                  lambda: 'return id(screensaver_mode).state == "sensor" && id(presence_detected);'
+                then:
+                  - script.execute: screensaver_idle_check
+                else:
+                  - script.execute: screensaver_sleep_timer
 
-  # Timer mode honours the clock/display-off setting.
+  # Timer mode honours the display-off/dimmed/clock setting.
   - id: screensaver_sleep_timer
     mode: restart
     then:
@@ -51,11 +59,17 @@ script:
           value: 'true'
       - if:
           condition:
-            lambda: 'return id(clock_screensaver_enabled).state;'
+            lambda: 'return id(screensaver_action).state == "clock" || (id(screensaver_action).state.empty() && id(clock_screensaver_enabled).state);'
           then:
             - script.execute: show_clock_view
           else:
-            - script.execute: screensaver_sleep_display_off
+            - if:
+                condition:
+                  lambda: 'return id(screensaver_action).state == "dim";'
+                then:
+                  - script.execute: screensaver_sleep_dim
+                else:
+                  - script.execute: screensaver_sleep_display_off
 
   # Sensor mode always turns the display off and leaves LVGL snow underneath.
   - id: screensaver_sleep_sensor
@@ -77,6 +91,21 @@ script:
       - light.turn_off: display_backlight
       - lvgl.pause:
           show_snow: true
+
+  - id: screensaver_sleep_dim
+    mode: restart
+    then:
+      - globals.set:
+          id: display_asleep
+          value: 'true'
+      - globals.set:
+          id: screensaver_display_off_active
+          value: 'false'
+      - script.execute: hide_clock_view
+      - light.turn_on:
+          id: display_backlight
+          brightness: !lambda 'return id(clock_brightness).state / 100.0f;'
+          transition_length: 3s
 
   # Setup screen burn-in protection
   - id: setup_screen_dim
