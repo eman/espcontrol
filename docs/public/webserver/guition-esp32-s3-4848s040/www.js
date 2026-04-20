@@ -724,7 +724,7 @@
     ".fade-in{animation:fadeIn .3s ease}" +
     "@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}" +
 
-    ".sp-wrap{display:flex;justify-content:center;padding:20px var(--gap) 4px;user-select:none}" +
+    ".sp-wrap{display:flex;justify-content:center;padding:12px var(--gap) 4px;user-select:none}" +
     ".sp-screen{width:var(--screen-w);aspect-ratio:var(--screen-aspect);background:#000;" +
     "border-radius:var(--radius);position:relative;overflow:hidden;" +
     "box-shadow:0 2px 20px rgba(0,0,0,.35);border:2px solid var(--surface);" +
@@ -780,8 +780,9 @@
     ".sp-empty-cell.sp-drop-placeholder{border-color:rgba(92,156,245,.5)}" : "") +
 
     ".sp-hint{text-align:center;font-size:.7rem;color:var(--text3);padding:8px 0 12px;user-select:none}" +
+    ".sp-selection-bar:not(.sp-visible)+.sp-wrap{padding-top:20px}" +
     ".sp-selection-bar{display:none;align-items:center;justify-content:center;gap:8px;" +
-    "padding:0 var(--gap) 12px;color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;user-select:none}" +
+    "padding:16px var(--gap) 0;color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;user-select:none}" +
     ".sp-selection-bar.sp-visible{display:flex}" +
     ".sp-selection-label{font-size:.8rem;color:var(--text2);margin-right:4px}" +
     ".sp-selection-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;" +
@@ -1925,6 +1926,7 @@
     updateClock();
 
     document.addEventListener("click", hideContextMenu);
+    document.addEventListener("mousedown", handleDocumentSelectionMouseDown);
     document.addEventListener("scroll", hideContextMenu, true);
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") hideContextMenu();
@@ -2008,6 +2010,11 @@
     page.id = "sp-screen";
     page.className = "sp-page";
 
+    var selectionBar = document.createElement("div");
+    selectionBar.className = "sp-selection-bar";
+    els.selectionBar = selectionBar;
+    page.appendChild(selectionBar);
+
     var wrap = document.createElement("div");
     wrap.className = "sp-wrap";
     wrap.innerHTML =
@@ -2031,11 +2038,6 @@
     hint.textContent = "tap to select \u2022 shift/ctrl+tap to multi-select \u2022 right click to manage";
     els.previewHint = hint;
     page.appendChild(hint);
-
-    var selectionBar = document.createElement("div");
-    selectionBar.className = "sp-selection-bar";
-    els.selectionBar = selectionBar;
-    page.appendChild(selectionBar);
 
     var overlay = document.createElement("div");
     overlay.className = "sp-settings-overlay";
@@ -2813,6 +2815,30 @@
     renderPreview();
   }
 
+  function clearCardSelection() {
+    var c = ctx();
+    if (!c.selected.length && c.getLastClicked() < 0) return;
+    c.setSelected([]);
+    c.setLastClicked(-1);
+    hideSettingsOverlay();
+    renderPreview();
+    renderButtonSettings();
+  }
+
+  function isSelectionControlTarget(target) {
+    return !!(
+      (els.previewMain && els.previewMain.contains(target)) ||
+      (els.selectionBar && els.selectionBar.contains(target)) ||
+      (els.settingsOverlay && els.settingsOverlay.contains(target)) ||
+      (ctxMenu && ctxMenu.contains(target))
+    );
+  }
+
+  function handleDocumentSelectionMouseDown(e) {
+    if (isSelectionControlTarget(e.target)) return;
+    clearCardSelection();
+  }
+
   function openSelectedCardSettings() {
     var c = ctx();
     if (c.selected.length !== 1) return;
@@ -3497,37 +3523,72 @@
     if (size === 4) grid[pos + GRID_COLS + 1] = -1;
   }
 
+  function placeOrderedGridEntries(entries, sizes, maxSlots) {
+    var grid = [];
+    for (var i = 0; i < maxSlots; i++) grid.push(0);
+
+    for (var j = 0; j < entries.length && j < maxSlots; j++) {
+      var slot = entries[j];
+      if (!(slot > 0 || slot === -2)) continue;
+
+      var targetSize = sizes[slot] || 1;
+      var place = j;
+      if (!canPlaceSlotAt(grid, place, targetSize, maxSlots)) {
+        place = findPlacementCell(grid, place, targetSize, maxSlots);
+      }
+      if (place < 0 && targetSize !== 1) {
+        targetSize = 1;
+        place = canPlaceSlotAt(grid, j, targetSize, maxSlots)
+          ? j
+          : findPlacementCell(grid, j, targetSize, maxSlots);
+      }
+      if (place < 0) continue;
+
+      if (targetSize === 1) delete sizes[slot]; else sizes[slot] = targetSize;
+      placeSlotAt(grid, slot, place, targetSize);
+    }
+
+    return grid;
+  }
+
   function moveSelectedToCell(fromPos, toPos) {
     var c = ctx();
     toPos = resolveSpanPos(toPos);
     if (toPos < 0 || toPos >= c.maxSlots) return false;
 
-    var movingSlot = c.grid[fromPos];
+    var sourceEntries = c.grid.slice();
+    clearSpans(sourceEntries, c.maxSlots);
+
+    var movingSlot = sourceEntries[fromPos];
     if (c.selected.length <= 1 || c.selected.indexOf(movingSlot) === -1) return false;
 
     var movingSlots = c.selected.slice();
-    var grid = c.grid.slice();
-    clearSpans(grid, c.maxSlots);
+    var targetSlot = sourceEntries[toPos];
+    if (targetSlot > 0 && c.selected.indexOf(targetSlot) !== -1) return true;
 
-    for (var i = 0; i < movingSlots.length; i++) {
-      var currentPos = grid.indexOf(movingSlots[i]);
-      if (currentPos !== -1) grid[currentPos] = 0;
+    var entries = [];
+    for (var i = 0; i < c.maxSlots; i++) {
+      var entry = sourceEntries[i];
+      if (entry > 0 && c.selected.indexOf(entry) !== -1) continue;
+      entries.push(entry);
     }
+    while (entries.length < c.maxSlots) entries.push(0);
 
-    var cursor = toPos;
-    for (var j = 0; j < movingSlots.length; j++) {
-      var slot = movingSlots[j];
-      var targetSize = c.sizes[slot] || 1;
-      var place = findPlacementCell(grid, cursor, targetSize, c.maxSlots);
-      if (place < 0 && targetSize !== 1) {
-        targetSize = 1;
-        place = findPlacementCell(grid, cursor, targetSize, c.maxSlots);
+    var insertPos;
+    if (targetSlot > 0 || targetSlot === -2) {
+      insertPos = entries.indexOf(targetSlot);
+      insertPos = insertPos < 0 ? toPos : insertPos + 1;
+    } else {
+      insertPos = toPos;
+      for (var r = 0; r < toPos; r++) {
+        if (sourceEntries[r] > 0 && c.selected.indexOf(sourceEntries[r]) !== -1) insertPos--;
       }
-      if (place < 0) continue;
-      if (targetSize === 1) delete c.sizes[slot]; else c.sizes[slot] = targetSize;
-      placeSlotAt(grid, slot, place, targetSize);
-      cursor = (place + 1) % c.maxSlots;
     }
+    insertPos = Math.max(0, Math.min(insertPos, entries.length));
+    entries.splice.apply(entries, [insertPos, 0].concat(movingSlots));
+    entries = entries.slice(0, c.maxSlots);
+
+    var grid = placeOrderedGridEntries(entries, c.sizes, c.maxSlots);
 
     if (c.isSub) {
       getSubpage(state.editingSubpage).grid = grid;
