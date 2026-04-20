@@ -950,7 +950,7 @@
       on404: function () {
         if (value === "dim" && !_screensaverActionMissingWarned) {
           _screensaverActionMissingWarned = true;
-          showBanner("Device is missing /text/screensaver_action. Hard-refresh this page, then reflash if it remains.", "warning");
+          showBanner("Request failed: 404 (/text/screensaver_action)", "warning");
         }
       },
     });
