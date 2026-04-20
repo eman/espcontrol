@@ -2779,6 +2779,8 @@
     var bIdx = slot - 1;
     if (bIdx < 0 || bIdx >= c.buttons.length) return;
     var b = c.buttons[bIdx];
+    var boundFieldSaveTimer = null;
+    var boundFieldDirty = false;
 
     var title = document.createElement("div");
     title.className = "sp-section-title";
@@ -2791,11 +2793,32 @@
     var idPrefix = c.isSub ? "sp-sp-inp-" : "sp-inp-";
 
     function saveField(field, val) {
+      flushBoundFieldSave();
       if (c.isSub) {
         saveSubpageConfig(state.editingSubpage);
       } else {
         saveButtonConfig(slot);
       }
+    }
+
+    function flushBoundFieldSave() {
+      if (boundFieldSaveTimer) {
+        clearTimeout(boundFieldSaveTimer);
+        boundFieldSaveTimer = null;
+      }
+      if (!boundFieldDirty) return;
+      boundFieldDirty = false;
+      if (c.isSub) {
+        saveSubpageConfig(state.editingSubpage);
+      } else {
+        saveButtonConfig(slot);
+      }
+    }
+
+    function queueBoundFieldSave(delay) {
+      boundFieldDirty = true;
+      if (boundFieldSaveTimer) clearTimeout(boundFieldSaveTimer);
+      boundFieldSaveTimer = setTimeout(flushBoundFieldSave, delay);
     }
 
     function bindField(input, field, rerender) {
@@ -2807,17 +2830,24 @@
         syncValue();
         if (input.value === lastSaved) return;
         lastSaved = input.value;
-        saveField(field, input.value);
+        queueBoundFieldSave(500);
         if (rerender) renderPreview();
       }
       input.addEventListener("input", function () {
         syncValue();
+        if (input.value !== lastSaved) queueBoundFieldSave(900);
         if (rerender) renderPreview();
       });
       input.addEventListener("change", persistValue);
       input.addEventListener("blur", persistValue);
       input.addEventListener("keydown", function (e) {
         if (e.key === "Enter") {
+          syncValue();
+          if (input.value !== lastSaved) {
+            lastSaved = input.value;
+            boundFieldDirty = true;
+          }
+          flushBoundFieldSave();
           persistValue();
           this.blur();
         }
@@ -3093,7 +3123,10 @@
     var saveBtn = document.createElement("button");
     saveBtn.className = "sp-action-btn sp-save-btn";
     saveBtn.textContent = "Save";
-    saveBtn.addEventListener("click", function () { closeSettings(); });
+    saveBtn.addEventListener("click", function () {
+      flushBoundFieldSave();
+      closeSettings();
+    });
     rightGroup.appendChild(saveBtn);
     saveRow.appendChild(rightGroup);
     panel.appendChild(saveRow);
