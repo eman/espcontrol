@@ -135,26 +135,13 @@ script:
                   - script.execute: hide_clock_view
                 else:
                   - script.execute: hide_clock_view
-                  # Let LVGL redraw after snow pause before restoring backlight.
-                  - delay: 1s
+                  - delay: 100ms
                   - globals.set:
                       id: display_asleep
                       value: 'false'
                   - script.execute: backlight_apply_brightness
       - script.execute: screensaver_idle_check
       - script.execute: home_screen_idle_check
-
-  # Home Assistant turns the light entity on before LVGL has resumed. Briefly
-  # blank it again so the snow pause clears before the backlight returns.
-  - id: screensaver_wake_from_backlight
-    mode: restart
-    then:
-      - if:
-          condition:
-            lambda: 'return id(screensaver_display_off_active);'
-          then:
-            - light.turn_off: display_backlight
-            - script.execute: screensaver_wake
 
   # Show the clock screensaver overlay
   - id: show_clock_view
