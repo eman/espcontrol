@@ -24,9 +24,9 @@
   // __DEVICE_CONFIG_START__
   var DEVICE_ID = "guition-esp32-p4-jc8012p4a1";
   var CFG = {
-    "slots": 15,
+    "slots": 20,
     "cols": 5,
-    "rows": 3,
+    "rows": 4,
     "dragMode": "swap",
     "dragAnimation": true,
     "features": {
@@ -42,8 +42,8 @@
     },
     "topbar": {
       "height": 3.28,
-      "padding": "0.63cqw",
-      "fontSize": 1.88
+      "padding": "0.47cqw",
+      "fontSize": 1.72
     },
     "grid": {
       "top": 3.28,
@@ -54,31 +54,31 @@
       "fr": "1fr"
     },
     "btn": {
-      "radius": 0.94,
-      "padding": 1.56,
-      "iconSize": 5,
-      "labelSize": 2.19,
+      "radius": 0.86,
+      "padding": 1.41,
+      "iconSize": 4.55,
+      "labelSize": 2.03,
       "labelLines": 2,
       "labelLinesDouble": 3
     },
     "emptyCell": {
-      "radius": 0.94
+      "radius": 0.86
     },
     "sensorBadge": {
-      "top": 0.94,
-      "right": 0.94,
-      "fontSize": 1.56
+      "top": 0.86,
+      "right": 0.86,
+      "fontSize": 1.41
     },
     "subpageBadge": {
-      "bottom": 0.94,
-      "right": 0.94,
-      "fontSize": 1.88
+      "bottom": 0.86,
+      "right": 0.86,
+      "fontSize": 1.72
     },
     "backBtn": {
-      "radius": 0.94,
-      "padding": 1.56,
-      "iconSize": 5,
-      "labelSize": 2.19,
+      "radius": 0.86,
+      "padding": 1.41,
+      "iconSize": 4.55,
+      "labelSize": 2.03,
       "labelLines": 2,
       "labelLinesDouble": 3
     }

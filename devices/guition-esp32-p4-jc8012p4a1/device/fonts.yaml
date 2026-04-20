@@ -10,26 +10,26 @@ font:
   # Main page: large statistics / sensor values
   - file: "gfonts://Roboto@Light"
     id: statistics_font_lt
-    size: 64
+    size: 60
     bpp: 4
     glyphs: "0123456789.-°/%kWhVA "
 
   # Main page: button icons
   - file: 'https://github.com/Templarian/MaterialDesign-Webfont/raw/v7.4.47/fonts/materialdesignicons-webfont.ttf'
     id: icon_font_lt
-    size: 64
+    size: 60
     bpp: 4
     glyphs: !include ../../../common/assets/icon_glyphs.yaml
 
-  # Button labels (28px)
+  # Button labels (26px)
   - file: "gfonts://Roboto"
     id: label_font_lt
-    size: 28
+    size: 26
     bpp: 4
     glyphs: !include ../../../common/assets/text_glyphs.yaml
 
-  # Top bar clock and temperature (24px)
+  # Top bar clock and temperature (22px)
   - file: "gfonts://Roboto"
     id: clockbar_font_lt
-    size: 24
+    size: 22
     bpp: 4

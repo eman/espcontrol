@@ -67,7 +67,7 @@ The panel includes hundreds of icons from the Material Design Icons set. If the 
 
 The home screen has a grid of buttons sized to fill the screen:
 
-- **10.1-inch JC8012P4A1** — 15 buttons (3 rows, 5 columns)
+- **10.1-inch JC8012P4A1** — 20 buttons (4 rows, 5 columns)
 - **7-inch JC1060P470** — 15 buttons (3 rows, 5 columns)
 - **4.3-inch JC4880P443** — 6 buttons (3 rows, 2 columns)
 - **4-inch 4848S040** — 9 buttons (3 rows, 3 columns)
