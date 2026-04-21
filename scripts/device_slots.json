@@ -1,0 +1,40 @@
+{
+  "devices": [
+    {
+      "slug": "guition-esp32-p4-jc1060p470",
+      "slots": 15,
+      "cols": 5,
+      "grid": "3x5",
+      "sensor_font": "statistics_font",
+      "color_correction": false,
+      "wrap_tall_labels": true
+    },
+    {
+      "slug": "guition-esp32-p4-jc4880p443",
+      "slots": 6,
+      "cols": 2,
+      "grid": "3x2",
+      "sensor_font": "statistics_font_lg",
+      "color_correction": true,
+      "wrap_tall_labels": false
+    },
+    {
+      "slug": "guition-esp32-p4-jc8012p4a1",
+      "slots": 20,
+      "cols": 5,
+      "grid": "5x4",
+      "sensor_font": "statistics_font_lt",
+      "color_correction": true,
+      "wrap_tall_labels": true
+    },
+    {
+      "slug": "guition-esp32-s3-4848s040",
+      "slots": 9,
+      "cols": 3,
+      "grid": "3x3",
+      "sensor_font": "statistics_font",
+      "color_correction": false,
+      "wrap_tall_labels": false
+    }
+  ]
+}
