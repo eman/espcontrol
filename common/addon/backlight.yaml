@@ -40,6 +40,9 @@ globals:
   - id: screensaver_fade_start_level
     type: float
     initial_value: '1.0'
+  - id: screensaver_clock_target_level
+    type: float
+    initial_value: '0.35'
 
 script:
   # Screensaver idle timer (restartable)
@@ -107,7 +110,7 @@ script:
       - output.turn_off: gpio_backlight_pwm
       - lambda: 'id(gpio_backlight_pwm).turn_off();'
 
-  - id: backlight_sleep_display_off
+  - id: backlight_fade_current_ui_to_black
     mode: restart
     then:
       - lambda: |-
@@ -148,6 +151,12 @@ script:
           id: gpio_backlight_pwm
           level: 0%
       - delay: 50ms
+
+  - id: backlight_sleep_display_off
+    mode: restart
+    then:
+      - script.execute: backlight_fade_current_ui_to_black
+      - script.wait: backlight_fade_current_ui_to_black
       - globals.set:
           id: display_asleep
           value: 'true'
@@ -242,6 +251,7 @@ script:
     mode: restart
     then:
       - script.stop: screen_schedule_sleep
+      - script.stop: backlight_fade_current_ui_to_black
       - script.stop: backlight_sleep_display_off
       - script.stop: backlight_schedule_display_off
       - lambda: |-
@@ -320,6 +330,11 @@ script:
     then:
       - lambda: |-
           id(is_clock_showing) = true;
+          float target = id(clock_brightness).state / 100.0f;
+          if (std::isnan(target) || target <= 0.0f) target = 0.35f;
+          if (target < 0.01f) target = 0.01f;
+          if (target > 1.0f) target = 1.0f;
+          id(screensaver_clock_target_level) = target;
           auto time = id(ha_time).now();
           if (time.is_valid()) {
             char buf[12];
@@ -340,13 +355,39 @@ script:
             int oy = (time.minute * 13) % 41 - 20;
             lv_obj_set_pos(id(clock_label), cx + ox - w/2, cy + oy - h/2);
           }
+      - script.execute: backlight_fade_current_ui_to_black
+      - script.wait: backlight_fade_current_ui_to_black
       - lvgl.widget.show: clock_screensaver
       - lvgl.widget.hide: display_time
       - lvgl.widget.hide: temperatures
+      - output.set_level:
+          id: gpio_backlight_pwm
+          level: 0%
+      - delay: 50ms
+      - output.set_level:
+          id: gpio_backlight_pwm
+          level: !lambda 'return id(screensaver_clock_target_level) * 0.20f;'
+      - delay: 50ms
+      - output.set_level:
+          id: gpio_backlight_pwm
+          level: !lambda 'return id(screensaver_clock_target_level) * 0.40f;'
+      - delay: 50ms
+      - output.set_level:
+          id: gpio_backlight_pwm
+          level: !lambda 'return id(screensaver_clock_target_level) * 0.60f;'
+      - delay: 50ms
+      - output.set_level:
+          id: gpio_backlight_pwm
+          level: !lambda 'return id(screensaver_clock_target_level) * 0.80f;'
+      - delay: 50ms
+      - output.set_level:
+          id: gpio_backlight_pwm
+          level: !lambda 'return id(screensaver_clock_target_level);'
+      - delay: 50ms
       - light.turn_on:
           id: display_backlight
-          brightness: !lambda 'return id(clock_brightness).state / 100.0f;'
-          transition_length: 3s
+          brightness: !lambda 'return id(screensaver_clock_target_level);'
+          transition_length: 0s
 
   # Hide the clock screensaver overlay
   - id: hide_clock_view
