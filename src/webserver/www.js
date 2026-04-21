@@ -288,6 +288,7 @@
     "padding:0 12px 0 10px;border-radius:999px;background:rgba(48,164,108,.16);" +
     "color:#30a46c;font-size:.68rem;font-weight:400;text-transform:uppercase;letter-spacing:.04em;line-height:1}" +
     ".sp-card-badge-dot{width:7px;height:7px;border-radius:999px;background:#30a46c;flex-shrink:0}" +
+    ".card:not(.collapsed) .sp-card-badge{display:none}" +
     ".sp-card-badge.sp-hidden{display:none}" +
 
     ".sp-panel{background:var(--surface);border-radius:var(--radius);padding:24px;" +
