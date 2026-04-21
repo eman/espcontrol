@@ -833,7 +833,7 @@
     ".card-header-right{display:flex;align-items:center;gap:8px}" +
     ".sp-card-badge{display:inline-flex;align-items:center;gap:7px;min-height:24px;" +
     "padding:0 12px 0 10px;border-radius:999px;background:rgba(48,164,108,.16);" +
-    "color:#30a46c;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1}" +
+    "color:#30a46c;font-size:.68rem;font-weight:400;text-transform:uppercase;letter-spacing:.04em;line-height:1}" +
     ".sp-card-badge-dot{width:7px;height:7px;border-radius:999px;background:#30a46c;flex-shrink:0}" +
     ".sp-card-badge.sp-hidden{display:none}" +
 
