@@ -100,9 +100,13 @@ script:
   - id: backlight_force_display_off
     mode: restart
     then:
-      - light.turn_off:
-          id: display_backlight
-          transition_length: 0s
+      - if:
+          condition:
+            light.is_on: display_backlight
+          then:
+            - light.turn_off:
+                id: display_backlight
+                transition_length: 0s
       - output.turn_off: gpio_backlight_pwm
       - lambda: 'id(gpio_backlight_pwm).turn_off();'
 
