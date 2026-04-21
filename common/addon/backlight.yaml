@@ -115,11 +115,12 @@ script:
     then:
       - light.turn_off:
           id: display_backlight
-          transition_length: 1s
+          transition_length: 400ms
+      - delay: 450ms
       - lvgl.resume:
       - script.execute: hide_clock_view
       - lvgl.page.show: screen_off_page
-      - delay: 3s
+      - delay: 50ms
       - script.execute: backlight_force_display_off
       - lvgl.pause:
       - script.execute: backlight_force_display_off
