@@ -16,6 +16,7 @@ You will find it in the **Settings** tab on the [Setup](/features/setup) page, u
 - **On Time** - the first hour when the screen should be awake. The default is **6:00 AM**.
 - **Off Time** - the first hour when the screen should be asleep. The default is **11:00 PM**.
 - **When Woken, Idle Time To Screen Off** - how long the screen stays awake after you tap it during the scheduled-off hours. The default is **1 minute**.
+- **When Woken, Screen Brightness** - the brightness used only for a temporary wake during scheduled-off hours. The default is **10%**.
 
 When the schedule is disabled, the on and off time controls are hidden and the panel uses the normal [screensaver](/features/screensaver) and [backlight](/features/backlight) rules.
 
@@ -29,10 +30,10 @@ If the on and off times are the same, the schedule is treated as always on.
 
 ## Manual Wake And Sleep
 
-Touching the screen while it is asleep wakes it without changing the saved schedule. If you wake it outside the scheduled hours, it stays awake for the **When Woken** idle time, then the schedule puts it back to sleep again.
+Touching the screen while it is asleep wakes it without changing the saved schedule. If you wake it outside the scheduled hours, it uses the **When Woken** brightness, stays awake for the **When Woken** idle time, then the schedule puts it back to sleep again.
 
 Pressing and holding a button on the touchscreen for 3 seconds puts the screen to sleep manually. This is stronger than the schedule, so it will not immediately wake again just because the current time is inside the scheduled-on window. Tap the screen to wake it.
 
 ## Brightness
 
-Screen schedule works alongside the daytime and nighttime brightness settings. When the screen is awake, brightness still follows sunrise and sunset for your selected timezone. When the screen is asleep, the physical backlight is off.
+Screen schedule works alongside the daytime and nighttime brightness settings. When the screen is awake during scheduled-on hours, brightness still follows sunrise and sunset for your selected timezone. A temporary wake during scheduled-off hours uses **When Woken, Screen Brightness** instead. When the screen is asleep, the physical backlight is off.

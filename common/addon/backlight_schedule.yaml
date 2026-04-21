@@ -144,6 +144,28 @@ number:
               - script.execute: screen_schedule_wake_timeout_check
 
   - platform: template
+    name: "Screen: Schedule Wake Brightness"
+    id: schedule_wake_brightness
+    min_value: 10
+    max_value: 100
+    step: 5
+    initial_value: 10
+    optimistic: true
+    restore_value: true
+    unit_of_measurement: "%"
+    entity_category: config
+    icon: "mdi:brightness-5"
+    web_server:
+      sorting_group_id: sg_brightness
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(manual_wake_ms) != 0;'
+            then:
+              - script.execute: backlight_apply_brightness
+
+  - platform: template
     name: "Screen: Daytime Brightness"
     id: brightness_day
     min_value: 10
@@ -386,13 +408,21 @@ script:
             id(backlight_force_display_off).execute();
             return;
           }
-          bool is_day = id(last_is_daytime);
-          float pct = calc_brightness_pct(
-            id(sunrise_sunset_valid), id(sunrise_hour), id(sunrise_minute),
-            id(sunset_hour), id(sunset_minute),
-            now.is_valid() ? now.hour : 12, now.is_valid() ? now.minute : 0,
-            &is_day, id(brightness_day).state, id(brightness_night).state);
-          id(last_is_daytime) = is_day;
+          float pct;
+          if (id(manual_wake_ms) != 0) {
+            pct = id(schedule_wake_brightness).state;
+            if (std::isnan(pct) || pct <= 0) pct = 10;
+            if (pct < 10) pct = 10;
+            if (pct > 100) pct = 100;
+          } else {
+            bool is_day = id(last_is_daytime);
+            pct = calc_brightness_pct(
+              id(sunrise_sunset_valid), id(sunrise_hour), id(sunrise_minute),
+              id(sunset_hour), id(sunset_minute),
+              now.is_valid() ? now.hour : 12, now.is_valid() ? now.minute : 0,
+              &is_day, id(brightness_day).state, id(brightness_night).state);
+            id(last_is_daytime) = is_day;
+          }
           auto call = id(display_backlight).turn_on();
           call.set_brightness(pct / 100.0f);
           call.set_transition_length(400);

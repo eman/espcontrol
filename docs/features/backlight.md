@@ -27,7 +27,7 @@ When the screensaver is active, the backlight turns off. On wake (touch or prese
 
 ## Screen Schedule
 
-The [screen schedule](/features/screen-schedule) can also turn the physical backlight off at set hours. Brightness is only applied while the screen is awake.
+The [screen schedule](/features/screen-schedule) can also turn the physical backlight off at set hours. Brightness is only applied while the screen is awake. If you temporarily wake the screen during scheduled-off hours, the schedule's separate **When Woken** brightness is used instead of the normal nighttime brightness.
 
 ## Before clock sync
 
