@@ -1548,19 +1548,21 @@
   var _postQueue = Promise.resolve();
 
   function post(url, fallbackUrl, errorMessage) {
+    var urls = Array.isArray(url) ? url.slice() : [url];
+    if (fallbackUrl) urls.push(fallbackUrl);
     _postQueue = _postQueue.then(function () {
-      return fetch(url, { method: "POST" }).then(function (r) {
-        if (r.ok || !fallbackUrl) {
-          if (!r.ok) showBanner(errorMessage || ("Request failed: " + r.status), "error");
-          return r;
-        }
-        return fetch(fallbackUrl, { method: "POST" }).then(function (fallbackResponse) {
-          if (!fallbackResponse.ok) {
-            showBanner(errorMessage || ("Request failed: " + fallbackResponse.status), "error");
+      var index = 0;
+      function tryNext() {
+        return fetch(urls[index], { method: "POST" }).then(function (r) {
+          if (r.ok || index >= urls.length - 1) {
+            if (!r.ok) showBanner(errorMessage || ("Request failed: " + r.status), "error");
+            return r;
           }
-          return fallbackResponse;
+          index++;
+          return tryNext();
         });
-      }).catch(function () {
+      }
+      return tryNext().catch(function () {
         showBanner("Cannot reach device \u2014 is it connected?", "error");
       });
     });
@@ -1632,8 +1634,20 @@
       errorMessage);
   }
 
+  function postWithObjectIds(domain, name, objectIds, action, errorMessage) {
+    var urls = ["/" + domain + "/" + encodeURIComponent(name) + "/" + action];
+    objectIds.forEach(function (objectId) {
+      urls.push("/" + domain + "/" + encodeURIComponent(objectId) + "/" + action);
+    });
+    post(urls, null, errorMessage);
+  }
+
   function postNumberWithObjectId(name, objectId, value, errorMessage) {
     postWithObjectId("number", name, objectId, "set?value=" + encodeURIComponent(value), errorMessage);
+  }
+
+  function postNumberWithObjectIds(name, objectIds, value, errorMessage) {
+    postWithObjectIds("number", name, objectIds, "set?value=" + encodeURIComponent(value), errorMessage);
   }
 
   function postSwitchWithObjectId(name, objectId, on, errorMessage) {
@@ -1658,7 +1672,11 @@
   }
 
   function postScreenScheduleWakeTimeout(value) {
-    postNumberWithObjectId("Screen: Schedule Wake Timeout", "screen__schedule_wake_timeout", value, SCREEN_SCHEDULE_WAKE_TIMEOUT_UNAVAILABLE);
+    postNumberWithObjectIds("Screen: Schedule Wake Timeout", [
+      "screen__schedule_wake_timeout",
+      "screen_schedule_wake_timeout",
+      "schedule_wake_timeout",
+    ], value, SCREEN_SCHEDULE_WAKE_TIMEOUT_UNAVAILABLE);
   }
 
   function getJsonQuietly(path, callback) {
@@ -5259,6 +5277,14 @@
         syncScreenScheduleUi();
       },
       "number-screen__schedule_wake_timeout": function (val) {
+        state.scheduleWakeTimeout = normalizeScheduleWakeTimeout(val);
+        syncScreenScheduleUi();
+      },
+      "number-screen_schedule_wake_timeout": function (val) {
+        state.scheduleWakeTimeout = normalizeScheduleWakeTimeout(val);
+        syncScreenScheduleUi();
+      },
+      "number-schedule_wake_timeout": function (val) {
         state.scheduleWakeTimeout = normalizeScheduleWakeTimeout(val);
         syncScreenScheduleUi();
       },
