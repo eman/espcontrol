@@ -6,6 +6,10 @@
 # DSI display, GSL3680 capacitive touchscreen, and backlight PWM.
 # =============================================================================
 
+substitutions:
+  espcontrol_component_url: "https://github.com/jtenniswood/espcontrol"
+  espcontrol_component_ref: "main"
+
 # ---------------------------------------------------------------------------
 # ESP32-P4 platform (16MB flash, ESP-IDF framework)
 # ---------------------------------------------------------------------------
@@ -33,8 +37,8 @@ esp32:
 external_components:
   - source:
       type: git
-      url: https://github.com/jtenniswood/espcontrol
-      ref: main
+      url: ${espcontrol_component_url}
+      ref: ${espcontrol_component_ref}
       path: components
     components: [espcontrol]
     refresh: 0s

@@ -6,6 +6,10 @@
 # capacitive touchscreen, and backlight PWM.
 # =============================================================================
 
+substitutions:
+  espcontrol_component_url: "https://github.com/jtenniswood/espcontrol"
+  espcontrol_component_ref: "main"
+
 # ---------------------------------------------------------------------------
 # ESP32-S3 platform (16MB flash, ESP-IDF framework)
 # ---------------------------------------------------------------------------
@@ -20,13 +24,13 @@ esp32:
       CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
 
 # ---------------------------------------------------------------------------
-# External component (sun_calc.h for on-device sunrise/sunset)
+# External component
 # ---------------------------------------------------------------------------
 external_components:
   - source:
       type: git
-      url: https://github.com/jtenniswood/espcontrol
-      ref: main
+      url: ${espcontrol_component_url}
+      ref: ${espcontrol_component_ref}
       path: components
     components: [espcontrol]
     refresh: 0s
