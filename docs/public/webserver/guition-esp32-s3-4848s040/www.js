@@ -36,8 +36,7 @@
         "90",
         "180",
         "270"
-      ],
-      "screenRotationDisplayOffset": 180
+      ]
     },
     "screen": {
       "width": "55%",
@@ -833,8 +832,10 @@
     ".card.collapsed .card-chevron{transform:rotate(-90deg)}" +
     ".card.collapsed .card-body{display:none}" +
     ".card-header-right{display:flex;align-items:center;gap:8px}" +
-    ".sp-card-badge{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;" +
-    "padding:3px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}" +
+    ".sp-card-badge{display:inline-flex;align-items:center;gap:7px;min-height:24px;" +
+    "padding:0 12px 0 10px;border-radius:999px;background:rgba(48,164,108,.16);" +
+    "color:#30a46c;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1}" +
+    ".sp-card-badge-dot{width:7px;height:7px;border-radius:999px;background:#30a46c;flex-shrink:0}" +
     ".sp-card-badge.sp-hidden{display:none}" +
 
     ".sp-panel{background:var(--surface);border-radius:var(--radius);padding:24px;" +
@@ -2231,7 +2232,8 @@
     });
 
     var scheduleBadge = document.createElement("span");
-    scheduleBadge.textContent = "Active";
+    scheduleBadge.setAttribute("aria-label", "Schedule on");
+    scheduleBadge.innerHTML = '<span class="sp-card-badge-dot"></span><span>ON</span>';
     els.setScheduleBadge = scheduleBadge;
     syncScreenScheduleUi();
     var scheduleCard = makeCollapsibleCard("Night Schedule", scheduleBody, true, scheduleBadge);
