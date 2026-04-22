@@ -226,6 +226,14 @@ inline std::string garage_state_label(const std::string &state) {
   return sentence_cap_text(state);
 }
 
+inline bool garage_state_is_active(const std::string &state) {
+  return state == "open" || state == "opening" || state == "closing";
+}
+
+inline bool garage_state_uses_open_icon(const std::string &state) {
+  return state == "open" || state == "opening";
+}
+
 // Parse a 6-char hex color string (no # prefix) into a uint32_t RGB value
 inline uint32_t parse_hex_color(const std::string &hex, bool &valid) {
   valid = hex.length() == 6;
@@ -627,10 +635,10 @@ inline void subscribe_garage_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl, lv_obj
     entity_id, {},
     std::function<void(const std::string &)>(
       [btn_ptr, icon_lbl, text_lbl, closed_icon, open_icon](const std::string &state) {
-        bool active = is_entity_on(state);
+        bool active = garage_state_is_active(state);
         if (active) lv_obj_add_state(btn_ptr, LV_STATE_CHECKED);
         else lv_obj_clear_state(btn_ptr, LV_STATE_CHECKED);
-        lv_label_set_text(icon_lbl, active ? open_icon : closed_icon);
+        lv_label_set_text(icon_lbl, garage_state_uses_open_icon(state) ? open_icon : closed_icon);
         std::string label = garage_state_label(state);
         lv_label_set_text(text_lbl, label.c_str());
       })

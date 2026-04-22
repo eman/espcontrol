@@ -23,4 +23,4 @@ There is no label setting for this card because the label area always shows the 
 - Tapping the card sends a toggle action to Home Assistant.
 - The card lights up while the door is open, opening, or closing.
 - The label shows the Home Assistant state, such as **Open**, **Closed**, **Opening**, or **Closing**.
-- The icon uses the closed icon when the state is closed, and the open icon while the door is open or moving.
+- The icon uses the closed **Garage** icon when the state is closed or closing, and the open icon when the state is open or opening.
