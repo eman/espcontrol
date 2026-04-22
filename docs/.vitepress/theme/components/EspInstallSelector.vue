@@ -21,7 +21,6 @@
           }"
           aria-hidden="true"
         >
-          <span class="screen-bar"></span>
           <span class="screen-grid">
             <span v-for="slot in device.slots" :key="slot"></span>
           </span>
@@ -206,7 +205,6 @@ onMounted(async () => {
 
 .device-screen {
   display: grid;
-  grid-template-rows: 10px 1fr;
   justify-self: center;
   width: 66px;
   aspect-ratio: var(--screen-aspect);
@@ -225,17 +223,11 @@ onMounted(async () => {
   width: 58px;
 }
 
-.screen-bar {
-  border-radius: 3px;
-  background: linear-gradient(90deg, #f2994a, #2f80ed);
-}
-
 .screen-grid {
   display: grid;
   grid-template-columns: repeat(var(--grid-cols), 1fr);
   grid-template-rows: repeat(var(--grid-rows), 1fr);
   gap: 2px;
-  padding-top: 4px;
 }
 
 .screen-grid span {
