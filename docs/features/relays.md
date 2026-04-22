@@ -58,12 +58,6 @@ Tapping a relay switch entity asks Home Assistant to toggle the relay. Tapping a
 
 The push button entities are useful when the relay is wired in parallel with existing momentary wall switches, for example when it is driving a dimmer or lighting controller that expects a short button press rather than a permanent on/off output.
 
-## Hardware Detection
-
-The relays are controlled directly by GPIO pins. That means there is no separate relay controller chip for the firmware to identify, so Espcontrol cannot reliably auto-detect whether a specific physical board has the relay hardware fitted.
-
-If your board is the relay variant, the entities will control the built-in relays. If your board does not have the relay hardware, the same entities may still appear in Home Assistant but will not switch a physical relay.
-
 ## Startup Behaviour
 
 The relay outputs default to **off** after startup or restart. This helps avoid a relay turning on unexpectedly when the panel reboots.
@@ -75,5 +69,11 @@ If you need a relay to return to a particular state after restart, handle that w
 After updating the firmware, test each relay from Home Assistant before connecting it to anything important. You should hear or feel each relay click when it changes state.
 
 ## Safety
+
+::: danger Electrical work can be dangerous
+Always consult a qualified electrician before using the relay outputs, especially for anything connected to fixed wiring, mains voltage, garage doors, gates, heating equipment, or anything else that could cause injury or property damage.
+
+Use the relay feature at your own risk. Espcontrol and its maintainers are not responsible or liable for damage, injury, code violations, incorrect wiring, equipment failure, or other losses caused by using the relay outputs.
+:::
 
 Check the relay rating printed on your board or supplied by the seller before connecting anything. Do not use the relays for mains voltage unless your specific relay board, wiring, enclosure, and local electrical rules make that safe.
