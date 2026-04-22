@@ -1,10 +1,12 @@
 // Slider and cover button types: draggable brightness/position control.
 // Factory creates both "slider" (light.turn_on w/ brightness) and "cover"
-// (cover.set_cover_position) variants. b.sensor stores slider orientation ("h" or "").
+// (cover.set_cover_position) variants. b.sensor stores slider orientation ("h" or "")
+// or cover interaction mode ("toggle").
 function sliderTypeFactory(opts) {
   return {
     label: opts.label,
     allowInSubpage: true,
+    hideLabel: !!opts.hideLabel,
     labelPlaceholder: opts.placeholder,
     onSelect: function (b) {
       b.sensor = ""; b.unit = "";
@@ -12,6 +14,55 @@ function sliderTypeFactory(opts) {
       b.icon_on = opts.defaultIconOn;
     },
     renderSettings: function (panel, b, slot, helpers) {
+      function labelField() {
+        var lf = document.createElement("div");
+        lf.className = "sp-field";
+        lf.appendChild(helpers.fieldLabel("Label", helpers.idPrefix + "label"));
+        var labelInp = helpers.textInput(helpers.idPrefix + "label", b.label, opts.placeholder);
+        lf.appendChild(labelInp);
+        panel.appendChild(lf);
+        helpers.bindField(labelInp, "label", true);
+      }
+
+      if (opts.interactionMode) {
+        var interactionMode = b.sensor === "toggle" ? "toggle" : "slider";
+        if (b.sensor && b.sensor !== "toggle") {
+          b.sensor = "";
+          helpers.saveField("sensor", "");
+        }
+
+        var imf = document.createElement("div");
+        imf.className = "sp-field";
+        imf.appendChild(helpers.fieldLabel("Interaction"));
+        var imSeg = document.createElement("div");
+        imSeg.className = "sp-segment";
+        var sliderBtn = document.createElement("button");
+        sliderBtn.type = "button";
+        sliderBtn.textContent = "Slider";
+        var toggleBtn = document.createElement("button");
+        toggleBtn.type = "button";
+        toggleBtn.textContent = "Toggle";
+        imSeg.appendChild(sliderBtn);
+        imSeg.appendChild(toggleBtn);
+        imf.appendChild(imSeg);
+        panel.appendChild(imf);
+
+        function setInteractionMode(mode, persist) {
+          interactionMode = mode;
+          sliderBtn.classList.toggle("active", mode === "slider");
+          toggleBtn.classList.toggle("active", mode === "toggle");
+          if (!persist) return;
+          b.sensor = mode === "toggle" ? "toggle" : "";
+          helpers.saveField("sensor", b.sensor);
+        }
+
+        sliderBtn.addEventListener("click", function () { setInteractionMode("slider", true); });
+        toggleBtn.addEventListener("click", function () { setInteractionMode("toggle", true); });
+        setInteractionMode(interactionMode, false);
+      }
+
+      if (opts.renderLabelInSettings) labelField();
+
       var ef = document.createElement("div");
       ef.className = "sp-field";
       ef.appendChild(helpers.fieldLabel("Entity ID", helpers.idPrefix + "entity"));
@@ -56,7 +107,7 @@ function sliderTypeFactory(opts) {
       }
 
       var allowDirection = opts.allowDirection !== false;
-      if (!allowDirection && b.sensor) {
+      if (!allowDirection && !opts.interactionMode && b.sensor) {
         b.sensor = "";
         helpers.saveField("sensor", "");
       }
@@ -141,6 +192,14 @@ function sliderTypeFactory(opts) {
     renderPreview: function (b, helpers) {
       var label = b.label || b.entity || opts.fallbackLabel;
       var iconName = b.icon && b.icon !== "Auto" ? iconSlug(b.icon) : opts.fallbackIcon;
+      if (opts.interactionMode && b.sensor === "toggle") {
+        return {
+          iconHtml: '<span class="sp-btn-icon mdi mdi-' + iconName + '"></span>',
+          labelHtml:
+            '<span class="sp-btn-label-row"><span class="sp-btn-label">' + helpers.escHtml(label) + '</span>' +
+            '<span class="sp-type-badge mdi mdi-' + opts.badgeIcon + '"></span></span>',
+        };
+      }
       var horizClass = opts.allowDirection !== false && b.sensor === "h" ? " sp-slider-horiz" : "";
       return {
         iconHtml:
@@ -180,4 +239,7 @@ registerButtonType("cover", sliderTypeFactory({
   badgeIcon: "blinds-horizontal",
   allowDirection: false,
   alwaysShowIconPair: true,
+  hideLabel: true,
+  renderLabelInSettings: true,
+  interactionMode: true,
 }));

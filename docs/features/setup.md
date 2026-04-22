@@ -29,7 +29,7 @@ Tap any empty space in the grid (shown as a dashed outline with a **+** icon). A
 
 **[Trigger](/card-types/buttons)** — a momentary card that fires an event to Home Assistant for use as an automation trigger.
 
-**[Cover](/card-types/covers)** — controls blinds, shutters, and garage doors with a position slider. 
+**[Cover](/card-types/covers)** — controls blinds, shutters, and garage doors with either a position slider or a tap-to-toggle card.
 
 **[Date](/card-types/calendar)** — displays today's day number with the month underneath.
 

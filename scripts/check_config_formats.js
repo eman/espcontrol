@@ -195,6 +195,17 @@ assertButtonRoundTrip(hooks, "garage label button", {
   precision: "",
 }, false);
 
+assertButtonRoundTrip(hooks, "cover toggle button", {
+  entity: "cover.office_blind",
+  label: "Office Blind",
+  icon: "Blinds",
+  icon_on: "Blinds Open",
+  sensor: "toggle",
+  unit: "",
+  type: "cover",
+  precision: "",
+}, false);
+
 assert.deepStrictEqual(buttonShape(hooks.parseButtonConfig("light.legacy;Legacy;Auto;Lightbulb;sensor.legacy;W;sensor;1")), {
   entity: "light.legacy",
   label: "Legacy",
@@ -241,6 +252,13 @@ assertSubpageRoundTrip(hooks, "internal relay subpage", {
   ],
 }, true);
 
+assertSubpageRoundTrip(hooks, "cover toggle subpage", {
+  order: ["1", "B"],
+  buttons: [
+    buttonShape({ entity: "cover.office_blind", label: "Office Blind", icon: "Blinds", icon_on: "Blinds Open", sensor: "toggle", type: "cover" }),
+  ],
+}, true);
+
 assertSubpageRoundTrip(hooks, "delimiter subpage", {
   order: ["1", "B", "2"],
   buttons: [
@@ -277,6 +295,13 @@ assert.deepStrictEqual(subpageShape(hooks.parseSubpageConfig("~1,B|R,cover.garag
     buttonShape({ entity: "cover.garage", label: "Garage Door", icon: "Garage", icon_on: "Garage Open", type: "garage" }),
   ],
 }, "compact garage label subpage parse");
+
+assert.deepStrictEqual(subpageShape(hooks.parseSubpageConfig("~1,B|C,cover.office_blind,Office%20Blind,Blinds,Blinds%20Open,toggle")), {
+  order: ["1", "B"],
+  buttons: [
+    buttonShape({ entity: "cover.office_blind", label: "Office Blind", icon: "Blinds", icon_on: "Blinds Open", sensor: "toggle", type: "cover" }),
+  ],
+}, "compact cover toggle subpage parse");
 
 assert.deepStrictEqual(subpageShape(hooks.parseSubpageConfig("~1,B|I,relay_2,Gate,Power%20Plug,Power,push")), {
   order: ["1", "B"],

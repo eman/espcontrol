@@ -94,7 +94,7 @@ struct ParsedCfg {
   std::string label;       // 1  display name (blank = use HA friendly_name)
   std::string icon;        // 2  icon name for off/default state
   std::string icon_on;     // 3  icon name for on state (blank = no swap)
-  std::string sensor;      // 4  sensor entity; "h" for horizontal slider; "push" for internal relay mode
+  std::string sensor;      // 4  sensor entity; "h" for horizontal slider; "push" for internal relay; "toggle" for cover mode
   std::string unit;        // 5  unit suffix for sensor display
   std::string type;        // 6  button type: "" (toggle), sensor, slider, cover, garage, push, internal, subpage
   std::string precision;   // 7  decimal places for sensors; "text" = text sensor mode
@@ -1004,6 +1004,10 @@ inline bool is_cover_entity(const std::string &entity_id) {
   return entity_id.size() > 6 && entity_id.compare(0, 6, "cover.") == 0;
 }
 
+inline bool cover_toggle_mode(const std::string &sensor) {
+  return sensor == "toggle";
+}
+
 // Send HA action for a slider change: toggle (value<0), brightness, or cover position
 inline void send_slider_action(const std::string &entity_id, int value) {
   esphome::api::HomeassistantActionRequest req;
@@ -1079,6 +1083,11 @@ inline void handle_button_click(const std::string &cfg, int slot_num,
     if (sub_scr)
       lv_scr_load_anim(sub_scr, LV_SCR_LOAD_ANIM_NONE, 0, 0, false);
   } else if (p.type == "garage") {
+    if (!p.entity.empty()) {
+      lv_obj_add_state(btn_obj, LV_STATE_CHECKED);
+      send_toggle_action(p.entity);
+    }
+  } else if (p.type == "cover" && cover_toggle_mode(p.sensor)) {
     if (!p.entity.empty()) {
       lv_obj_add_state(btn_obj, LV_STATE_CHECKED);
       send_toggle_action(p.entity);
@@ -1220,6 +1229,11 @@ inline const char *slider_icon_on(const std::string &type, const std::string &ic
   return find_icon(icon_on.c_str());
 }
 
+inline void setup_cover_toggle_card(BtnSlot &s, const ParsedCfg &p) {
+  lv_label_set_text(s.icon_lbl, slider_icon_off(p.type, p.entity, p.icon));
+  lv_label_set_text(s.text_lbl, p.label.empty() ? "Cover" : p.label.c_str());
+}
+
 // Full slider button setup: visual + event handlers + HA action on release
 inline void setup_slider_visual(BtnSlot &s, const ParsedCfg &p, uint32_t on_color) {
   setup_toggle_visual(s, p);
@@ -1336,7 +1350,7 @@ struct SubpageBtn {
   std::string label;
   std::string icon;
   std::string icon_on;
-  std::string sensor;     // sensor entity for toggle; orientation "h"|"" for slider/cover
+  std::string sensor;     // sensor entity for toggle; orientation "h"|"" for slider; "toggle" for cover mode
   std::string unit;
   std::string type;       // button type: "" (toggle), sensor, slider, cover, garage, push, internal, subpage
   std::string precision;  // decimal places for sensor display; "text" = text sensor mode
@@ -1658,6 +1672,10 @@ inline void grid_phase1(
       setup_garage_card(s, p);
       continue;
     }
+    if (p.type == "cover" && cover_toggle_mode(p.sensor)) {
+      setup_cover_toggle_card(s, p);
+      continue;
+    }
     if (p.type == "internal") {
       setup_internal_relay_card(s, p);
       continue;
@@ -1759,6 +1777,17 @@ inline void grid_phase2(
           s.text_lbl, p.label.empty() ? "Garage Door" : p.label);
         subscribe_garage_state(s.btn, s.icon_lbl, status_label,
           garage_closed_icon(p.icon), garage_open_icon(p.icon_on), p.entity);
+        if (p.label.empty())
+          subscribe_friendly_name(status_label, p.entity);
+      }
+      continue;
+    }
+    if (p.type == "cover" && cover_toggle_mode(p.sensor)) {
+      if (!p.entity.empty()) {
+        TransientStatusLabel *status_label = create_transient_status_label(
+          s.text_lbl, p.label.empty() ? "Cover" : p.label);
+        subscribe_garage_state(s.btn, s.icon_lbl, status_label,
+          slider_icon_off(p.type, p.entity, p.icon), slider_icon_on(p.type, p.icon_on), p.entity);
         if (p.label.empty())
           subscribe_friendly_name(status_label, p.entity);
       }
@@ -2038,6 +2067,47 @@ inline void grid_phase2(
         lv_label_set_text(stl, "Weather");
         if (!sb.entity.empty())
           subscribe_weather_state(sil, stl, sb.entity);
+
+      } else if (sb.type == "cover" && cover_toggle_mode(sb.sensor)) {
+        lv_label_set_text(sil, slider_icon_off(sb.type, sb.entity, sb.icon));
+        lv_label_set_text(stl, sb.label.empty() ? "Cover" : sb.label.c_str());
+        if (!sb.entity.empty()) {
+          TransientStatusLabel *status_label = create_transient_status_label(
+            stl, sb.label.empty() ? "Cover" : sb.label);
+          subscribe_garage_state(sb_btn, sil, status_label,
+            slider_icon_off(sb.type, sb.entity, sb.icon), slider_icon_on(sb.type, sb.icon_on), sb.entity);
+          if (sb.label.empty())
+            subscribe_friendly_name(status_label, sb.entity);
+
+          if (sp_indicator) {
+            lv_obj_t *parent_btn = slots[si].btn;
+            lv_obj_t *parent_icon = slots[si].icon_lbl;
+            int parent_idx = si;
+            int cwi = sp_child_alloc_idx++;
+            if (cwi >= MAX_SUBPAGE_ITEMS) {
+              ESP_LOGW("sensors", "Too many subpage state indicators; skipping %s", sb.entity.c_str());
+            } else {
+              sp_child_was_on[cwi] = false;
+              subscribe_subpage_parent_indicator(
+                sb.entity, parent_btn, parent_icon, parent_idx,
+                &sp_child_was_on[cwi], sp_has_icon_on,
+                sp_icon_off_glyph, sp_icon_on_glyph, sp_on_count);
+            }
+          }
+
+          int eid_idx = sp_entity_alloc_idx++;
+          if (eid_idx >= MAX_SUBPAGE_ITEMS) {
+            ESP_LOGW("sensors", "Too many subpage click handlers; skipping %s", sb.entity.c_str());
+          } else {
+            sp_entity_ids[eid_idx] = sb.entity;
+            lv_obj_add_event_cb(sb_btn, [](lv_event_t *e) {
+              lv_obj_t *target = static_cast<lv_obj_t *>(lv_event_get_target(e));
+              lv_obj_add_state(target, LV_STATE_CHECKED);
+              std::string *en = (std::string *)lv_event_get_user_data(e);
+              if (en && !en->empty()) send_toggle_action(*en);
+            }, LV_EVENT_CLICKED, &sp_entity_ids[eid_idx]);
+          }
+        }
 
       } else if (sb.type == "garage") {
         lv_label_set_text(sil, garage_closed_icon(sb.icon));
