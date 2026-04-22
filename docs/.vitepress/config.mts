@@ -182,6 +182,7 @@ export default defineConfig({
           { text: 'Internal Relays', link: '/card-types/internal-relays' },
           { text: 'Sensors', link: '/card-types/sensors' },
           { text: 'Sliders', link: '/card-types/sliders' },
+          { text: 'Timezone', link: '/card-types/timezone' },
           { text: 'Weather', link: '/card-types/weather' },
         ],
       },

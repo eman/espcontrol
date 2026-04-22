@@ -8,7 +8,7 @@
 //
 // Per-device config (grid size, styling) is injected between __DEVICE_CONFIG__
 // markers by scripts/build.py. Button type plugins (switch, sensor, weather,
-// calendar, slider, cover, garage, push, subpage) are injected between __BUTTON_TYPES__ markers.
+// calendar, slider, cover, garage, push, subpage, timezone) are injected between __BUTTON_TYPES__ markers.
 // Icon data is generated between GENERATED:ICONS / GENERATED:DOMAIN_ICONS.
 // =============================================================================
 
@@ -1577,6 +1577,7 @@
       push: "P",
       internal: "I",
       subpage: "G",
+      timezone: "T",
     };
     return map[type || ""] || (type || "");
   }
@@ -1592,6 +1593,7 @@
       P: "push",
       I: "internal",
       G: "subpage",
+      T: "timezone",
     };
     return map[code || ""] || (code || "");
   }
@@ -2986,12 +2988,12 @@
         var b = c.buttons[bIdx];
         var iconName = resolveIcon(b);
         var label = b.label || b.entity || "Configure";
-        var color = (b.type === "sensor" || b.type === "weather" || b.type === "calendar")
+        var color = (b.type === "sensor" || b.type === "weather" || b.type === "calendar" || b.type === "timezone")
           ? state.sensorColor : state.offColor;
         var previewTypeDef = BUTTON_TYPES[b.type || ""] || null;
         if (previewTypeDef && c.isSub && !previewTypeDef.allowInSubpage) previewTypeDef = null;
         var typePreview = previewTypeDef && previewTypeDef.renderPreview
-          ? previewTypeDef.renderPreview(b, { escHtml: escHtml })
+          ? previewTypeDef.renderPreview(b, { escHtml: escHtml, escAttr: escAttr })
           : null;
 
         var btn = document.createElement("div");
@@ -5145,6 +5147,15 @@
     select.appendChild(o);
   }
 
+  function updateTimezonePreviewCards() {
+    if (!els.previewMain) return;
+    if (typeof timezoneCardPreviewTime !== "function") return;
+    var previews = els.previewMain.querySelectorAll(".sp-timezone-preview");
+    for (var i = 0; i < previews.length; i++) {
+      previews[i].textContent = timezoneCardPreviewTime(previews[i].getAttribute("data-tz"));
+    }
+  }
+
   function updateClock() {
     if (!els.clock) return;
     var now = new Date();
@@ -5166,6 +5177,7 @@
       var mn = String(now.getUTCMinutes()).padStart(2, "0");
       els.clock.textContent = String(hr).padStart(2, "0") + ":" + mn;
     }
+    updateTimezonePreviewCards();
     var msToNext = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
     setTimeout(updateClock, msToNext + 50);
   }

@@ -261,6 +261,9 @@ script:
             return time_buf;
       - lambda: |-
           auto now = id(ha_time).now();
+          bool use_12h =
+              id(clock_format_select).current_option() == "12h";
+          update_timezone_cards(now.is_valid(), now.timestamp, use_12h);
           if (now.is_valid()) {
             static char date_buf[11];
             snprintf(date_buf, sizeof(date_buf), "%04d-%02d-%02d",
