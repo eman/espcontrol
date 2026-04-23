@@ -94,7 +94,7 @@ struct ParsedCfg {
   std::string label;       // 1  display name (blank = use HA friendly_name)
   std::string icon;        // 2  icon name for off/default state
   std::string icon_on;     // 3  icon name for on state (blank = no swap)
-  std::string sensor;      // 4  sensor entity; "h" for horizontal slider; "push" for internal relay; "toggle" for cover mode
+  std::string sensor;      // 4  sensor entity; "h" for horizontal slider; "push" for internal relay; "toggle"/"tilt" for cover modes
   std::string unit;        // 5  unit suffix for sensor display
   std::string type;        // 6  button type: "" (toggle), sensor, slider, cover, garage, push, internal, subpage
   std::string precision;   // 7  decimal places for sensors; "text" = text sensor mode
@@ -1038,8 +1038,12 @@ inline bool cover_toggle_mode(const std::string &sensor) {
   return sensor == "toggle";
 }
 
-// Send HA action for a slider change: toggle (value<0), brightness, or cover position
-inline void send_slider_action(const std::string &entity_id, int value) {
+inline bool cover_tilt_mode(const std::string &sensor) {
+  return sensor == "tilt";
+}
+
+// Send HA action for a slider change: toggle (value<0), brightness, or cover position/tilt
+inline void send_slider_action(const std::string &entity_id, int value, bool cover_tilt = false) {
   esphome::api::HomeassistantActionRequest req;
   req.is_event = false;
   if (value < 0) {
@@ -1049,13 +1053,14 @@ inline void send_slider_action(const std::string &entity_id, int value) {
     kv.key = decltype(kv.key)("entity_id");
     kv.value = decltype(kv.value)(entity_id.c_str());
   } else if (is_cover_entity(entity_id)) {
-    req.service = decltype(req.service)("cover.set_cover_position");
+    req.service = decltype(req.service)(
+      cover_tilt ? "cover.set_cover_tilt_position" : "cover.set_cover_position");
     req.data.init(2);
     auto &kv1 = req.data.emplace_back();
     kv1.key = decltype(kv1.key)("entity_id");
     kv1.value = decltype(kv1.value)(entity_id.c_str());
     auto &kv2 = req.data.emplace_back();
-    kv2.key = decltype(kv2.key)("position");
+    kv2.key = decltype(kv2.key)(cover_tilt ? "tilt_position" : "position");
     char buf[8];
     snprintf(buf, sizeof(buf), "%d", value);
     kv2.value = decltype(kv2.value)(buf);
@@ -1125,7 +1130,7 @@ inline void handle_button_click(const std::string &cfg, int slot_num,
   } else if (p.type == "internal") {
     if (!p.entity.empty()) send_internal_relay_action(p);
   } else if (p.type == "slider" || p.type == "cover") {
-    if (!p.entity.empty()) send_slider_action(p.entity, -1);
+    if (!p.entity.empty()) send_slider_action(p.entity, -1, cover_tilt_mode(p.sensor));
   } else {
     if (!p.entity.empty()) send_toggle_action(p.entity);
   }
@@ -1138,6 +1143,7 @@ struct SliderCtx {
   std::string entity_id;
   lv_obj_t *fill;
   bool horizontal;
+  bool cover_tilt;
   bool inverted;
   lv_coord_t radius;
 };
@@ -1283,6 +1289,7 @@ inline void setup_slider_visual(BtnSlot &s, const ParsedCfg &p, uint32_t on_colo
   ctx->entity_id = p.entity;
   ctx->fill = fill;
   ctx->horizontal = horizontal;
+  ctx->cover_tilt = p.type == "cover" && cover_tilt_mode(p.sensor);
   ctx->inverted = is_cover_entity(p.entity);
   ctx->radius = lv_obj_get_style_radius(s.btn, LV_PART_MAIN);
   lv_obj_set_user_data(slider, (void *)ctx);
@@ -1302,17 +1309,18 @@ inline void setup_slider_visual(BtnSlot &s, const ParsedCfg &p, uint32_t on_colo
     SliderCtx *c = (SliderCtx *)lv_obj_get_user_data(sl);
     if (c && !c->entity_id.empty()) {
       int val = lv_slider_get_value(sl);
-      send_slider_action(c->entity_id, val);
+      send_slider_action(c->entity_id, val, c->cover_tilt);
     }
   }, LV_EVENT_RELEASED, nullptr);
 }
 
-// Subscribe to HA state for a slider entity (light brightness or cover position)
+// Subscribe to HA state for a slider entity (light brightness or cover position/tilt)
 inline void subscribe_slider_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
                                   lv_obj_t *slider,
                                   bool has_icon_on,
                                   const char *icon_off, const char *icon_on,
-                                  const std::string &entity_id) {
+                                  const std::string &entity_id,
+                                  bool cover_tilt = false) {
   SliderCtx *sctx = (SliderCtx *)lv_obj_get_user_data(slider);
   lv_obj_t *fill = sctx ? sctx->fill : nullptr;
   bool horiz = sctx ? sctx->horizontal : false;
@@ -1334,7 +1342,7 @@ inline void subscribe_slider_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
   );
   if (is_cover) {
     esphome::api::global_api_server->subscribe_home_assistant_state(
-      entity_id, std::string("current_position"),
+      entity_id, std::string(cover_tilt ? "current_tilt_position" : "current_position"),
       std::function<void(const std::string &)>(
         [slider, btn_ptr, fill, horiz, inv, rad, icon_lbl, has_icon_on, icon_off, icon_on](const std::string &val) {
           char *end;
@@ -1380,7 +1388,7 @@ struct SubpageBtn {
   std::string label;
   std::string icon;
   std::string icon_on;
-  std::string sensor;     // sensor entity for toggle; orientation "h"|"" for slider; "toggle" for cover mode
+  std::string sensor;     // sensor entity for toggle; orientation "h"|"" for slider; "toggle"/"tilt" for cover modes
   std::string unit;
   std::string type;       // button type: "" (toggle), sensor, slider, cover, garage, push, internal, subpage
   std::string precision;  // decimal places for sensor display; "text" = text sensor mode
@@ -1435,6 +1443,7 @@ inline lv_obj_t *setup_subpage_slider(lv_obj_t *btn, lv_obj_t *icon_lbl, lv_obj_
   ctx->entity_id = sb.entity;
   ctx->fill = fill;
   ctx->horizontal = horiz;
+  ctx->cover_tilt = sb.type == "cover" && cover_tilt_mode(sb.sensor);
   ctx->inverted = is_cover_entity(sb.entity);
   ctx->radius = radius;
   lv_obj_set_user_data(sl, (void *)ctx);
@@ -1453,13 +1462,14 @@ inline lv_obj_t *setup_subpage_slider(lv_obj_t *btn, lv_obj_t *icon_lbl, lv_obj_
     lv_obj_t *s = static_cast<lv_obj_t *>(lv_event_get_target(e));
     SliderCtx *c = (SliderCtx *)lv_obj_get_user_data(s);
     if (c && !c->entity_id.empty())
-      send_slider_action(c->entity_id, lv_slider_get_value(s));
+      send_slider_action(c->entity_id, lv_slider_get_value(s), c->cover_tilt);
   }, LV_EVENT_RELEASED, nullptr);
 
   bool has_icon_on = slider_has_alt_icon(sb.type, sb.icon_on);
   const char *sl_icon_on = has_icon_on ? slider_icon_on(sb.type, sb.icon_on) : nullptr;
   const char *sl_icon_off = has_icon_on ? slider_icon_off(sb.type, sb.entity, sb.icon) : nullptr;
-  subscribe_slider_state(btn, icon_lbl, sl, has_icon_on, sl_icon_off, sl_icon_on, sb.entity);
+  subscribe_slider_state(btn, icon_lbl, sl, has_icon_on, sl_icon_off, sl_icon_on,
+    sb.entity, ctx->cover_tilt);
 
   // Intentionally leaked -- lives for the lifetime of the display
   std::string *eid = new std::string(sb.entity);
@@ -1841,7 +1851,8 @@ inline void grid_phase2(
       const char *sl_icon_on_cp = sl_has_icon_on ? slider_icon_on(p.type, p.icon_on) : nullptr;
       const char *sl_icon_off_cp = sl_has_icon_on ? slider_icon_off(p.type, p.entity, p.icon) : nullptr;
       subscribe_slider_state(s.btn, s.icon_lbl, slider,
-        sl_has_icon_on, sl_icon_off_cp, sl_icon_on_cp, p.entity);
+        sl_has_icon_on, sl_icon_off_cp, sl_icon_on_cp, p.entity,
+        p.type == "cover" && cover_tilt_mode(p.sensor));
       if (p.label.empty())
         subscribe_friendly_name(s.text_lbl, p.entity);
       continue;

@@ -1,7 +1,7 @@
 // Slider and cover button types: draggable brightness/position control.
 // Factory creates both "slider" (light.turn_on w/ brightness) and "cover"
-// (cover.set_cover_position) variants. b.sensor stores slider orientation ("h" or "")
-// or cover interaction mode ("toggle").
+// variants. b.sensor stores slider orientation ("h" or "") for lights, and
+// for covers it stores "toggle", "" (position slider), or "tilt".
 function sliderTypeFactory(opts) {
   return {
     label: opts.label,
@@ -26,7 +26,8 @@ function sliderTypeFactory(opts) {
 
       if (opts.interactionMode) {
         var interactionMode = b.sensor === "toggle" ? "toggle" : "slider";
-        if (b.sensor && b.sensor !== "toggle") {
+        var sliderFunction = b.sensor === "tilt" ? "tilt" : "position";
+        if (b.sensor && b.sensor !== "toggle" && b.sensor !== "tilt") {
           b.sensor = "";
           helpers.saveField("sensor", "");
         }
@@ -47,15 +48,47 @@ function sliderTypeFactory(opts) {
         imf.appendChild(imSeg);
         panel.appendChild(imf);
 
+        var sliderModeField = document.createElement("div");
+        sliderModeField.className = "sp-field";
+        sliderModeField.appendChild(helpers.fieldLabel("Slider Function", helpers.idPrefix + "cover-slider-mode"));
+        var sliderModeSelect = document.createElement("select");
+        sliderModeSelect.className = "sp-select";
+        sliderModeSelect.id = helpers.idPrefix + "cover-slider-mode";
+        [
+          ["position", "Position"],
+          ["tilt", "Tilt"],
+        ].forEach(function (entry) {
+          var option = document.createElement("option");
+          option.value = entry[0];
+          option.textContent = entry[1];
+          sliderModeSelect.appendChild(option);
+        });
+        sliderModeField.appendChild(sliderModeSelect);
+        panel.appendChild(sliderModeField);
+
+        function persistCoverSliderMode() {
+          if (interactionMode === "toggle") {
+            b.sensor = "toggle";
+          } else {
+            b.sensor = sliderFunction === "tilt" ? "tilt" : "";
+          }
+          helpers.saveField("sensor", b.sensor);
+        }
+
         function setInteractionMode(mode, persist) {
           interactionMode = mode;
           sliderBtn.classList.toggle("active", mode === "slider");
           toggleBtn.classList.toggle("active", mode === "toggle");
+          sliderModeField.style.display = mode === "slider" ? "" : "none";
           if (!persist) return;
-          b.sensor = mode === "toggle" ? "toggle" : "";
-          helpers.saveField("sensor", b.sensor);
+          persistCoverSliderMode();
         }
 
+        sliderModeSelect.value = sliderFunction;
+        sliderModeSelect.addEventListener("change", function () {
+          sliderFunction = this.value === "tilt" ? "tilt" : "position";
+          persistCoverSliderMode();
+        });
         sliderBtn.addEventListener("click", function () { setInteractionMode("slider", true); });
         toggleBtn.addEventListener("click", function () { setInteractionMode("toggle", true); });
         setInteractionMode(interactionMode, false);

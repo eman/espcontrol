@@ -206,6 +206,17 @@ assertButtonRoundTrip(hooks, "cover toggle button", {
   precision: "",
 }, false);
 
+assertButtonRoundTrip(hooks, "cover tilt button", {
+  entity: "cover.office_blind",
+  label: "Office Blind",
+  icon: "Blinds",
+  icon_on: "Blinds Open",
+  sensor: "tilt",
+  unit: "",
+  type: "cover",
+  precision: "",
+}, false);
+
 assert.deepStrictEqual(buttonShape(hooks.parseButtonConfig("light.legacy;Legacy;Auto;Lightbulb;sensor.legacy;W;sensor;1")), {
   entity: "light.legacy",
   label: "Legacy",
@@ -236,6 +247,13 @@ assert.deepStrictEqual(subpageShape(hooks.parseSubpageConfig("1,B,2|light.legacy
   ],
 }, "legacy subpage parse");
 
+assert.deepStrictEqual(subpageShape(hooks.parseSubpageConfig("1,B|cover.office_blind:Office Blind:Blinds:Blinds Open:tilt::cover")), {
+  order: ["1", "B"],
+  buttons: [
+    buttonShape({ entity: "cover.office_blind", label: "Office Blind", icon: "Blinds", icon_on: "Blinds Open", sensor: "tilt", type: "cover" }),
+  ],
+}, "legacy cover tilt subpage parse");
+
 assertSubpageRoundTrip(hooks, "normal subpage", {
   order: ["1", "B", "2"],
   buttons: [
@@ -256,6 +274,13 @@ assertSubpageRoundTrip(hooks, "cover toggle subpage", {
   order: ["1", "B"],
   buttons: [
     buttonShape({ entity: "cover.office_blind", label: "Office Blind", icon: "Blinds", icon_on: "Blinds Open", sensor: "toggle", type: "cover" }),
+  ],
+}, true);
+
+assertSubpageRoundTrip(hooks, "cover tilt subpage", {
+  order: ["1", "B"],
+  buttons: [
+    buttonShape({ entity: "cover.office_blind", label: "Office Blind", icon: "Blinds", icon_on: "Blinds Open", sensor: "tilt", type: "cover" }),
   ],
 }, true);
 
@@ -302,6 +327,13 @@ assert.deepStrictEqual(subpageShape(hooks.parseSubpageConfig("~1,B|C,cover.offic
     buttonShape({ entity: "cover.office_blind", label: "Office Blind", icon: "Blinds", icon_on: "Blinds Open", sensor: "toggle", type: "cover" }),
   ],
 }, "compact cover toggle subpage parse");
+
+assert.deepStrictEqual(subpageShape(hooks.parseSubpageConfig("~1,B|C,cover.office_blind,Office%20Blind,Blinds,Blinds%20Open,tilt")), {
+  order: ["1", "B"],
+  buttons: [
+    buttonShape({ entity: "cover.office_blind", label: "Office Blind", icon: "Blinds", icon_on: "Blinds Open", sensor: "tilt", type: "cover" }),
+  ],
+}, "compact cover tilt subpage parse");
 
 assert.deepStrictEqual(subpageShape(hooks.parseSubpageConfig("~1,B|I,relay_2,Gate,Power%20Plug,Power,push")), {
   order: ["1", "B"],

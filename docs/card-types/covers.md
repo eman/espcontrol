@@ -16,18 +16,24 @@ A cover card lets you control a Home Assistant cover entity — blinds, shutters
 2. Choose the interaction:
    - **Slider** lets you drag to a precise cover position.
    - **Toggle** opens or closes the cover with a tap.
-3. Set a **Label** (optional) — shown at the bottom of the card. If left blank, the entity's friendly name from Home Assistant is used.
-4. Enter an **Entity ID** — the Home Assistant cover entity you want to control (for example, `cover.office_blind`).
-5. Choose a **Closed Icon** (defaults to **Blinds**).
-6. Choose an **Open Icon** (defaults to **Blinds Open**).
+3. If you choose **Slider**, choose the **Slider Function**:
+   - **Position** uses Home Assistant's `cover.set_cover_position` action.
+   - **Tilt** uses Home Assistant's `cover.set_cover_tilt_position` action.
+   - Your Home Assistant cover entity needs to support tilt for **Tilt** mode to work.
+4. Set a **Label** (optional) — shown at the bottom of the card. If left blank, the entity's friendly name from Home Assistant is used.
+5. Enter an **Entity ID** — the Home Assistant cover entity you want to control (for example, `cover.office_blind`).
+6. Choose a **Closed Icon** (defaults to **Blinds**).
+7. Choose an **Open Icon** (defaults to **Blinds Open**).
 
 ## How It Works on the Panel
 
 ### Slider Interaction
 
-- **Drag** the slider to set the cover position from 0 (closed) to 100 (fully open). Releasing the slider sends the new position to Home Assistant via `cover.set_cover_position`.
+- **Drag** the slider to set the selected cover value from 0 to 100.
+- In **Position** mode, releasing the slider sends the new position to Home Assistant via `cover.set_cover_position`.
+- In **Tilt** mode, releasing the slider sends the new tilt value to Home Assistant via `cover.set_cover_tilt_position`.
 - The **fill bar** is always vertical and represents how much the cover is closed — a fully closed cover shows a full bar, and a fully open cover shows an empty bar. This inverted fill matches blinds or shutters blocking a window.
-- The fill bar updates in real time as the cover moves, tracking the `current_position` attribute from Home Assistant.
+- The fill bar updates in real time as the cover moves, tracking `current_position` in **Position** mode and `current_tilt_position` in **Tilt** mode.
 
 ### Toggle Interaction
 
