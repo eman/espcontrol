@@ -153,6 +153,7 @@ export default defineConfig({
           { text: '7-inch JC1060P470', link: '/screens/jc1060p470' },
           { text: '4.3-inch JC4880P443', link: '/screens/jc4880p443' },
           { text: '4-inch 4848S040', link: '/screens/4848s040' },
+          { text: '4-inch SenseCAP Indicator', link: '/screens/seeed-sensecap-indicator' },
         ],
       },
       {

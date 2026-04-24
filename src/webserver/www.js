@@ -2305,7 +2305,7 @@
     tzSelect.value = state.timezone;
     tzSelect.addEventListener("change", function () {
       state.timezone = this.value;
-      postSelect("Screen: Timezone", this.value);
+      postSelectWithObjectId("Screen: Timezone", "screen__timezone", this.value);
       updateClock();
     });
     tzField.appendChild(tzSelect);
@@ -2326,7 +2326,7 @@
     });
     cfSelect.value = state.clockFormat;
     cfSelect.addEventListener("change", function () {
-      postSelect("Screen: Clock Format", this.value);
+      postSelectWithObjectId("Screen: Clock Format", "screen__clock_format", this.value);
     });
     cfField.appendChild(cfSelect);
     clockBody.appendChild(cfField);

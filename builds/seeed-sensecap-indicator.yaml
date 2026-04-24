@@ -1,0 +1,27 @@
+# =============================================================================
+# BUILD PROFILE - Seeed SenseCAP Indicator
+# =============================================================================
+# CI/local build entry point for the SenseCAP Indicator panel.
+# =============================================================================
+
+substitutions:
+  name: "espcontrol-sensecap"
+  friendly_name: "Seeed SenseCAP Indicator"
+
+esphome:
+  name_add_mac_suffix: true
+
+external_components:
+  - source:
+      type: local
+      path: ../components
+    components: [espcontrol]
+
+packages:
+  espcontrol: !include ../devices/seeed-sensecap-indicator/packages.yaml
+
+wifi:
+  ap:
+    ssid: "${friendly_name}"
+
+captive_portal:

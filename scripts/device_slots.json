@@ -35,6 +35,15 @@
       "sensor_font": "statistics_font",
       "color_correction": false,
       "wrap_tall_labels": false
+    },
+    {
+      "slug": "seeed-sensecap-indicator",
+      "slots": 9,
+      "cols": 3,
+      "grid": "3x3",
+      "sensor_font": "statistics_font",
+      "color_correction": false,
+      "wrap_tall_labels": false
     }
   ]
 }

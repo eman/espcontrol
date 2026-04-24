@@ -1,0 +1,28 @@
+# =============================================================================
+# FONTS (DEVICE OVERRIDE) - Smaller fonts for the 480x480 square display
+# =============================================================================
+# Supplements the common fonts with smaller variants for the main UI.
+# The common fonts (icon_font, label_font, etc.) still load for setup screens;
+# these _sm variants are referenced by the device theme and LVGL config.
+# =============================================================================
+
+font:
+  # Button icons (46px, down from common 52px)
+  - file: 'https://github.com/Templarian/MaterialDesign-Webfont/raw/v7.4.47/fonts/materialdesignicons-webfont.ttf'
+    id: icon_font_sm
+    size: 46
+    bpp: 4
+    glyphs: !include ../../../common/assets/icon_glyphs.yaml
+
+  # Button labels (22px)
+  - file: "gfonts://Roboto"
+    id: label_font_sm
+    size: 22
+    bpp: 4
+    glyphs: !include ../../../common/assets/text_glyphs.yaml
+
+  # Top bar clock and temperature (20px)
+  - file: "gfonts://Roboto"
+    id: clockbar_font_sm
+    size: 20
+    bpp: 4

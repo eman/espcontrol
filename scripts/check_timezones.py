@@ -20,9 +20,9 @@ def load_timezone_options() -> dict[str, str]:
     options: dict[str, str] = {}
     for match in re.finditer(r'^\s+- "([^"]+)"$', TIME_YAML.read_text(), re.M):
         option = match.group(1)
-        if " (GMT" not in option or ("/" not in option and not option.startswith("UTC ")):
+        if "/" not in option and option != "UTC":
             continue
-        tz_id = option.split(" (", 1)[0]
+        tz_id = option
         options[tz_id] = option
     return options
 
