@@ -76,22 +76,23 @@
     "Light Switch", "Lightbulb", "Lightbulb Group", "Lightbulb Group Outline", "Lightbulb Night", "Lightbulb Night Outline",
     "Lightbulb Off", "Lightbulb On Outline", "Lightbulb Spot", "Lightbulb Spot Off", "Lightbulb Variant", "Lightbulb Variant Outline",
     "Lightbulb Outline", "Lightning Bolt", "Lock", "Lock Open", "Lock Open Outline", "Lock Outline",
-    "Mailbox", "Message Video", "Meter Electric", "Meter Gas", "Microwave", "Monitor",
-    "Motion Sensor", "Movie Roll", "Music", "Outdoor Lamp", "Oven", "Package",
-    "Package Closed", "Pool", "Power", "Power Plug", "Printer", "Printer 3D",
-    "Projector", "Projector Off", "Robot Vacuum", "Roller Shade", "Roller Shade Closed", "Router",
-    "Router Network", "Security", "Shower", "Smoke Detector", "Snowflake", "Snowflake Alert",
-    "Snowflake Thermometer", "Sofa", "Solar Panel", "Solar Panel Large", "Solar Power", "Solar Power Variant",
-    "Speaker", "Spotlight", "Sprinkler", "String Lights", "String Lights Off", "Sun",
-    "Table", "Television", "Television Off", "Thermometer", "Thermometer Alert", "Thermometer High",
-    "Thermometer Low", "Thermostat", "Timer", "Toilet", "Transmission Tower", "Trash Can",
-    "Wall Outlet", "Wall Sconce", "Washer", "Water", "Water Heater", "Water Percent",
-    "Weather Cloudy", "Weather Cloudy Alert", "Weather Dust", "Weather Fog", "Weather Hail", "Weather Hazy",
-    "Weather Hurricane", "Weather Lightning", "Weather Lightning Rainy", "Weather Night", "Weather Night Cloudy", "Weather Partly Cloudy",
-    "Weather Partly Lightning", "Weather Partly Rainy", "Weather Partly Snowy", "Weather Partly Snowy Rainy", "Weather Pouring", "Weather Rainy",
-    "Weather Snowy", "Weather Snowy Heavy", "Weather Snowy Rainy", "Weather Sunny", "Weather Sunny Alert", "Weather Sunny Off",
-    "Weather Sunset", "Weather Sunset Down", "Weather Sunset Up", "Weather Tornado", "Weather Windy", "Weather Windy Variant",
-    "Wind Power", "Wind Turbine", "Wind Turbine Alert", "Wind Turbine Check", "Window Shutter", "Window Shutter Open",
+    "Mailbox", "Message Video", "Meter Electric", "Meter Gas", "Microsoft Xbox", "Microwave",
+    "Monitor", "Motion Sensor", "Movie Roll", "Music", "Outdoor Lamp", "Oven",
+    "Package", "Package Closed", "Pool", "Power", "Power Plug", "Printer",
+    "Printer 3D", "Projector", "Projector Off", "Robot Vacuum", "Roller Shade", "Roller Shade Closed",
+    "Router", "Router Network", "Security", "Shower", "Smoke Detector", "Snowflake",
+    "Snowflake Alert", "Snowflake Thermometer", "Sofa", "Solar Panel", "Solar Panel Large", "Solar Power",
+    "Solar Power Variant", "Speaker", "Spotlight", "Sprinkler", "String Lights", "String Lights Off",
+    "Sun", "Table", "Television", "Television Off", "Thermometer", "Thermometer Alert",
+    "Thermometer High", "Thermometer Low", "Thermostat", "Timer", "Toilet", "Transmission Tower",
+    "Trash Can", "Wall Outlet", "Wall Sconce", "Washer", "Water", "Water Heater",
+    "Water Percent", "Weather Cloudy", "Weather Cloudy Alert", "Weather Dust", "Weather Fog", "Weather Hail",
+    "Weather Hazy", "Weather Hurricane", "Weather Lightning", "Weather Lightning Rainy", "Weather Night", "Weather Night Cloudy",
+    "Weather Partly Cloudy", "Weather Partly Lightning", "Weather Partly Rainy", "Weather Partly Snowy", "Weather Partly Snowy Rainy", "Weather Pouring",
+    "Weather Rainy", "Weather Snowy", "Weather Snowy Heavy", "Weather Snowy Rainy", "Weather Sunny", "Weather Sunny Alert",
+    "Weather Sunny Off", "Weather Sunset", "Weather Sunset Down", "Weather Sunset Up", "Weather Tornado", "Weather Windy",
+    "Weather Windy Variant", "Wind Power", "Wind Turbine", "Wind Turbine Alert", "Wind Turbine Check", "Window Shutter",
+    "Window Shutter Open",
   ];
   // --- GENERATED:ICONS END ---
 
@@ -562,7 +563,7 @@
     presenceEntity: "",
     screensaverMode: "disabled",
     _screensaverModeReceived: false,
-    clockScreensaverOn: true,
+    clockScreensaverOn: false,
     clockBrightnessDay: 35,
     clockBrightnessNight: 35,
     clockBrightnessSplitReceived: false,
@@ -5002,7 +5003,7 @@
           var importedClockBrightnessNight = normalizeClockBrightness(
             s.clock_brightness_night != null ? s.clock_brightness_night : s.clock_brightness,
             importedClockBrightnessDay);
-          postSwitch("Screen Saver: Clock", s.clock_screensaver != null ? !!s.clock_screensaver : true);
+          postSwitch("Screen Saver: Clock", s.clock_screensaver != null ? !!s.clock_screensaver : false);
           postClockBrightnessDay(importedClockBrightnessDay);
           postClockBrightnessNight(importedClockBrightnessNight);
           postScreensaverTimeout(s.screensaver_timeout || 300);
@@ -5018,7 +5019,7 @@
           state.screensaverMode = importedScreensaverMode;
           state._screensaverModeReceived = true;
           state.presenceEntity = s.presence_sensor_entity || "";
-          state.clockScreensaverOn = s.clock_screensaver != null ? !!s.clock_screensaver : true;
+          state.clockScreensaverOn = s.clock_screensaver != null ? !!s.clock_screensaver : false;
           state.clockBrightnessDay = importedClockBrightnessDay;
           state.clockBrightnessNight = importedClockBrightnessNight;
           state.screensaverTimeout = s.screensaver_timeout || 300;

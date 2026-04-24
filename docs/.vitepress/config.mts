@@ -103,7 +103,9 @@ export default defineConfig({
     )
 
     if (pageData.relativePath !== 'index.md' && title && description) {
-      const isHowTo = pageData.relativePath === 'getting-started/install.md'
+      const isHowTo =
+        pageData.relativePath === 'getting-started/install.md' ||
+        pageData.relativePath === 'getting-started/manual-esphome-setup.md'
       const articleSchema: Record<string, unknown> = {
         '@context': 'https://schema.org',
         '@type': isHowTo ? 'HowTo' : 'TechArticle',
@@ -114,12 +116,20 @@ export default defineConfig({
         author: { '@type': 'Person', name: 'jtenniswood', url: 'https://github.com/jtenniswood' },
       }
       if (isHowTo) {
-        articleSchema.step = [
-          { '@type': 'HowToStep', name: 'Flash firmware from your browser' },
-          { '@type': 'HowToStep', name: 'Connect to WiFi' },
-          { '@type': 'HowToStep', name: 'Add to Home Assistant' },
-          { '@type': 'HowToStep', name: 'Configure buttons from the web page' },
-        ]
+        articleSchema.step =
+          pageData.relativePath === 'getting-started/manual-esphome-setup.md'
+            ? [
+                { '@type': 'HowToStep', name: 'Choose the correct ESPHome package file' },
+                { '@type': 'HowToStep', name: 'Create the device in ESPHome Device Builder' },
+                { '@type': 'HowToStep', name: 'Install by USB or OTA' },
+                { '@type': 'HowToStep', name: 'Add the display to Home Assistant' },
+              ]
+            : [
+                { '@type': 'HowToStep', name: 'Flash firmware from your browser' },
+                { '@type': 'HowToStep', name: 'Connect to WiFi' },
+                { '@type': 'HowToStep', name: 'Add to Home Assistant' },
+                { '@type': 'HowToStep', name: 'Configure buttons from the web page' },
+              ]
       }
       pageData.frontmatter.head.push([
         'script',
@@ -142,6 +152,7 @@ export default defineConfig({
         items: [
           { text: 'Overview', link: '/' },
           { text: 'Install', link: '/getting-started/install' },
+          { text: 'Manual ESPHome Setup', link: '/getting-started/manual-esphome-setup' },
           { text: 'Home Assistant Actions', link: '/getting-started/home-assistant-actions' },
           { text: 'Troubleshooting', link: '/getting-started/troubleshooting' },
         ],

@@ -8,6 +8,10 @@ description:
 
 Flash the Espcontrol firmware to your Guition ESP32 display directly from your browser — no special software or technical knowledge required.
 
+::: tip Prefer ESPHome?
+If you want to compile and install the firmware yourself, use the [manual ESPHome setup guide](/getting-started/manual-esphome-setup).
+:::
+
 ## What You Need
 
 - **A supported Guition ESP32 panel:**

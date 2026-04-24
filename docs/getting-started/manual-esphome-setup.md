@@ -1,0 +1,103 @@
+---
+title: Manual ESPHome Setup
+description:
+  How to add Espcontrol to ESPHome manually, compile the firmware, and install it by USB or OTA.
+---
+
+# Manual ESPHome Setup
+
+The normal [browser install](/getting-started/install) is the easiest route. Use this page if you prefer to manage Espcontrol from ESPHome, want to compile the firmware yourself, or need to install from the ESPHome Device Builder dashboard.
+
+## What You Need
+
+- A supported Guition ESP32 panel.
+- ESPHome Device Builder in Home Assistant, or the ESPHome command line on your computer.
+- A USB-C data cable for the first install.
+- Your WiFi name and password.
+
+::: tip First install or update?
+Use USB for a blank screen or a screen that is not already running Espcontrol. Once Espcontrol is installed and connected to WiFi, later ESPHome installs can usually be done wirelessly with OTA.
+:::
+
+## Choose the Correct Package File
+
+Each screen uses a different ESPHome package file. Pick the one that matches your panel:
+
+| Panel | Package file |
+| --- | --- |
+| 10.1-inch JC8012P4A1 | `devices/guition-esp32-p4-jc8012p4a1/packages.yaml` |
+| 7-inch JC1060P470 | `devices/guition-esp32-p4-jc1060p470/packages.yaml` |
+| 4.3-inch JC4880P443 | `devices/guition-esp32-p4-jc4880p443/packages.yaml` |
+| 4-inch 4848S040 | `devices/guition-esp32-s3-4848s040/packages.yaml` |
+
+## ESPHome Device Builder
+
+1. Open **Home Assistant > ESPHome Device Builder**.
+2. Select **New Device**.
+3. Enter a name, such as `espcontrol-kitchen`.
+4. When ESPHome creates the starter YAML, replace it with the template below.
+5. Change `name`, `friendly_name`, WiFi details, and the `file` line for your screen.
+6. Click **Save**, then open the device menu and choose **Validate**.
+
+```yaml
+substitutions:
+  name: "espcontrol-kitchen"
+  friendly_name: "Espcontrol Kitchen"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+packages:
+  setup:
+    url: https://github.com/jtenniswood/espcontrol/
+    file: devices/guition-esp32-p4-jc1060p470/packages.yaml
+    refresh: 1d
+```
+
+If you do not use ESPHome secrets, replace the two `!secret` lines with your WiFi details:
+
+```yaml
+wifi:
+  ssid: "Your WiFi Name"
+  password: "Your WiFi Password"
+```
+
+::: warning Keep the device name simple
+Use lowercase letters, numbers, and hyphens for `name`. For example, `espcontrol-kitchen` is better than `Kitchen Touchscreen`.
+:::
+
+## Install by USB
+
+Use this for the first install.
+
+1. Plug the display into the computer running ESPHome, or into the Home Assistant machine if you are using the add-on.
+2. In ESPHome Device Builder, open the device menu and choose **Install**.
+3. Choose the USB serial option if it is available.
+4. Wait for compiling and flashing to finish before unplugging the display.
+
+If ESPHome cannot access the USB port directly, choose **Manual download** instead. For a blank screen, select the factory firmware option if ESPHome asks which format to use. Then open [ESPHome Web Tools](https://web.esphome.io/) in Chrome or Edge, connect to the display, and flash the downloaded file.
+
+## Install with the ESPHome Command Line
+
+If you use ESPHome on your own computer, create a YAML file with the same template, then run:
+
+```sh
+esphome run espcontrol-kitchen.yaml
+```
+
+ESPHome will compile the firmware and ask where to install it. Choose the serial port for a USB install, or enter the device IP address for an OTA update.
+
+## After the Display Boots
+
+1. Wait for the display to join WiFi.
+2. Add it to Home Assistant when the ESPHome integration discovers it.
+3. Open the display address in a browser, for example `http://192.168.1.42`.
+4. Configure buttons, colours, brightness, and other settings from the built-in web page.
+5. Follow [Home Assistant Actions](/getting-started/home-assistant-actions) so the display is allowed to control your Home Assistant devices.
+
+## Updating Later
+
+Because the package uses `refresh: 1d`, ESPHome checks GitHub for Espcontrol updates about once a day when it compiles. To update manually, open ESPHome Device Builder and run **Install** again. If the display is online, use OTA so you do not need to reconnect USB.
+
+Next: [Home Assistant Actions](/getting-started/home-assistant-actions)
