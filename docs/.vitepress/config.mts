@@ -186,14 +186,16 @@ export default defineConfig({
       {
         text: 'Card Types',
         items: [
-          { text: 'Triggers', link: '/card-types/buttons' },
-          { text: 'Covers', link: '/card-types/covers' },
+          { text: 'Switch', link: '/card-types/switches' },
+          { text: 'Trigger', link: '/card-types/buttons' },
+          { text: 'Sensor', link: '/card-types/sensors' },
+          { text: 'Slider', link: '/card-types/sliders' },
+          { text: 'Cover', link: '/card-types/covers' },
+          { text: 'Garage Door', link: '/card-types/garage-doors' },
           { text: 'Date', link: '/card-types/calendar' },
-          { text: 'Garage Doors', link: '/card-types/garage-doors' },
-          { text: 'Internal Relays', link: '/card-types/internal-relays' },
-          { text: 'Sensors', link: '/card-types/sensors' },
-          { text: 'Sliders', link: '/card-types/sliders' },
           { text: 'Weather', link: '/card-types/weather' },
+          { text: 'Internal', link: '/card-types/internal-relays' },
+          { text: 'Subpage', link: '/features/subpages' },
         ],
       },
       {

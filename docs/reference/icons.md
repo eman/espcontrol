@@ -1,6 +1,6 @@
 ---
 title: Icon Reference
-description: Browse all available icons for your Espcontrol buttons.
+description: Browse all available icons for your Espcontrol cards.
 ---
 
 # Icon Reference

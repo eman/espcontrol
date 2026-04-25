@@ -21,7 +21,7 @@ These are configured from the **Settings** tab in the [Setup](/features/setup) u
 
 1. The panel checks the update server for a newer version.
 2. If one is available and **Auto Update** is on, it downloads and installs the update.
-3. The panel restarts with the new firmware. Your settings (buttons, colours, temperatures, etc.) are preserved.
+3. The panel restarts with the new firmware. Your settings (cards, colours, temperatures, etc.) are preserved.
 
 The update usually takes a minute or two. The display may show a loading screen briefly during the restart.
 

@@ -21,7 +21,7 @@ Weather cards are read-only — tapping them does nothing.
 - The icon changes automatically when the weather condition changes.
 - The label uses the condition name from Home Assistant.
 - If Home Assistant reports `unknown`, `unavailable`, or an unexpected condition, the card shows a fallback weather icon and a readable label.
-- The card uses the **tertiary** colour from [Appearance](/features/appearance), like sensor cards.
+- The card uses the **tertiary** colour from [Appearance](/features/appearance), like Sensor and Date cards.
 
 ## Supported Conditions
 
