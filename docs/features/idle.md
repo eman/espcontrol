@@ -6,7 +6,7 @@ description:
 
 # Idle
 
-If you navigate to a [subpage](/features/subpages) and walk away, the panel can automatically return to the home screen after a set amount of time. This keeps the display on the main button grid so it's ready to use the next time you glance at it.
+If you navigate to a [subpage](/features/subpages) and walk away, the panel can automatically return to the home screen after a set amount of time. This keeps the display on the main card grid so it's ready to use the next time you glance at it.
 
 ## Settings
 

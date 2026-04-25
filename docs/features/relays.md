@@ -42,21 +42,21 @@ Use the switch version when the relay should represent an ongoing on/off state. 
 
 ## Using Relays on the Touchscreen
 
-Relay controls on the touchscreen can now work locally on the panel. Use an **Internal Relay** card when you want the touchscreen to control the physical relay even if Home Assistant is offline.
+Relay controls on the touchscreen can work locally on the panel. Use an **Internal** card when you want the touchscreen to control the physical relay even if Home Assistant is offline.
 
-Internal Relay cards have two modes:
+Internal cards have two modes:
 
-- **Switch** — looks like a normal switch card and toggles the selected relay on or off.
-- **Push Button** — looks like a trigger card and briefly pulses the selected relay.
+- **Switch** — looks like a normal Switch card and toggles the selected relay on or off.
+- **Push Button** — looks like a Trigger card and briefly pulses the selected relay.
 
 1. Open the Espcontrol setup page in your browser.
-2. Choose an empty button slot.
+2. Choose an empty card slot.
 3. Change the type to **Internal**.
 4. Choose **Relay 1**, **Relay 2**, or **Relay 3**.
 5. Choose **Switch** or **Push Button** mode.
-6. Save the button configuration.
+6. Save the card configuration.
 
-The relay entities are still exposed to Home Assistant. You can keep using normal Switch cards with relay entity IDs if you prefer Home Assistant to stay in the middle, but those cards need Home Assistant to be connected.
+The relay entities are still exposed to Home Assistant. You can keep using normal [Switch](/card-types/switches) cards with relay entity IDs if you prefer Home Assistant to stay in the middle, but those cards need Home Assistant to be connected.
 
 The push button entities are useful when the relay is wired in parallel with existing momentary wall switches, for example when it is driving a dimmer or lighting controller that expects a short button press rather than a permanent on/off output.
 

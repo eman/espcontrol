@@ -1,10 +1,10 @@
 ---
-title: Sensors
+title: Sensor
 description:
   How to display live numeric readings or text states from Home Assistant on your Espcontrol panel.
 ---
 
-# Sensors
+# Sensor
 
 A sensor card displays live Home Assistant data. It has two modes:
 
@@ -30,13 +30,13 @@ For **Numeric** mode:
 For **Text** mode:
 
 1. Choose an **Icon**. This icon is always shown and does not change based on the sensor value.
-2. The live state from Home Assistant is shown where a toggle label would normally appear.
+2. The live state from Home Assistant is shown where a Switch card label would normally appear.
 
 ## How It Works on the Panel
 
 - Numeric mode displays the current value in large text, with the unit beside it and the label underneath.
-- Numeric mode uses the **tertiary** colour from [Appearance](/features/appearance), so it remains visually distinct from toggles and trigger cards.
-- Text mode uses the same tertiary colour as Numeric mode, while keeping the normal toggle-style icon and label layout.
+- Numeric mode uses the **tertiary** colour from [Appearance](/features/appearance), so it remains visually distinct from Switch and Trigger cards.
+- Text mode uses the same tertiary colour as Numeric mode, while keeping the normal Switch-style icon and label layout.
 - Text mode formats states in sentence case. For example, `not_home` displays as `Not home`.
 
 ## Example Sensors

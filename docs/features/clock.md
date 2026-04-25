@@ -14,7 +14,7 @@ Configured in the **Clock** section of the **Settings** tab in [Setup](/features
 
 - **Timezone** — select your timezone from the dropdown. This also determines sunrise and sunset times used by the [backlight schedule](/features/backlight).
 - **Clock Format** — choose **12h** for 12-hour time with AM/PM, or **24h** for 24-hour time. Defaults to 24h.
-- **Show Clock Bar** — turn this off to hide the top clock/temperature bar and give the button grid more screen space.
+- **Show Clock Bar** — turn this off to hide the top clock/temperature bar and give the card grid more screen space.
 - **Sunrise / Sunset** — read-only reference values calculated from your timezone, updated daily. Displayed in whichever format you chose.
 
 ## How It Works

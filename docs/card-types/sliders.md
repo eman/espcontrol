@@ -1,10 +1,10 @@
 ---
-title: Sliders
+title: Slider
 description:
   How to use slider cards on your Espcontrol panel to control light brightness from Home Assistant.
 ---
 
-# Sliders
+# Slider
 
 A slider card lets you control the brightness of a Home Assistant light entity by dragging a fill bar up or down (or left to right). 
 
@@ -31,7 +31,7 @@ You can orient the slider in two directions:
 - **Vertical** (default) — the fill bar grows upward from the bottom of the card.
 - **Horizontal** — the fill bar grows from left to right.
 
-Choose the direction that best fits your grid layout. Double-height cards work well with vertical sliders, while wide cards suit horizontal sliders.
+Choose the direction that best fits your grid layout. **Tall** cards work well with vertical sliders, while **Wide** cards suit horizontal sliders.
 
 ## Change Icon When On
 

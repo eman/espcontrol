@@ -161,7 +161,7 @@
     "white-space:nowrap;letter-spacing:-.01em}" +
     ".sp-nav{display:flex;align-items:center;height:100%}" +
     ".sp-tab{padding:0 16px;height:100%;display:flex;align-items:center;color:var(--text2);cursor:pointer;" +
-    "font-size:.875rem;font-weight:500;border-bottom:2px solid transparent;transition:color .2s}" +
+    "font-size:.875rem;font-weight:500;border-bottom:2px solid transparent;text-decoration:none;transition:color .2s}" +
     ".sp-tab:hover{color:var(--text)}" +
     ".sp-tab.active{color:var(--accent);border-bottom-color:var(--accent)}" +
 
@@ -419,6 +419,9 @@
     ".sp-apply-btn:active{opacity:.85}" +
     ".sp-apply-btn:disabled{opacity:.4;cursor:not-allowed}" +
     ".sp-apply-note{font-size:.75rem;color:var(--text3);margin-top:8px}" +
+    ".sp-settings-footer{padding:0 var(--gap) var(--gap);text-align:center}" +
+    ".sp-settings-link{color:var(--text2);font-size:.8rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer}" +
+    ".sp-settings-link:hover{color:var(--text)}" +
 
     ".sp-log-toolbar{display:flex;justify-content:flex-end;padding:12px var(--gap) 0}" +
     ".sp-log-clear{background:var(--surface2);color:var(--text);border:1px solid var(--border);" +
@@ -1981,7 +1984,6 @@
   function buildHeader(parent) {
     var header = document.createElement("div");
     header.className = "sp-header";
-    header.setAttribute("role", "tablist");
 
     var brand = document.createElement("div");
     brand.className = "sp-brand";
@@ -1990,11 +1992,11 @@
 
     var nav = document.createElement("nav");
     nav.className = "sp-nav";
+    nav.setAttribute("aria-label", "Primary");
 
     var tabs = [
       { id: "screen", label: "Screen" },
       { id: "settings", label: "Settings" },
-      { id: "logs", label: "Logs" },
     ];
 
     tabs.forEach(function (t) {
@@ -2007,6 +2009,14 @@
       nav.appendChild(tab);
       els["tab_" + t.id] = tab;
     });
+
+    var docsLink = document.createElement("a");
+    docsLink.className = "sp-tab";
+    docsLink.href = "https://jtenniswood.github.io/espcontrol/";
+    docsLink.target = "_blank";
+    docsLink.rel = "noopener";
+    docsLink.textContent = "Docs";
+    nav.appendChild(docsLink);
 
     header.appendChild(nav);
     parent.appendChild(header);
@@ -2640,6 +2650,19 @@
     page.appendChild(config);
     page.appendChild(buildApplyBar());
 
+    var footer = document.createElement("div");
+    footer.className = "sp-settings-footer";
+    var logsLink = document.createElement("a");
+    logsLink.className = "sp-settings-link";
+    logsLink.href = "#logs";
+    logsLink.textContent = "View logs";
+    logsLink.addEventListener("click", function (e) {
+      e.preventDefault();
+      switchTab("logs");
+    });
+    footer.appendChild(logsLink);
+    page.appendChild(footer);
+
     parent.appendChild(page);
     els.settingsPage = page;
   }
@@ -2961,7 +2984,7 @@
 
   function switchTab(tab) {
     state.activeTab = tab;
-    ["screen", "settings", "logs"].forEach(function (t) {
+    ["screen", "settings"].forEach(function (t) {
       els["tab_" + t].className = "sp-tab" + (tab === t ? " active" : "");
       els["tab_" + t].setAttribute("aria-selected", tab === t ? "true" : "false");
     });

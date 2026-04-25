@@ -6,7 +6,7 @@ description:
 
 # Home Assistant Actions
 
-Espcontrol needs permission to call Home Assistant actions (like toggling lights or switches) on your behalf. Without this, the touchscreen can display the time and screensaver but **buttons won't be able to control your devices**.
+Espcontrol needs permission to call Home Assistant actions (like toggling lights or switches) on your behalf. Without this, the touchscreen can display the time and screensaver but **cards won't be able to control your devices**.
 
 Your display will prompt you to do this during first-time setup. Follow the steps below.
 
@@ -28,7 +28,7 @@ Your display will prompt you to do this during first-time setup. Follow the step
 
 ![Options dialog with the actions checkbox enabled](/images/ha-actions-step-4.png)
 
-5. **Go back to your display** and tap **Done** on the setup screen. Your buttons will now be able to control Home Assistant devices.
+5. **Go back to your display** and tap **Done** on the setup screen. Your cards will now be able to control Home Assistant devices.
 
 ::: tip One-time setup
 You only need to do this once per device. The setting persists across firmware updates and device restarts.
@@ -41,4 +41,3 @@ You won't be able to control any devices, it will be in a read only state, and e
 ## Device Not Showing Up?
 
 If you don't see your Espcontrol device in the ESPHome integration, it may not have been added to Home Assistant yet. Head back to the [Install](/getting-started/install#add-to-home-assistant) guide to add it first.
-

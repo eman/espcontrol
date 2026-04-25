@@ -93,7 +93,7 @@ ESPHome will compile the firmware and ask where to install it. Choose the serial
 1. Wait for the display to join WiFi.
 2. Add it to Home Assistant when the ESPHome integration discovers it.
 3. Open the display address in a browser, for example `http://192.168.1.42`.
-4. Configure buttons, colours, brightness, and other settings from the built-in web page.
+4. Configure cards, colours, brightness, and other settings from the built-in web page.
 5. Follow [Home Assistant Actions](/getting-started/home-assistant-actions) so the display is allowed to control your Home Assistant devices.
 
 ## Updating Later

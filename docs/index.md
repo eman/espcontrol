@@ -1,14 +1,14 @@
 ---
 title: Espcontrol — No-Code Smart Home Touch Controller
 titleTemplate: :title
-description: "No-code smart home controller for ESP32 touchscreens. Easy web installer, full docs, no ESPHome required. Configure buttons to control your Home Assistant devices."
+description: "No-code smart home controller for ESP32 touchscreens. Easy web installer, full docs, no ESPHome required. Configure cards to control your Home Assistant devices."
 ---
 
 ![Espcontrol on a 7-inch touchscreen: home screen with temperature, clock, and control tiles](/images/home_screen_hero.jpg)
 
 # Espcontrol
 
-**A no-code, super-easy-to-configure smart home controller.** Configure affordable touchscreens to control devices across your entire smart home — no ESPHome setup, no YAML, no code to write. Just flash, connect, and start adding buttons.
+**A no-code, super-easy-to-configure smart home controller.** Configure affordable touchscreens to control devices across your entire smart home — no ESPHome setup, no YAML, no code to write. Just flash, connect, and start adding cards.
 
 Espcontrol is free, open-source firmware that turns **Guition ESP32** touchscreens into beautiful control panels for [Home Assistant](https://www.home-assistant.io/). It comes with **full documentation** and an **[easy-to-use web installer](/getting-started/install)** — you can go from unboxing to a working wall panel in minutes.
 
@@ -16,9 +16,9 @@ Espcontrol is free, open-source firmware that turns **Guition ESP32** touchscree
 
 ## Features
 
-- **Grid layout** — a fixed grid sized to each screen so you can place buttons exactly where you want them
-- **Subpages** — group related controls into folders to keep the home screen tidy
-- **Double-height buttons** — span any button across two rows for easier tapping and greater prominence
+- **Grid layout** — a fixed grid sized to each screen so you can place cards exactly where you want them
+- **Subpage cards** — group related controls into folders to keep the home screen tidy
+- **Flexible card sizes** — make cards Single, Tall, Wide, or Large to suit the control
 - **Edit controls** — drag-and-drop ordering, bulk select, and copy-paste between pages from the built-in web UI
 - **Screensaver** — dims and sleeps after a set time, or wakes automatically from a presence sensor
 
@@ -44,4 +44,4 @@ If you find this project useful, consider buying me a coffee to support ongoing 
 ## Next Steps
 
 - [Install](/getting-started/install) — what you need, how to flash, and first-time setup
-- [Setup](/features/setup) — how to configure buttons, display, and screensaver from your browser
+- [Setup](/features/setup) — how to configure cards, display, and screensaver from your browser

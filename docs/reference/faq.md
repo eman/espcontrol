@@ -10,7 +10,7 @@ description:
 
 There are several ways:
 
-- **On the display itself** — when no buttons are configured yet, the panel shows its address on screen.
+- **On the display itself** — when no cards are configured yet, the panel shows its address on screen.
 - **In your router** — look at the connected devices list (usually at `192.168.1.1` or similar). The panel will appear with its hostname.
 - **In Home Assistant** — go to **Settings > Devices & Services > ESPHome**, click on the device, and look for the IP address.
 
@@ -33,7 +33,7 @@ The panel's built-in web page loads some visual resources from the internet. If 
 
 To start completely fresh, re-flash the firmware using the [install guide](/getting-started/install). Connect the panel to your computer with a USB-C cable and use the web installer. This will reset WiFi settings and the panel will create its setup hotspot again.
 
-Your button configuration is stored separately and will be preserved unless you change it through the web page.
+Your card configuration is stored separately and will be preserved unless you change it through the web page.
 
 ## Can I Use This Without Home Assistant?
 
@@ -63,24 +63,24 @@ See [Firmware Updates](/features/firmware-updates) for more details.
 
 The panel includes hundreds of icons from the Material Design Icons set. If the one you need isn't there, [open an issue on GitHub](https://github.com/jtenniswood/espcontrol/issues) with the icon name (from [pictogrammers.com/library/mdi](https://pictogrammers.com/library/mdi/)) and what you'd use it for. We'll look into adding it.
 
-## How Many Buttons Can I Have?
+## How Many Cards Can I Have?
 
-The home screen has a grid of buttons sized to fill the screen:
+The home screen has a grid of card slots sized to fill the screen:
 
-- **10.1-inch JC8012P4A1** — 20 buttons (4 rows, 5 columns)
-- **7-inch JC1060P470** — 15 buttons (3 rows, 5 columns)
-- **4.3-inch JC4880P443** — 6 buttons (3 rows, 2 columns)
-- **4-inch 4848S040** — 9 buttons (3 rows, 3 columns)
+- **10.1-inch JC8012P4A1** — 20 cards (4 rows, 5 columns)
+- **7-inch JC1060P470** — 15 cards (3 rows, 5 columns)
+- **4.3-inch JC4880P443** — 6 cards (3 rows, 2 columns)
+- **4-inch 4848S040** — 9 cards (3 rows, 3 columns)
 
-You can have even more using **subpages**. Any button can be turned into a folder that opens a new page of buttons. Each subpage has one fewer slot than the home screen (the first slot is a back button). See [Subpages](/features/subpages) for details.
+You can have even more using **Subpage** cards. Any home-screen card can be turned into a folder that opens a new page of cards. Each subpage has one fewer usable slot than the home screen because it includes a Back card. See [Subpage](/features/subpages) for details.
 
-## What Are Subpages?
+## What Is a Subpage?
 
-Subpages are like folders for your buttons. Set any button to the **Subpage** type and it becomes a folder — tapping it on the panel opens a new page with its own set of buttons. This is great for grouping controls by room or device type without filling up the home screen. Each subpage has its own buttons, icons, and labels, set up the same way as the home screen. See [Subpages](/features/subpages).
+Subpages are like folders for your cards. Set a home-screen card to the **Subpage** type and it becomes a folder. Tapping it on the panel opens a new page with its own set of cards. This is great for grouping controls by room or device type without filling up the home screen. See [Subpage](/features/subpages).
 
 ## Can I Back Up My Setup?
 
-Yes. In the [Setup](/features/setup) **Settings** tab, under **Backup**, you can **Export** your entire setup (buttons, subpages, colours, and display settings) as a file. To restore it later, use **Import** to load the saved file. You can also use this to copy your setup to a different panel — the import will rearrange buttons automatically if the panels are different sizes. See [Backup](/features/backup) for details.
+Yes. In the [Setup](/features/setup) **Settings** tab, under **Backup**, you can **Export** your entire setup (cards, subpages, colours, and display settings) as a file. To restore it later, use **Import** to load the saved file. You can also use this to copy your setup to a different panel — the import will rearrange cards automatically if the panels are different sizes. See [Backup](/features/backup) for details.
 
 ## Which Panels Are Supported?
 
@@ -91,7 +91,7 @@ Espcontrol currently supports four Guition touchscreen panels:
 - **JC4880P443** — 4.3-inch, 480x800, portrait orientation (ESP32-P4)
 - **4848S040** — 4-inch, 480x480, square (ESP32-S3)
 
-All use the same firmware features, button configuration, and web UI. The grid layout automatically matches each panel's screen size and orientation.
+All use the same firmware features, card configuration, and web UI. The grid layout automatically matches each panel's screen size and orientation.
 
 ## Does the Panel Work with Other Smart Home Platforms?
 

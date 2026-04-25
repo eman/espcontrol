@@ -18,5 +18,5 @@ description: ESPHome firmware for Guition ESP32 touchscreen Home Assistant contr
 - Documentation: https://jtenniswood.github.io/espcontrol/
 
 [content-types]
-- Documentation (install, web UI, buttons, display, backlight, firmware, hardware, package layout).
+- Documentation (install, web UI, cards, display, backlight, firmware, hardware, package layout).
 - Open-source ESPHome configuration and custom component for Guition ESP32 touchscreens (JC8012P4A1, JC1060P470, JC4880P443, and 4848S040).

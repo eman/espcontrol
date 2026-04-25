@@ -8,6 +8,6 @@ description:
 
 These settings control the colours used across your panel. You'll find them in the **Settings** tab on the [Setup](/features/setup) page, under the **Appearance** section.
 
-- **Primary** — the colour buttons show when a device is switched on. Use the colour picker or type a colour code (for example, `FF8C00` for orange).
-- **Secondary** — the colour buttons show when a device is switched off.
-- **Tertiary** — the background colour used for sensor cards.
+- **Primary** — the colour cards show when an entity is active. Use the colour picker or type a colour code (for example, `FF8C00` for orange).
+- **Secondary** — the colour cards show when an entity is not active.
+- **Tertiary** — the background colour used for Sensor, Date, and Weather cards.
