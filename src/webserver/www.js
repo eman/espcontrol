@@ -163,6 +163,9 @@
     "font-size:.875rem;font-weight:500;border-bottom:2px solid transparent;text-decoration:none;transition:color .2s}" +
     ".sp-tab:hover{color:var(--text)}" +
     ".sp-tab.active{color:var(--accent);border-bottom-color:var(--accent)}" +
+    ".sp-tab-docs{position:relative;gap:6px;margin-left:8px;padding-left:24px}" +
+    ".sp-tab-docs::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:1px;background:var(--border)}" +
+    ".sp-tab-docs .mdi{font-size:16px;line-height:1;opacity:.7}" +
 
     ".sp-page{display:none}.sp-page.active{display:block}" +
 
@@ -505,6 +508,7 @@
     ".sp-header{padding:0 12px;height:48px}" +
     ".sp-brand{font-size:.875rem}" +
     ".sp-tab{padding:0 12px;font-size:.8rem}" +
+    ".sp-tab-docs{margin-left:4px;padding-left:18px}" +
     ".card{padding:16px}" +
     ".card-header{margin:-16px -16px 0 -16px;padding:16px 16px 0 16px}" +
     ".card-body{padding-top:14px}" +
@@ -515,6 +519,7 @@
     ":root{--gap:10px}" +
     ".sp-header{padding:0 10px}" +
     ".sp-tab{padding:0 10px;font-size:.75rem}" +
+    ".sp-tab-docs{margin-left:2px;padding-left:16px;gap:4px}" +
     ".sp-support-btn{right:12px;bottom:12px;min-height:48px;padding:7px 16px 7px 12px;font-size:24px}" +
     ".sp-support-btn svg{width:26px;height:26px}" +
     ".sp-color-row{flex-wrap:wrap}" +
@@ -1988,11 +1993,11 @@
     });
 
     var docsLink = document.createElement("a");
-    docsLink.className = "sp-tab";
+    docsLink.className = "sp-tab sp-tab-docs";
     docsLink.href = "https://jtenniswood.github.io/espcontrol/";
     docsLink.target = "_blank";
     docsLink.rel = "noopener";
-    docsLink.textContent = "Docs";
+    docsLink.innerHTML = 'Docs <span class="mdi mdi-arrow-top-right"></span>';
     nav.appendChild(docsLink);
 
     header.appendChild(nav);
