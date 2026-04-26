@@ -1,9 +1,9 @@
 # =============================================================================
 # SCREEN: LOADING
 # =============================================================================
-# Boot screen. Must be the first page included in packages.yaml so LVGL
-# shows it at startup. on_boot updates status text; after a grace period,
-# if WiFi is not connected, switches to wifi_setup_page.
+# Boot screen for Ethernet-only builds. Must be the first page included in
+# packages.yaml so LVGL shows it at startup. If Ethernet is not connected after
+# the grace period, switches to ethernet_setup_page.
 # =============================================================================
 
 globals:
@@ -34,7 +34,7 @@ lvgl:
             widgets:
               - label:
                   text_font: icon_font_setup
-                  text: $icon_wifi
+                  text: $icon_ethernet
                   text_color: 0xFFFFFF
                   text_align: center
               - label:
@@ -71,7 +71,7 @@ esphome:
             condition:
               lambda: |-
                 return id(screen_schedule_asleep) ||
-                       (id(schedule_enabled).state && !panel_time_or_fallback(id(panel_time).now(), id(homeassistant_time).now()).is_valid());
+                       (id(schedule_enabled).state && !id(ha_time).now().is_valid());
             then:
               - script.execute: backlight_force_display_off
             else:
@@ -81,22 +81,15 @@ esphome:
                   transition_length: 500ms
     - priority: -100
       then:
+        - lambda: |-
+            lv_label_set_text(id(loading_status_label), "Connecting to Ethernet");
+        - delay: 15s
+        - lambda: 'id(boot_grace_period) = false;'
         - if:
             condition:
-              lambda: 'return wifi::global_wifi_component->has_sta();'
+              lambda: |-
+                return ethernet::global_eth_component == nullptr ||
+                       !ethernet::global_eth_component->is_connected();
             then:
-              - lambda: |-
-                  lv_label_set_text(id(loading_status_label), "Connecting to WiFi");
-              - delay: 15s
-              - lambda: 'id(boot_grace_period) = false;'
-              - if:
-                  condition:
-                    not:
-                      wifi.connected:
-                  then:
-                    - lvgl.page.show: wifi_setup_page
-                    - script.execute: setup_screen_dim
-            else:
-              - lambda: 'id(boot_grace_period) = false;'
-              - lvgl.page.show: wifi_setup_page
+              - lvgl.page.show: ethernet_setup_page
               - script.execute: setup_screen_dim

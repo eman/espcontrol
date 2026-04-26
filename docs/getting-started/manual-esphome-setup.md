@@ -17,7 +17,7 @@ For detailed instructions on compiling the factory firmware directly using Docke
 - A supported Guition ESP32 panel.
 - ESPHome Device Builder in Home Assistant, or the ESPHome command line on your computer.
 - A USB-C data cable for the first install.
-- Your WiFi name and password.
+- Your WiFi name and password, unless you are using the advanced wired Ethernet option for the 7-inch Ethernet model.
 
 ::: tip First install or update?
 Use USB for a blank screen or a screen that is not already running Espcontrol. Once Espcontrol is installed and connected to WiFi, later ESPHome installs can usually be done wirelessly with OTA.
@@ -66,6 +66,27 @@ wifi:
   ssid: "Your WiFi Name"
   password: "Your WiFi Password"
 ```
+
+## Advanced: 7-inch Ethernet Option
+
+Some 7-inch JC1060P470 panels include wired Ethernet. ESPHome cannot run WiFi and Ethernet in the same firmware, so this option is Ethernet-only and is intended for manual installs.
+
+Use this template for the Ethernet model. Do not add a `wifi:` block.
+
+```yaml
+substitutions:
+  name: "espcontrol-office"
+  friendly_name: "Espcontrol Office"
+  network_transport: ethernet
+
+packages:
+  setup:
+    url: https://github.com/jtenniswood/espcontrol/
+    file: devices/guition-esp32-p4-jc1060p470/packages.yaml
+    refresh: 1d
+```
+
+If Ethernet is unplugged or your network does not give the display an IP address, the display will show an Ethernet setup message. It will not create a WiFi hotspot in this mode.
 
 ::: warning Keep the device name simple
 Use lowercase letters, numbers, and hyphens for `name`. For example, `espcontrol-kitchen` is better than `Kitchen Touchscreen`.

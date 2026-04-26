@@ -1,10 +1,9 @@
 // =============================================================================
 // ESPCONTROL WEB UI - Custom device configuration interface
 // =============================================================================
-// Replaces the default ESPHome webserver UI with a three-tab layout:
+// Replaces the default ESPHome webserver UI with a two-tab layout:
 //   Screen  - Live grid preview with drag-and-drop button arrangement
 //   Settings - Display, brightness, firmware, and entity configuration
-//   Logs    - Real-time device log viewer via SSE
 //
 // Per-device config (grid size, styling) is injected between __DEVICE_CONFIG__
 // markers by scripts/build.py. Button type plugins (switch, sensor, weather,
@@ -12,7 +11,7 @@
 // Icon data is generated between GENERATED:ICONS / GENERATED:DOMAIN_ICONS.
 // =============================================================================
 
-// Custom UI: three-page layout (Screen / Settings / Logs)
+// Custom UI: two-page layout (Screen / Settings)
 (function () {
   // __DEVICE_CONFIG_START__
   var DEVICE_ID = "guition-esp32-p4-jc1060p470";
@@ -76,23 +75,23 @@
     "Light Switch", "Lightbulb", "Lightbulb Group", "Lightbulb Group Outline", "Lightbulb Night", "Lightbulb Night Outline",
     "Lightbulb Off", "Lightbulb On Outline", "Lightbulb Spot", "Lightbulb Spot Off", "Lightbulb Variant", "Lightbulb Variant Outline",
     "Lightbulb Outline", "Lightning Bolt", "Lock", "Lock Open", "Lock Open Outline", "Lock Outline",
-    "Mailbox", "Message Video", "Meter Electric", "Meter Gas", "Microsoft Xbox", "Microwave",
-    "Monitor", "Motion Sensor", "Movie Roll", "Music", "Outdoor Lamp", "Oven",
-    "Package", "Package Closed", "Pool", "Power", "Power Plug", "Printer",
-    "Printer 3D", "Projector", "Projector Off", "Robot Vacuum", "Roller Shade", "Roller Shade Closed",
-    "Router", "Router Network", "Security", "Shower", "Smoke Detector", "Snowflake",
-    "Snowflake Alert", "Snowflake Thermometer", "Sofa", "Solar Panel", "Solar Panel Large", "Solar Power",
-    "Solar Power Variant", "Speaker", "Spotlight", "Sprinkler", "String Lights", "String Lights Off",
-    "Sun", "Table", "Television", "Television Off", "Thermometer", "Thermometer Alert",
-    "Thermometer High", "Thermometer Low", "Thermostat", "Timer", "Toilet", "Transmission Tower",
-    "Trash Can", "Wall Outlet", "Wall Sconce", "Washer", "Water", "Water Heater",
-    "Water Percent", "Weather Cloudy", "Weather Cloudy Alert", "Weather Dust", "Weather Fog", "Weather Hail",
-    "Weather Hazy", "Weather Hurricane", "Weather Lightning", "Weather Lightning Rainy", "Weather Night", "Weather Night Cloudy",
-    "Weather Partly Cloudy", "Weather Partly Lightning", "Weather Partly Rainy", "Weather Partly Snowy", "Weather Partly Snowy Rainy", "Weather Pouring",
-    "Weather Rainy", "Weather Snowy", "Weather Snowy Heavy", "Weather Snowy Rainy", "Weather Sunny", "Weather Sunny Alert",
-    "Weather Sunny Off", "Weather Sunset", "Weather Sunset Down", "Weather Sunset Up", "Weather Tornado", "Weather Windy",
-    "Weather Windy Variant", "Wind Power", "Wind Turbine", "Wind Turbine Alert", "Wind Turbine Check", "Window Shutter",
-    "Window Shutter Open",
+    "Mailbox", "Message Video", "Medication", "Medication Outline", "Meter Electric", "Meter Gas",
+    "Microsoft Xbox", "Microwave", "Monitor", "Motion Sensor", "Movie Roll", "Music",
+    "Outdoor Lamp", "Oven", "Package", "Package Closed", "Pill", "Pill Multiple",
+    "Pool", "Power", "Power Plug", "Printer", "Printer 3D", "Projector",
+    "Projector Off", "Robot Vacuum", "Roller Shade", "Roller Shade Closed", "Router", "Router Network",
+    "Security", "Shower", "Smoke Detector", "Snowflake", "Snowflake Alert", "Snowflake Thermometer",
+    "Sofa", "Solar Panel", "Solar Panel Large", "Solar Power", "Solar Power Variant", "Speaker",
+    "Spotlight", "Sprinkler", "String Lights", "String Lights Off", "Sun", "Table",
+    "Television", "Television Off", "Thermometer", "Thermometer Alert", "Thermometer High", "Thermometer Low",
+    "Thermostat", "Timer", "Toilet", "Transmission Tower", "Trash Can", "Wall Outlet",
+    "Wall Sconce", "Washer", "Water", "Water Heater", "Water Percent", "Weather Cloudy",
+    "Weather Cloudy Alert", "Weather Dust", "Weather Fog", "Weather Hail", "Weather Hazy", "Weather Hurricane",
+    "Weather Lightning", "Weather Lightning Rainy", "Weather Night", "Weather Night Cloudy", "Weather Partly Cloudy", "Weather Partly Lightning",
+    "Weather Partly Rainy", "Weather Partly Snowy", "Weather Partly Snowy Rainy", "Weather Pouring", "Weather Rainy", "Weather Snowy",
+    "Weather Snowy Heavy", "Weather Snowy Rainy", "Weather Sunny", "Weather Sunny Alert", "Weather Sunny Off", "Weather Sunset",
+    "Weather Sunset Down", "Weather Sunset Up", "Weather Tornado", "Weather Windy", "Weather Windy Variant", "Wind Power",
+    "Wind Turbine", "Wind Turbine Alert", "Wind Turbine Check", "Window Shutter", "Window Shutter Open",
   ];
   // --- GENERATED:ICONS END ---
 
@@ -164,6 +163,9 @@
     "font-size:.875rem;font-weight:500;border-bottom:2px solid transparent;text-decoration:none;transition:color .2s}" +
     ".sp-tab:hover{color:var(--text)}" +
     ".sp-tab.active{color:var(--accent);border-bottom-color:var(--accent)}" +
+    ".sp-tab-docs{position:relative;gap:6px;margin-left:8px;padding-left:24px}" +
+    ".sp-tab-docs::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:1px;background:var(--border)}" +
+    ".sp-tab-docs .mdi{font-size:16px;line-height:1;opacity:.7}" +
 
     ".sp-page{display:none}.sp-page.active{display:block}" +
 
@@ -419,27 +421,6 @@
     ".sp-apply-btn:active{opacity:.85}" +
     ".sp-apply-btn:disabled{opacity:.4;cursor:not-allowed}" +
     ".sp-apply-note{font-size:.75rem;color:var(--text3);margin-top:8px}" +
-    ".sp-settings-footer{padding:0 var(--gap) var(--gap);text-align:center}" +
-    ".sp-settings-link{color:var(--text2);font-size:.8rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer}" +
-    ".sp-settings-link:hover{color:var(--text)}" +
-
-    ".sp-log-toolbar{display:flex;justify-content:flex-end;padding:12px var(--gap) 0}" +
-    ".sp-log-clear{background:var(--surface2);color:var(--text);border:1px solid var(--border);" +
-    "border-radius:var(--action-r);padding:8px 14px;font-size:.8rem;font-weight:500;cursor:pointer;" +
-    "font-family:inherit;transition:all .25s}" +
-    ".sp-log-clear:hover{background:var(--border);border-color:#4a4d54}" +
-    ".sp-log-output{margin:8px var(--gap) var(--gap);padding:16px;background:var(--surface);" +
-    "border:1px solid var(--border);border-radius:var(--radius);" +
-    "font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;" +
-    "font-size:.75rem;line-height:1.7;color:var(--text2);overflow-x:auto;overflow-y:auto;" +
-    "max-height:70vh;white-space:pre;word-break:break-all}" +
-    ".sp-log-line{padding:1px 0;border-left:3px solid transparent;padding-left:8px}" +
-    ".sp-log-error{color:#f66f81;border-left-color:#f14158;background:rgba(244,63,94,.08)}" +
-    ".sp-log-warn{color:#f9b44e;border-left-color:#da8b17;background:rgba(234,179,8,.06)}" +
-    ".sp-log-info{color:#3dd68c}" +
-    ".sp-log-config{color:#c8abfa}" +
-    ".sp-log-debug{color:#5c73e7}" +
-    ".sp-log-verbose{color:var(--text2)}" +
 
     ".sp-empty{text-align:center;padding:24px;color:var(--text3);font-size:.85rem}" +
 
@@ -527,6 +508,7 @@
     ".sp-header{padding:0 12px;height:48px}" +
     ".sp-brand{font-size:.875rem}" +
     ".sp-tab{padding:0 12px;font-size:.8rem}" +
+    ".sp-tab-docs{margin-left:4px;padding-left:18px}" +
     ".card{padding:16px}" +
     ".card-header{margin:-16px -16px 0 -16px;padding:16px 16px 0 16px}" +
     ".card-body{padding-top:14px}" +
@@ -537,6 +519,7 @@
     ":root{--gap:10px}" +
     ".sp-header{padding:0 10px}" +
     ".sp-tab{padding:0 10px;font-size:.75rem}" +
+    ".sp-tab-docs{margin-left:2px;padding-left:16px;gap:4px}" +
     ".sp-support-btn{right:12px;bottom:12px;min-height:48px;padding:7px 16px 7px 12px;font-size:24px}" +
     ".sp-support-btn svg{width:26px;height:26px}" +
     ".sp-color-row{flex-wrap:wrap}" +
@@ -588,6 +571,9 @@
     timezoneOptions: [],
     clockFormat: "24h",
     clockFormatOptions: ["12h", "24h"],
+    ntpServer1: "0.pool.ntp.org",
+    ntpServer2: "1.pool.ntp.org",
+    ntpServer3: "2.pool.ntp.org",
     screenRotation: "0",
     screenRotationOptions: (CFG.features && CFG.features.screenRotationOptions) || ["0", "90", "180", "270"],
     sunrise: "",
@@ -706,6 +692,11 @@
     if (n < 1) return 1;
     if (n > 100) return 100;
     return Math.round(n);
+  }
+
+  function normalizeNtpServer(value, fallback) {
+    var v = String(value == null ? "" : value).trim();
+    return v || fallback;
   }
 
   function formatDuration(seconds) {
@@ -1970,7 +1961,6 @@
     buildHeader(root);
     buildScreenPage(root);
     buildSettingsPage(root);
-    buildLogsPage(root);
 
     var app = document.querySelector("esp-app");
     if (app) {
@@ -2011,11 +2001,11 @@
     });
 
     var docsLink = document.createElement("a");
-    docsLink.className = "sp-tab";
+    docsLink.className = "sp-tab sp-tab-docs";
     docsLink.href = "https://github.com/eman/espcontrol";
     docsLink.target = "_blank";
     docsLink.rel = "noopener";
-    docsLink.textContent = "Docs";
+    docsLink.innerHTML = 'Docs <span class="mdi mdi-arrow-top-right"></span>';
     nav.appendChild(docsLink);
 
     header.appendChild(nav);
@@ -2316,7 +2306,7 @@
     tzSelect.value = state.timezone;
     tzSelect.addEventListener("change", function () {
       state.timezone = this.value;
-      postSelectWithObjectId("Screen: Timezone", "screen__timezone", this.value);
+      postSelect("Screen: Timezone", this.value);
       updateClock();
     });
     tzField.appendChild(tzSelect);
@@ -2337,11 +2327,40 @@
     });
     cfSelect.value = state.clockFormat;
     cfSelect.addEventListener("change", function () {
-      postSelectWithObjectId("Screen: Clock Format", "screen__clock_format", this.value);
+      postSelect("Screen: Clock Format", this.value);
     });
     cfField.appendChild(cfSelect);
     clockBody.appendChild(cfField);
     els.setClockFormat = cfSelect;
+
+    function addNtpServerField(label, id, stateKey, postName, placeholder) {
+      var field = document.createElement("div");
+      field.className = "sp-field";
+      field.appendChild(fieldLabel(label, id));
+      var input = textInput(id, state[stateKey], placeholder);
+      input.addEventListener("blur", function () {
+        var value = this.value.trim();
+        this.value = value;
+        state[stateKey] = value;
+        postText(postName, value);
+      });
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") this.blur();
+      });
+      field.appendChild(input);
+      clockBody.appendChild(field);
+      return input;
+    }
+
+    els.setNtpServer1 = addNtpServerField(
+      "NTP Server 1", "sp-set-ntp-server-1", "ntpServer1",
+      "Screen: NTP Server 1", "0.pool.ntp.org");
+    els.setNtpServer2 = addNtpServerField(
+      "NTP Server 2", "sp-set-ntp-server-2", "ntpServer2",
+      "Screen: NTP Server 2", "1.pool.ntp.org");
+    els.setNtpServer3 = addNtpServerField(
+      "NTP Server 3", "sp-set-ntp-server-3", "ntpServer3",
+      "Screen: NTP Server 3", "2.pool.ntp.org");
 
     var clockBarBadge = document.createElement("span");
     clockBarBadge.setAttribute("aria-label", "Clock bar on");
@@ -2650,19 +2669,6 @@
     page.appendChild(config);
     page.appendChild(buildApplyBar());
 
-    var footer = document.createElement("div");
-    footer.className = "sp-settings-footer";
-    var logsLink = document.createElement("a");
-    logsLink.className = "sp-settings-link";
-    logsLink.href = "#logs";
-    logsLink.textContent = "View logs";
-    logsLink.addEventListener("click", function (e) {
-      e.preventDefault();
-      switchTab("logs");
-    });
-    footer.appendChild(logsLink);
-    page.appendChild(footer);
-
     parent.appendChild(page);
     els.settingsPage = page;
   }
@@ -2957,31 +2963,6 @@
     return bar;
   }
 
-  // ── Logs Page ──────────────────────────────────────────────────────────
-
-  function buildLogsPage(parent) {
-    var page = document.createElement("div");
-    page.id = "sp-logs";
-    page.className = "sp-page";
-
-    var toolbar = document.createElement("div");
-    toolbar.className = "sp-log-toolbar";
-    var clearBtn = document.createElement("button");
-    clearBtn.className = "sp-log-clear";
-    clearBtn.textContent = "Clear";
-    clearBtn.addEventListener("click", function () { els.logOutput.innerHTML = ""; });
-    toolbar.appendChild(clearBtn);
-    page.appendChild(toolbar);
-
-    var output = document.createElement("div");
-    output.className = "sp-log-output";
-    page.appendChild(output);
-    els.logOutput = output;
-
-    parent.appendChild(page);
-    els.logsPage = page;
-  }
-
   function switchTab(tab) {
     state.activeTab = tab;
     ["screen", "settings"].forEach(function (t) {
@@ -2990,7 +2971,6 @@
     });
     els.screenPage.className = "sp-page" + (tab === "screen" ? " active" : "");
     els.settingsPage.className = "sp-page" + (tab === "settings" ? " active" : "");
-    els.logsPage.className = "sp-page" + (tab === "logs" ? " active" : "");
   }
 
   // ── Preview rendering (unified) ────────────────────────────────────────
@@ -4790,6 +4770,11 @@
         indoor_temp_entity: state.indoorEntity,
         outdoor_temp_entity: state.outdoorEntity,
         clock_bar: state.clockBarOn,
+        timezone: state.timezone,
+        clock_format: state.clockFormat,
+        ntp_server_1: state.ntpServer1,
+        ntp_server_2: state.ntpServer2,
+        ntp_server_3: state.ntpServer3,
         screensaver_mode: getActiveScreensaverMode(),
         presence_sensor_entity: state.presenceEntity,
         clock_screensaver: state.clockScreensaverOn,
@@ -5012,6 +4997,34 @@
           postText("Indoor Temp Entity", s.indoor_temp_entity || "");
           postText("Outdoor Temp Entity", s.outdoor_temp_entity || "");
           postClockBar(s.clock_bar != null ? !!s.clock_bar : true);
+          var importedTimezone = s.timezone || state.timezone;
+          var importedClockFormat =
+            state.clockFormatOptions.indexOf(s.clock_format) !== -1
+              ? s.clock_format
+              : state.clockFormat;
+          var hasNtpServer1 = Object.prototype.hasOwnProperty.call(s, "ntp_server_1");
+          var hasNtpServer2 = Object.prototype.hasOwnProperty.call(s, "ntp_server_2");
+          var hasNtpServer3 = Object.prototype.hasOwnProperty.call(s, "ntp_server_3");
+          var importedNtpServer1 = hasNtpServer1
+            ? normalizeNtpServer(s.ntp_server_1, "0.pool.ntp.org")
+            : state.ntpServer1;
+          var importedNtpServer2 = hasNtpServer2
+            ? normalizeNtpServer(s.ntp_server_2, "1.pool.ntp.org")
+            : state.ntpServer2;
+          var importedNtpServer3 = hasNtpServer3
+            ? normalizeNtpServer(s.ntp_server_3, "2.pool.ntp.org")
+            : state.ntpServer3;
+          if (s.timezone) postSelect("Screen: Timezone", importedTimezone);
+          if (s.clock_format) postSelect("Screen: Clock Format", importedClockFormat);
+          if (hasNtpServer1) {
+            postText("Screen: NTP Server 1", importedNtpServer1);
+          }
+          if (hasNtpServer2) {
+            postText("Screen: NTP Server 2", importedNtpServer2);
+          }
+          if (hasNtpServer3) {
+            postText("Screen: NTP Server 3", importedNtpServer3);
+          }
           var importedScreensaverMode = s.screensaver_mode || "disabled";
           if (importedScreensaverMode !== "sensor" &&
               importedScreensaverMode !== "timer" &&
@@ -5039,6 +5052,11 @@
           state.indoorEntity = s.indoor_temp_entity || "";
           state.outdoorEntity = s.outdoor_temp_entity || "";
           state.clockBarOn = s.clock_bar != null ? !!s.clock_bar : true;
+          state.timezone = importedTimezone;
+          state.clockFormat = importedClockFormat;
+          state.ntpServer1 = importedNtpServer1;
+          state.ntpServer2 = importedNtpServer2;
+          state.ntpServer3 = importedNtpServer3;
           state.screensaverMode = importedScreensaverMode;
           state._screensaverModeReceived = true;
           state.presenceEntity = s.presence_sensor_entity || "";
@@ -5054,6 +5072,11 @@
           syncInput(els.setIndoorEntity, state.indoorEntity);
           syncInput(els.setOutdoorEntity, state.outdoorEntity);
           syncInput(els.setPresence, state.presenceEntity);
+          if (els.setTimezone) els.setTimezone.value = state.timezone;
+          if (els.setClockFormat) els.setClockFormat.value = state.clockFormat;
+          syncInput(els.setNtpServer1, state.ntpServer1);
+          syncInput(els.setNtpServer2, state.ntpServer2);
+          syncInput(els.setNtpServer3, state.ntpServer3);
           syncClockScreensaverControls();
           syncScreensaverTimeoutUi();
           syncIdleUi();
@@ -5450,6 +5473,30 @@
         if (els.setClockFormat) els.setClockFormat.value = state.clockFormat;
         updateClock();
       },
+      "text-screen__ntp_server_1": function (val) {
+        state.ntpServer1 = normalizeNtpServer(val, "0.pool.ntp.org");
+        syncInput(els.setNtpServer1, state.ntpServer1);
+      },
+      "text-screen__ntp_server_2": function (val) {
+        state.ntpServer2 = normalizeNtpServer(val, "1.pool.ntp.org");
+        syncInput(els.setNtpServer2, state.ntpServer2);
+      },
+      "text-screen__ntp_server_3": function (val) {
+        state.ntpServer3 = normalizeNtpServer(val, "2.pool.ntp.org");
+        syncInput(els.setNtpServer3, state.ntpServer3);
+      },
+      "text-ntp_server_1": function (val) {
+        state.ntpServer1 = normalizeNtpServer(val, "0.pool.ntp.org");
+        syncInput(els.setNtpServer1, state.ntpServer1);
+      },
+      "text-ntp_server_2": function (val) {
+        state.ntpServer2 = normalizeNtpServer(val, "1.pool.ntp.org");
+        syncInput(els.setNtpServer2, state.ntpServer2);
+      },
+      "text-ntp_server_3": function (val) {
+        state.ntpServer3 = normalizeNtpServer(val, "2.pool.ntp.org");
+        syncInput(els.setNtpServer3, state.ntpServer3);
+      },
       "select-screen__rotation": function (val, d) {
         state.screenRotation = normalizeScreenRotation(d.value || val || state.screenRotation);
         if (d.option && Array.isArray(d.option)) {
@@ -5582,11 +5629,6 @@
       console.log("[SSE] unhandled:", id, val);
     });
 
-    source.addEventListener("log", function (e) {
-      var d;
-      try { d = JSON.parse(e.data); } catch (_) { d = { msg: e.data }; }
-      appendLog(d.msg || e.data, d.lvl);
-    });
   }
 
   function syncInput(el, val) {
@@ -5648,69 +5690,12 @@
     }
   }
 
-  // ── Log viewer ─────────────────────────────────────────────────────────
-
-  var ANSI_LEVEL = {
-    "1;31": "sp-log-error",   // bold red → error
-    "0;31": "sp-log-error",   // red → error
-    "0;33": "sp-log-warn",    // yellow → warning
-    "0;32": "sp-log-info",    // green → info
-    "0;35": "sp-log-config",  // magenta → config
-    "0;36": "sp-log-debug",   // cyan → debug
-    "0;37": "sp-log-verbose"  // white → verbose
-  };
-  var ANSI_RE = /\033\[[\d;]*m/g;
-  var HIDDEN_STATE_LOG_RE = [
-    /\[[DS]\]\[text_sensor(?::[^\]]*)?\].*['"]Screen: Date['"].*(>>|Sending state)/,
-    /\[[DS]\]\[sensor(?::[^\]]*)?\].*['"]Wifi Strength['"].*(>>|Sending state)/
-  ];
-
-  function shouldHideLogMessage(msg) {
-    var clean = String(msg || "").replace(ANSI_RE, "");
-    for (var i = 0; i < HIDDEN_STATE_LOG_RE.length; i++) {
-      if (HIDDEN_STATE_LOG_RE[i].test(clean)) return true;
-    }
-    return false;
-  }
-
-  function appendLog(msg, lvl) {
-    if (!els.logOutput) return;
-    if (shouldHideLogMessage(msg)) return;
-    var line = document.createElement("div");
-    line.className = "sp-log-line";
-
-    var ansiClass = "";
-    var m = msg.match(/\033\[([\d;]+)m/);
-    if (m) ansiClass = ANSI_LEVEL[m[1]] || "";
-
-    if (ansiClass) {
-      line.classList.add(ansiClass);
-    } else if (lvl === 1) line.classList.add("sp-log-error");
-    else if (lvl === 2) line.classList.add("sp-log-warn");
-    else if (lvl === 3) line.classList.add("sp-log-info");
-    else if (lvl === 4) line.classList.add("sp-log-config");
-    else if (lvl === 5) line.classList.add("sp-log-debug");
-    else if (lvl >= 6) line.classList.add("sp-log-verbose");
-
-    line.textContent = msg.replace(ANSI_RE, "");
-
-    var atBottom = els.logOutput.scrollHeight - els.logOutput.scrollTop - els.logOutput.clientHeight < 40;
-    els.logOutput.appendChild(line);
-    var overflow = els.logOutput.childNodes.length - 1000;
-    if (overflow > 0) {
-      for (var i = 0; i < overflow; i++)
-        els.logOutput.removeChild(els.logOutput.firstChild);
-    }
-    if (atBottom) els.logOutput.scrollTop = els.logOutput.scrollHeight;
-  }
-
   if (typeof globalThis !== "undefined" && globalThis.__ESPCONTROL_TEST_HOOKS__) {
     globalThis.__ESPCONTROL_TEST_HOOKS__.config = {
       parseButtonConfig: parseButtonConfig,
       serializeButtonConfig: serializeButtonConfig,
       parseSubpageConfig: parseSubpageConfig,
       serializeSubpageConfig: serializeSubpageConfig,
-      shouldHideLogMessage: shouldHideLogMessage,
     };
   }
 

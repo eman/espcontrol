@@ -1,0 +1,33 @@
+# =============================================================================
+# NETWORK - Ethernet diagnostics exposed to Home Assistant
+# =============================================================================
+# Online status, uptime, and Ethernet IP address.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Online status (binary_sensor)
+# ---------------------------------------------------------------------------
+binary_sensor:
+  - platform: status
+    name: "Online"
+    id: ink_ha_connected
+    icon: mdi:check-network
+
+# ---------------------------------------------------------------------------
+# Uptime
+# ---------------------------------------------------------------------------
+sensor:
+  - platform: uptime
+    name: "Uptime Sensor"
+    id: uptime_sensor
+    entity_category: diagnostic
+    internal: true
+
+# ---------------------------------------------------------------------------
+# IP address (text_sensor)
+# ---------------------------------------------------------------------------
+text_sensor:
+  - platform: ethernet_info
+    ip_address:
+      name: IP Address
+      icon: mdi:ip-network
