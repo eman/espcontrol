@@ -8,6 +8,10 @@ description:
 
 The normal [browser install](/getting-started/install) is the easiest route. Use this page if you prefer to manage Espcontrol from ESPHome, want to compile the firmware yourself, or need to install from the ESPHome Device Builder dashboard.
 
+::: tip Want to build from source?
+For detailed instructions on compiling the factory firmware directly using Docker and Python scripts, see [Build from Source](/reference/build-from-source).
+:::
+
 ## What You Need
 
 - A supported Guition ESP32 panel.
@@ -50,7 +54,7 @@ wifi:
 
 packages:
   setup:
-    url: https://github.com/jtenniswood/espcontrol/
+    url: https://github.com/eman/espcontrol/
     file: devices/guition-esp32-p4-jc1060p470/packages.yaml
     refresh: 1d
 ```

@@ -25,6 +25,6 @@ wifi:
 # ---------------------------------------------------------------------------
 packages:
   setup:
-    url: https://github.com/jtenniswood/espcontrol/
+    url: https://github.com/eman/espcontrol/
     file: devices/seeed-sensecap-indicator/packages.yaml
     refresh: 1d

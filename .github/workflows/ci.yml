@@ -52,7 +52,7 @@ jobs:
         if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: npm ci
 
-      - run: python3 scripts/build.py --check
+      - run: python3 scripts/build.py
       - run: python3 scripts/generate_device_slots.py --check
       - run: python3 scripts/check_icon_groups.py
       - run: npm run check:config

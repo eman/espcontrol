@@ -2012,7 +2012,7 @@
 
     var docsLink = document.createElement("a");
     docsLink.className = "sp-tab";
-    docsLink.href = "https://jtenniswood.github.io/espcontrol/";
+    docsLink.href = "https://github.com/eman/espcontrol";
     docsLink.target = "_blank";
     docsLink.rel = "noopener";
     docsLink.textContent = "Docs";
@@ -5299,7 +5299,7 @@
         state.outdoorEntity = val;
         syncInput(els.setOutdoorEntity, val);
       },
-      "number-screensaver_timeout": function (val) {
+      "number-screensaver_timeout": function (val, d) {
         syncScreensaverTimeoutLimits(d);
         state.screensaverTimeout = parseFloat(val) || 300;
         syncScreensaverTimeoutUi();
