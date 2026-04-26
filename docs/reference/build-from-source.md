@@ -34,7 +34,7 @@ python3 scripts/build.py    # Generate icons & www.js
 These steps create:
 - `common/assets/icon_glyphs.yaml` — LVGL font glyphs
 - `components/espcontrol/icons.h` — C++ icon definitions
-- `docs/public/webserver/*/www.js` — Per-device web UI (minified, build artifact)
+- `docs/public/webserver/*/www.js` — Per-device web UI (minified)
 
 ### Web UI Build Process
 
@@ -51,19 +51,21 @@ The web UI is built per-device into `docs/public/webserver/{device}/www.js` each
 
 3. **Main UI template** — Base interface logic from `src/webserver/www.js`
 
-The build script minifies the result using esbuild for optimal size. The www.js files are build artifacts and are not checked into source control — they are regenerated on each build.
+The build script minifies the result using esbuild for optimal size. The www.js files are committed to source control so that:
+- **Factory firmware** can embed them at compile time via `js_include`
+- **OTA firmware** can fetch them at runtime from the main branch via `js_url`
 
-**When to rebuild:**
+CI automatically regenerates www.js files whenever source code changes and commits them back to the repository.
+
+**When to rebuild locally:**
 - After modifying any file in `src/webserver/` (template, types, devices config)
 - After adding a new button type handler
-- Before compiling firmware
+- Before compiling firmware for factory builds
 
 To manually rebuild:
 ```bash
 python3 scripts/build.py
 ```
-
-The factory firmware compilation automatically includes the built www.js at compile time via `js_include` in the ESPHome configuration.
 
 ## Build Factory Firmware
 

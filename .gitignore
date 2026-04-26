@@ -8,5 +8,4 @@ docs/.vitepress/dist/
 *.pyo
 *.pyd
 builds/.esphome/
-docs/public/webserver/*/www.js
 secrets.yaml
