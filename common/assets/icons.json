@@ -1085,6 +1085,16 @@
       "mdi": "wind-turbine-check"
     },
     {
+      "name": "Window Closed",
+      "codepoint": "F05AE",
+      "mdi": "window-closed"
+    },
+    {
+      "name": "Window Open",
+      "codepoint": "F05B1",
+      "mdi": "window-open"
+    },
+    {
       "name": "Window Shutter",
       "codepoint": "F111C",
       "mdi": "window-shutter"
