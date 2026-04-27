@@ -230,6 +230,8 @@ static const IconEntry ICON_ENTRIES[] = {
     {"Wind Turbine",               "\U000F0DA5"},
     {"Wind Turbine Alert",         "\U000F19AB"},
     {"Wind Turbine Check",         "\U000F19AC"},
+    {"Window Closed",              "\U000F05AE"},
+    {"Window Open",                "\U000F05B1"},
     {"Window Shutter",             "\U000F111C"},
     {"Window Shutter Open",        "\U000F111E"},
     // --- GENERATED:ICONS END ---

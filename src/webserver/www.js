@@ -91,7 +91,8 @@
     "Weather Partly Rainy", "Weather Partly Snowy", "Weather Partly Snowy Rainy", "Weather Pouring", "Weather Rainy", "Weather Snowy",
     "Weather Snowy Heavy", "Weather Snowy Rainy", "Weather Sunny", "Weather Sunny Alert", "Weather Sunny Off", "Weather Sunset",
     "Weather Sunset Down", "Weather Sunset Up", "Weather Tornado", "Weather Windy", "Weather Windy Variant", "Wind Power",
-    "Wind Turbine", "Wind Turbine Alert", "Wind Turbine Check", "Window Shutter", "Window Shutter Open",
+    "Wind Turbine", "Wind Turbine Alert", "Wind Turbine Check", "Window Closed", "Window Open", "Window Shutter",
+    "Window Shutter Open",
   ];
   // --- GENERATED:ICONS END ---
 
@@ -306,6 +307,7 @@
     "margin-bottom:var(--gap);border:1px solid var(--border)}" +
 
     ".sp-field{margin-bottom:28px}.sp-field:last-child{margin-bottom:0}" +
+    ".sp-field-stack{display:grid;gap:10px}" +
     ".sp-field-label{display:block;font-size:.8rem;font-weight:500;color:var(--text2);margin-bottom:8px}" +
     ".sp-input,.sp-select{width:100%;padding:10px 12px;background:var(--surface2);" +
     "border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.875rem;" +
@@ -2333,11 +2335,15 @@
     clockBody.appendChild(cfField);
     els.setClockFormat = cfSelect;
 
-    function addNtpServerField(label, id, stateKey, postName, placeholder) {
-      var field = document.createElement("div");
-      field.className = "sp-field";
-      field.appendChild(fieldLabel(label, id));
+    var ntpField = document.createElement("div");
+    ntpField.className = "sp-field";
+    ntpField.appendChild(fieldLabel("NTP Servers", "sp-set-ntp-server-1"));
+    var ntpList = document.createElement("div");
+    ntpList.className = "sp-field-stack";
+
+    function addNtpServerInput(id, stateKey, postName, placeholder, ariaLabel) {
       var input = textInput(id, state[stateKey], placeholder);
+      input.setAttribute("aria-label", ariaLabel);
       input.addEventListener("blur", function () {
         var value = this.value.trim();
         this.value = value;
@@ -2347,20 +2353,22 @@
       input.addEventListener("keydown", function (e) {
         if (e.key === "Enter") this.blur();
       });
-      field.appendChild(input);
-      clockBody.appendChild(field);
+      ntpList.appendChild(input);
       return input;
     }
 
-    els.setNtpServer1 = addNtpServerField(
-      "NTP Server 1", "sp-set-ntp-server-1", "ntpServer1",
-      "Screen: NTP Server 1", "0.pool.ntp.org");
-    els.setNtpServer2 = addNtpServerField(
-      "NTP Server 2", "sp-set-ntp-server-2", "ntpServer2",
-      "Screen: NTP Server 2", "1.pool.ntp.org");
-    els.setNtpServer3 = addNtpServerField(
-      "NTP Server 3", "sp-set-ntp-server-3", "ntpServer3",
-      "Screen: NTP Server 3", "2.pool.ntp.org");
+    els.setNtpServer1 = addNtpServerInput(
+      "sp-set-ntp-server-1", "ntpServer1",
+      "Screen: NTP Server 1", "0.pool.ntp.org", "NTP Server 1");
+    els.setNtpServer2 = addNtpServerInput(
+      "sp-set-ntp-server-2", "ntpServer2",
+      "Screen: NTP Server 2", "1.pool.ntp.org", "NTP Server 2");
+    els.setNtpServer3 = addNtpServerInput(
+      "sp-set-ntp-server-3", "ntpServer3",
+      "Screen: NTP Server 3", "2.pool.ntp.org", "NTP Server 3");
+
+    ntpField.appendChild(ntpList);
+    clockBody.appendChild(ntpField);
 
     var clockBarBadge = document.createElement("span");
     clockBarBadge.setAttribute("aria-label", "Clock bar on");

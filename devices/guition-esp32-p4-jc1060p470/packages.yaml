@@ -25,12 +25,14 @@ substitutions:
   clock_cy: "300"
   network_transport: "wifi"
   network_package_suffix: ${ "_ethernet" if network_transport == "ethernet" else "" }
+  backlight_pwm_frequency: ${ "20000Hz" if network_transport == "ethernet" else "1000Hz" }
 
 packages:
   # ---------------------------------------------------------------------------
   # Device, assets, and LVGL base
   # ---------------------------------------------------------------------------
   device:          !include device/device.yaml
+  network_coprocessor: !include device/network_coprocessor${network_package_suffix}.yaml
   fonts:           !include ../../common/assets/fonts.yaml
   icons:           !include ../../common/assets/icons.yaml
   fonts_device:    !include device/fonts.yaml

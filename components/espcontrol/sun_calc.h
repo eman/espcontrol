@@ -283,6 +283,10 @@ inline void apply_ntp_servers(const std::string &server_1,
                               const std::string &server_2,
                               const std::string &server_3) {
 #if defined(USE_ESP_IDF)
+  if (!esp_sntp_enabled()) {
+    return;
+  }
+
   static std::string active_servers[3];
   active_servers[0] = trim_ntp_server(server_1);
   active_servers[1] = trim_ntp_server(server_2);
@@ -296,9 +300,7 @@ inline void apply_ntp_servers(const std::string &server_1,
     esp_sntp_setservername(i, active_servers[i].c_str());
   }
 
-  if (esp_sntp_enabled()) {
-    esp_sntp_restart();
-  }
+  esp_sntp_restart();
 #else
   (void) server_1;
   (void) server_2;

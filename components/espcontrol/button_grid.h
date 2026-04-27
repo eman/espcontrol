@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <vector>
 #include <functional>
+#include "esphome/core/string_ref.h"
 #include "icons.h"
 #include "backlight.h"
 
@@ -137,6 +138,31 @@ inline bool is_text_sensor_card(const std::string &type, const std::string &prec
 
 inline bool is_text_sensor_card(const ParsedCfg &p) {
   return is_text_sensor_card(p.type, p.precision);
+}
+
+constexpr size_t HA_STATE_TEXT_MAX_LEN = 96;
+constexpr size_t HA_SHORT_STATE_MAX_LEN = 32;
+constexpr size_t HA_FRIENDLY_NAME_MAX_LEN = 64;
+
+inline std::string string_ref_limited(esphome::StringRef value, size_t max_len) {
+  size_t len = value.size();
+  if (len > max_len) len = max_len;
+  return std::string(value.c_str(), len);
+}
+
+inline void lv_label_set_text_limited(lv_obj_t *label, esphome::StringRef value, size_t max_len) {
+  std::string text = string_ref_limited(value, max_len);
+  lv_label_set_text(label, text.c_str());
+}
+
+inline bool parse_float_ref(esphome::StringRef value, float &out) {
+  char *end;
+  out = strtof(value.c_str(), &end);
+  return end != value.c_str();
+}
+
+inline bool is_entity_on_ref(esphome::StringRef state) {
+  return state == "on" || state == "home" || state == "playing" || state == "open";
 }
 
 inline std::string sentence_cap_text(const std::string &state) {
@@ -835,8 +861,8 @@ inline void subscribe_calendar_date_source(const std::string &entity_id) {
   subscribed.push_back(source);
   esphome::api::global_api_server->subscribe_home_assistant_state(
     source, {},
-    std::function<void(const std::string &)>([](const std::string &state) {
-      update_calendar_cards_from_date_text(state);
+    std::function<void(esphome::StringRef)>([](esphome::StringRef state) {
+      update_calendar_cards_from_date_text(string_ref_limited(state, 16));
     })
   );
 }
@@ -951,17 +977,16 @@ inline void setup_text_sensor_card(BtnSlot &s, const ParsedCfg &p,
 inline void subscribe_sensor_value(lv_obj_t *sensor_lbl, const std::string &sensor_id, int precision = 0) {
   esphome::api::global_api_server->subscribe_home_assistant_state(
     sensor_id, {},
-    std::function<void(const std::string &)>([sensor_lbl, precision](const std::string &state) {
-      char *end;
-      float val = strtof(state.c_str(), &end);
-      if (end != state.c_str()) {
+    std::function<void(esphome::StringRef)>([sensor_lbl, precision](esphome::StringRef state) {
+      float val = 0.0f;
+      if (parse_float_ref(state, val)) {
         char fmt[8];
         snprintf(fmt, sizeof(fmt), "%%.%df", precision);
         char buf[16];
         snprintf(buf, sizeof(buf), fmt, val);
         lv_label_set_text(sensor_lbl, buf);
       } else {
-        lv_label_set_text(sensor_lbl, state.c_str());
+        lv_label_set_text_limited(sensor_lbl, state, HA_SHORT_STATE_MAX_LEN);
       }
     })
   );
@@ -970,8 +995,8 @@ inline void subscribe_sensor_value(lv_obj_t *sensor_lbl, const std::string &sens
 inline void subscribe_text_sensor_value(lv_obj_t *text_lbl, const std::string &sensor_id) {
   esphome::api::global_api_server->subscribe_home_assistant_state(
     sensor_id, {},
-    std::function<void(const std::string &)>([text_lbl](const std::string &state) {
-      std::string text = sentence_cap_text(state);
+    std::function<void(esphome::StringRef)>([text_lbl](esphome::StringRef state) {
+      std::string text = sentence_cap_text(string_ref_limited(state, HA_STATE_TEXT_MAX_LEN));
       lv_label_set_text(text_lbl, text.c_str());
     })
   );
@@ -980,9 +1005,10 @@ inline void subscribe_text_sensor_value(lv_obj_t *text_lbl, const std::string &s
 inline void subscribe_weather_state(lv_obj_t *icon_lbl, lv_obj_t *text_lbl, const std::string &entity_id) {
   esphome::api::global_api_server->subscribe_home_assistant_state(
     entity_id, {},
-    std::function<void(const std::string &)>([icon_lbl, text_lbl](const std::string &state) {
-      lv_label_set_text(icon_lbl, weather_icon_for_state(state));
-      lv_label_set_text(text_lbl, weather_label_for_state(state).c_str());
+    std::function<void(esphome::StringRef)>([icon_lbl, text_lbl](esphome::StringRef state) {
+      std::string state_text = string_ref_limited(state, HA_SHORT_STATE_MAX_LEN);
+      lv_label_set_text(icon_lbl, weather_icon_for_state(state_text));
+      lv_label_set_text(text_lbl, weather_label_for_state(state_text).c_str());
     })
   );
 }
@@ -993,14 +1019,15 @@ inline void subscribe_garage_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
                                    const std::string &entity_id) {
   esphome::api::global_api_server->subscribe_home_assistant_state(
     entity_id, {},
-    std::function<void(const std::string &)>(
-      [btn_ptr, icon_lbl, status_label, closed_icon, open_icon](const std::string &state) {
-        bool active = garage_state_is_active(state);
+    std::function<void(esphome::StringRef)>(
+      [btn_ptr, icon_lbl, status_label, closed_icon, open_icon](esphome::StringRef state) {
+        std::string state_text = string_ref_limited(state, HA_SHORT_STATE_MAX_LEN);
+        bool active = garage_state_is_active(state_text);
         if (active) lv_obj_add_state(btn_ptr, LV_STATE_CHECKED);
         else lv_obj_clear_state(btn_ptr, LV_STATE_CHECKED);
-        lv_label_set_text(icon_lbl, garage_state_uses_open_icon(state) ? open_icon : closed_icon);
+        lv_label_set_text(icon_lbl, garage_state_uses_open_icon(state_text) ? open_icon : closed_icon);
         transient_status_label_show_if_changed(
-          status_label, garage_state_label(state), garage_state_releases_label(state));
+          status_label, garage_state_label(state_text), garage_state_releases_label(state_text));
       })
   );
 }
@@ -1011,14 +1038,15 @@ inline void subscribe_cover_toggle_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
                                          const std::string &entity_id) {
   esphome::api::global_api_server->subscribe_home_assistant_state(
     entity_id, {},
-    std::function<void(const std::string &)>(
-      [btn_ptr, icon_lbl, status_label, closed_icon, open_icon](const std::string &state) {
-        bool active = cover_toggle_state_is_active(state);
+    std::function<void(esphome::StringRef)>(
+      [btn_ptr, icon_lbl, status_label, closed_icon, open_icon](esphome::StringRef state) {
+        std::string state_text = string_ref_limited(state, HA_SHORT_STATE_MAX_LEN);
+        bool active = cover_toggle_state_is_active(state_text);
         if (active) lv_obj_add_state(btn_ptr, LV_STATE_CHECKED);
         else lv_obj_clear_state(btn_ptr, LV_STATE_CHECKED);
-        lv_label_set_text(icon_lbl, garage_state_uses_open_icon(state) ? open_icon : closed_icon);
+        lv_label_set_text(icon_lbl, garage_state_uses_open_icon(state_text) ? open_icon : closed_icon);
         transient_status_label_show_if_changed(
-          status_label, garage_state_label(state), garage_state_releases_label(state));
+          status_label, garage_state_label(state_text), garage_state_releases_label(state_text));
       })
   );
 }
@@ -1028,8 +1056,8 @@ inline void subscribe_friendly_name(TransientStatusLabel *status_label,
                                     const std::string &entity_id) {
   esphome::api::global_api_server->subscribe_home_assistant_state(
     entity_id, std::string("friendly_name"),
-    std::function<void(const std::string &)>([status_label](const std::string &name) {
-      transient_status_label_set_steady(status_label, name);
+    std::function<void(esphome::StringRef)>([status_label](esphome::StringRef name) {
+      transient_status_label_set_steady(status_label, string_ref_limited(name, HA_FRIENDLY_NAME_MAX_LEN));
     })
   );
 }
@@ -1037,8 +1065,8 @@ inline void subscribe_friendly_name(TransientStatusLabel *status_label,
 inline void subscribe_friendly_name(lv_obj_t *text_lbl, const std::string &entity_id) {
   esphome::api::global_api_server->subscribe_home_assistant_state(
     entity_id, std::string("friendly_name"),
-    std::function<void(const std::string &)>([text_lbl](const std::string &name) {
-      lv_label_set_text(text_lbl, name.c_str());
+    std::function<void(esphome::StringRef)>([text_lbl](esphome::StringRef name) {
+      lv_label_set_text_limited(text_lbl, name, HA_FRIENDLY_NAME_MAX_LEN);
     })
   );
 }
@@ -1051,10 +1079,10 @@ inline void subscribe_toggle_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
                                    const std::string &entity_id) {
   esphome::api::global_api_server->subscribe_home_assistant_state(
     entity_id, {},
-    std::function<void(const std::string &)>(
+    std::function<void(esphome::StringRef)>(
       [btn_ptr, icon_lbl, sensor_ctr, slot_has_sensor, slot_has_icon_on,
-       slot_icon_off, slot_icon_on](const std::string &state) {
-        bool on = is_entity_on(state);
+       slot_icon_off, slot_icon_on](esphome::StringRef state) {
+        bool on = is_entity_on_ref(state);
         if (on) lv_obj_add_state(btn_ptr, LV_STATE_CHECKED);
         else lv_obj_clear_state(btn_ptr, LV_STATE_CHECKED);
         if (*slot_has_icon_on) {
@@ -1417,9 +1445,9 @@ inline void subscribe_slider_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
   bool is_fan = is_fan_entity(entity_id);
   esphome::api::global_api_server->subscribe_home_assistant_state(
     entity_id, {},
-    std::function<void(const std::string &)>(
-      [slider, btn_ptr, fill, horiz, inv, rad, icon_lbl, has_icon_on, icon_off, icon_on](const std::string &state) {
-        bool on = is_entity_on(state);
+    std::function<void(esphome::StringRef)>(
+      [slider, btn_ptr, fill, horiz, inv, rad, icon_lbl, has_icon_on, icon_off, icon_on](esphome::StringRef state) {
+        bool on = is_entity_on_ref(state);
         if (!on) {
           lv_slider_set_value(slider, 0, LV_ANIM_OFF);
           if (fill) slider_update_fill(fill, btn_ptr, inv ? 100 : 0, horiz, inv, rad);
@@ -1431,11 +1459,10 @@ inline void subscribe_slider_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
   if (is_cover) {
     esphome::api::global_api_server->subscribe_home_assistant_state(
       entity_id, std::string(cover_tilt ? "current_tilt_position" : "current_position"),
-      std::function<void(const std::string &)>(
-        [slider, btn_ptr, fill, horiz, inv, rad, icon_lbl, has_icon_on, icon_off, icon_on](const std::string &val) {
-          char *end;
-          float pos = strtof(val.c_str(), &end);
-          if (end != val.c_str()) {
+      std::function<void(esphome::StringRef)>(
+        [slider, btn_ptr, fill, horiz, inv, rad, icon_lbl, has_icon_on, icon_off, icon_on](esphome::StringRef val) {
+          float pos = 0.0f;
+          if (parse_float_ref(val, pos)) {
             int pct = (int)(pos + 0.5f);
             if (pct < 0) pct = 0;
             if (pct > 100) pct = 100;
@@ -1451,11 +1478,10 @@ inline void subscribe_slider_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
   } else if (is_fan) {
     esphome::api::global_api_server->subscribe_home_assistant_state(
       entity_id, std::string("percentage"),
-      std::function<void(const std::string &)>(
-        [slider, btn_ptr, fill, horiz, inv, rad](const std::string &val) {
-          char *end;
-          float pct_f = strtof(val.c_str(), &end);
-          if (end != val.c_str()) {
+      std::function<void(esphome::StringRef)>(
+        [slider, btn_ptr, fill, horiz, inv, rad](esphome::StringRef val) {
+          float pct_f = 0.0f;
+          if (parse_float_ref(val, pct_f)) {
             int pct = (int)(pct_f + 0.5f);
             if (pct < 0) pct = 0;
             if (pct > 100) pct = 100;
@@ -1468,11 +1494,10 @@ inline void subscribe_slider_state(lv_obj_t *btn_ptr, lv_obj_t *icon_lbl,
   } else {
     esphome::api::global_api_server->subscribe_home_assistant_state(
       entity_id, std::string("brightness"),
-      std::function<void(const std::string &)>(
-        [slider, btn_ptr, fill, horiz, inv, rad](const std::string &val) {
-          char *end;
-          float bri = strtof(val.c_str(), &end);
-          if (end != val.c_str()) {
+      std::function<void(esphome::StringRef)>(
+        [slider, btn_ptr, fill, horiz, inv, rad](esphome::StringRef val) {
+          float bri = 0.0f;
+          if (parse_float_ref(val, bri)) {
             int pct = (int)((bri * 100.0f + 127.0f) / 255.0f);
             if (pct < 1) pct = 1;
             if (pct > 100) pct = 100;
@@ -1655,10 +1680,10 @@ inline void subscribe_subpage_parent_indicator(
     int *sp_on_count) {
   esphome::api::global_api_server->subscribe_home_assistant_state(
     entity_id, {},
-    std::function<void(const std::string &)>(
+    std::function<void(esphome::StringRef)>(
       [parent_btn, parent_icon, parent_idx, child_was_on,
-       has_alt_icon, off_glyph, on_glyph, sp_on_count](const std::string &state) {
-        bool is_on = is_entity_on(state);
+       has_alt_icon, off_glyph, on_glyph, sp_on_count](esphome::StringRef state) {
+        bool is_on = is_entity_on_ref(state);
         if (is_on && !*child_was_on) {
           sp_on_count[parent_idx]++;
           *child_was_on = true;
@@ -2397,8 +2422,8 @@ inline void grid_phase2(
         lv_obj_t *bp = sb_btn;
         esphome::api::global_api_server->subscribe_home_assistant_state(
           sb.entity, {},
-          std::function<void(const std::string &)>([bp](const std::string &state) {
-            bool on = is_entity_on(state);
+          std::function<void(esphome::StringRef)>([bp](esphome::StringRef state) {
+            bool on = is_entity_on_ref(state);
             if (on) lv_obj_add_state(bp, LV_STATE_CHECKED);
             else lv_obj_clear_state(bp, LV_STATE_CHECKED);
           })
@@ -2474,11 +2499,10 @@ inline void grid_phase3(
   if (indoor_on && !indoor_entity.empty()) {
     esphome::api::global_api_server->subscribe_home_assistant_state(
       indoor_entity, {},
-      std::function<void(const std::string &)>(
-        [indoor_temp_ptr, outdoor_temp_ptr, temp_label](const std::string &state) {
-          char *end;
-          float val = strtof(state.c_str(), &end);
-          if (end != state.c_str()) {
+      std::function<void(esphome::StringRef)>(
+        [indoor_temp_ptr, outdoor_temp_ptr, temp_label](esphome::StringRef state) {
+          float val = 0.0f;
+          if (parse_float_ref(state, val)) {
             *indoor_temp_ptr = val;
             float outdoor = *outdoor_temp_ptr;
             char buf[16];
@@ -2496,11 +2520,10 @@ inline void grid_phase3(
   if (outdoor_on && !outdoor_entity.empty()) {
     esphome::api::global_api_server->subscribe_home_assistant_state(
       outdoor_entity, {},
-      std::function<void(const std::string &)>(
-        [indoor_temp_ptr, outdoor_temp_ptr, temp_label](const std::string &state) {
-          char *end;
-          float val = strtof(state.c_str(), &end);
-          if (end != state.c_str()) {
+      std::function<void(esphome::StringRef)>(
+        [indoor_temp_ptr, outdoor_temp_ptr, temp_label](esphome::StringRef state) {
+          float val = 0.0f;
+          if (parse_float_ref(state, val)) {
             *outdoor_temp_ptr = val;
             float indoor = *indoor_temp_ptr;
             char buf[16];
@@ -2518,8 +2541,8 @@ inline void grid_phase3(
   if (!presence_entity.empty()) {
     esphome::api::global_api_server->subscribe_home_assistant_state(
       presence_entity, {},
-      std::function<void(const std::string &)>(
-        [presence_detected_ptr, wake_callback, sleep_callback](const std::string &state) {
+      std::function<void(esphome::StringRef)>(
+        [presence_detected_ptr, wake_callback, sleep_callback](esphome::StringRef state) {
           if (state == "on") {
             *presence_detected_ptr = true;
             lv_disp_trig_activity(NULL);
