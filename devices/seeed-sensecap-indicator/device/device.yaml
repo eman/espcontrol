@@ -117,7 +117,7 @@ light:
             condition:
               lambda: |-
                 return id(screen_schedule_asleep) ||
-                       (id(schedule_enabled).state && !id(ha_time).now().is_valid());
+                       (id(schedule_enabled).state && !id(homeassistant_time).now().is_valid());
             then:
               - script.execute: backlight_force_display_off
             else:
