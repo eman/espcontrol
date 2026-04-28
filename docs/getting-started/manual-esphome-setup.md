@@ -95,7 +95,9 @@ The Ethernet firmware is intentionally different from the normal WiFi firmware:
 - It keeps the ESP32-C6 hosted WiFi co-processor disabled because it is not needed for wired networking.
 - It uses a higher backlight PWM frequency on this panel to avoid the visible shimmer that can appear when Ethernet is active.
 
-To switch back to WiFi later, remove `network_transport: ethernet`, add your `wifi:` block again, then recompile and install the firmware.
+When switching a display between WiFi firmware and Ethernet firmware, install the new firmware over USB. OTA updates can fail during this change because the currently running firmware and the new firmware use different network hardware.
+
+To switch back to WiFi later, remove `network_transport: ethernet`, add your `wifi:` block again, then recompile and install the firmware over USB.
 
 ::: warning Keep the device name simple
 Use lowercase letters, numbers, and hyphens for `name`. For example, `espcontrol-kitchen` is better than `Kitchen Touchscreen`.
@@ -111,16 +113,6 @@ Use this for the first install.
 4. Wait for compiling and flashing to finish before unplugging the display.
 
 If ESPHome cannot access the USB port directly, choose **Manual download** instead. For a blank screen, select the factory firmware option if ESPHome asks which format to use. Then open [ESPHome Web Tools](https://web.esphome.io/) in Chrome or Edge, connect to the display, and flash the downloaded file.
-
-## Install with the ESPHome Command Line
-
-If you use ESPHome on your own computer, create a YAML file with the same template, then run:
-
-```sh
-esphome run espcontrol-kitchen.yaml
-```
-
-ESPHome will compile the firmware and ask where to install it. Choose the serial port for a USB install, or enter the device IP address for an OTA update.
 
 ## After the Display Boots
 

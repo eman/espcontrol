@@ -7,7 +7,7 @@
 //
 // Per-device config (grid size, styling) is injected between __DEVICE_CONFIG__
 // markers by scripts/build.py. Button type plugins (switch, sensor, weather,
-// calendar, slider, cover, garage, push, subpage) are injected between __BUTTON_TYPES__ markers.
+// action, calendar, timezone, slider, cover, garage, push, subpage) are injected between __BUTTON_TYPES__ markers.
 // Icon data is generated between GENERATED:ICONS / GENERATED:DOMAIN_ICONS.
 // =============================================================================
 
@@ -26,6 +26,7 @@
     Auto: "cog",
     Alarm: "bell-ring",
     Application: "application-outline",
+    "Ceiling Lights Multiple": "ceiling-light-multiple",
     Clock: "clock-outline",
     Downlight: "light-recessed",
     Doorbell: "doorbell-video",
@@ -35,7 +36,6 @@
     "Grid Export": "transmission-tower-export",
     "Grid Import": "transmission-tower-import",
     "Grid Off": "transmission-tower-off",
-    Heater: "radiator",
     Humidifier: "air-humidifier",
     "Humidity Alert": "water-percent-alert",
     Key: "key-variant",
@@ -49,6 +49,7 @@
     Spotlight: "spotlight-beam",
     Sun: "white-balance-sunny",
     Table: "table-furniture",
+    "Home-Thermostat": "home-thermometer",
     Timer: "timer-outline",
     "Wall Outlet": "power-socket",
     Washer: "washing-machine",
@@ -62,30 +63,32 @@
     "Battery Charging", "Battery Charging 100", "Battery Charging 70", "Battery High", "Battery Low", "Battery Medium",
     "Battery Off", "Battery Outline", "Battery Unknown", "Bed", "Bell", "Blinds",
     "Blinds Horizontal", "Blinds Horizontal Closed", "Blinds Open", "Bluetooth", "Broom", "Camera",
-    "Car Electric", "Cast", "CCTV", "Ceiling Fan", "Ceiling Light", "Chandelier",
-    "Clock", "Coffee Maker", "Current AC", "Current DC", "Curtains", "Curtains Closed",
-    "Desk Lamp", "Dishwasher", "Dog", "Downlight", "Door", "Door Open",
-    "Doorbell", "Dryer", "EV Charger", "Fan", "Fire", "Fireplace",
-    "Flash", "Floor Lamp", "Fountain", "Fridge", "Gamepad", "Garage",
-    "Garage Open", "Garage Open Variant", "Garage Variant", "Gate", "Gate Open", "Gesture Tap",
-    "Gauge", "Gauge Empty", "Gauge Full", "Gauge Low", "Grid Export", "Grid Import",
-    "Grid Off", "Headphones", "Heater", "Home", "Hot Tub", "Humidifier",
-    "Humidity Alert", "Iron", "Kettle", "Key", "Lamp", "Lamp Outline",
-    "LAN", "Lawnmower", "Leaf", "LED Strip", "LED Strip Variant", "LED Strip Variant Off",
-    "Light Switch", "Lightbulb", "Lightbulb Group", "Lightbulb Group Outline", "Lightbulb Night", "Lightbulb Night Outline",
-    "Lightbulb Off", "Lightbulb On Outline", "Lightbulb Spot", "Lightbulb Spot Off", "Lightbulb Variant", "Lightbulb Variant Outline",
-    "Lightbulb Outline", "Lightning Bolt", "Lock", "Lock Open", "Lock Open Outline", "Lock Outline",
-    "Mailbox", "Message Video", "Medication", "Medication Outline", "Meter Electric", "Meter Gas",
-    "Microsoft Xbox", "Microwave", "Monitor", "Motion Sensor", "Movie Roll", "Music",
-    "Outdoor Lamp", "Oven", "Package", "Package Closed", "Pill", "Pill Multiple",
-    "Pool", "Power", "Power Plug", "Printer", "Printer 3D", "Projector",
-    "Projector Off", "Robot Vacuum", "Roller Shade", "Roller Shade Closed", "Router", "Router Network",
-    "Security", "Shower", "Smoke Detector", "Snowflake", "Snowflake Alert", "Snowflake Thermometer",
-    "Sofa", "Solar Panel", "Solar Panel Large", "Solar Power", "Solar Power Variant", "Speaker",
-    "Spotlight", "Sprinkler", "String Lights", "String Lights Off", "Sun", "Table",
-    "Television", "Television Off", "Thermometer", "Thermometer Alert", "Thermometer High", "Thermometer Low",
-    "Thermostat", "Timer", "Toilet", "Transmission Tower", "Trash Can", "Wall Outlet",
-    "Wall Sconce", "Washer", "Water", "Water Heater", "Water Percent", "Weather Cloudy",
+    "Car Electric", "Cast", "CCTV", "Ceiling Fan", "Ceiling Light", "Ceiling Lights Multiple",
+    "Chandelier", "Clock", "Coffee Maker", "Current AC", "Current DC", "Curtains",
+    "Curtains Closed", "Desk Lamp", "Dishwasher", "Dog", "Downlight", "Door",
+    "Door Open", "Doorbell", "Dryer", "EV Charger", "Fan", "Fire",
+    "Fireplace", "Flash", "Floor Lamp", "Fountain", "Fridge", "Gamepad",
+    "Garage", "Garage Open", "Garage Open Variant", "Garage Variant", "Gate", "Gate Open",
+    "Gesture Tap", "Gauge", "Gauge Empty", "Gauge Full", "Gauge Low", "Grid Export",
+    "Grid Import", "Grid Off", "Headphones", "Radiator", "Radiator Off", "Home",
+    "Heat Pump", "HVAC", "HVAC Off", "Hot Tub", "Humidifier", "Humidity Alert",
+    "Iron", "Kettle", "Key", "Lamp", "Lamp Outline", "LAN",
+    "Lawnmower", "Leaf", "LED Strip", "LED Strip Variant", "LED Strip Variant Off", "Light Switch",
+    "Lightbulb", "Lightbulb Group", "Lightbulb Group Outline", "Lightbulb Night", "Lightbulb Night Outline", "Lightbulb Off",
+    "Lightbulb On Outline", "Lightbulb Spot", "Lightbulb Spot Off", "Lightbulb Variant", "Lightbulb Variant Outline", "Lightbulb Outline",
+    "Lightning Bolt", "Lock", "Lock Open", "Lock Open Outline", "Lock Outline", "Mailbox",
+    "Message Video", "Medication", "Medication Outline", "Meter Electric", "Meter Gas", "Microsoft Xbox",
+    "Microwave", "Monitor", "Motion Sensor", "Movie Roll", "Music", "Outdoor Lamp",
+    "Oven", "Package", "Package Closed", "Pill", "Pill Multiple", "Pool",
+    "Power", "Power Plug", "Printer", "Printer 3D", "Projector", "Projector Off",
+    "Robot Vacuum", "Roller Shade", "Roller Shade Closed", "Router", "Router Network", "Security",
+    "Shower", "Smoke Detector", "Snowflake", "Snowflake Alert", "Snowflake Thermometer", "Sofa",
+    "Solar Panel", "Solar Panel Large", "Solar Power", "Solar Power Variant", "Speaker", "Spotlight",
+    "Sprinkler", "String Lights", "String Lights Off", "Power Socket UK", "Power Socket EU", "Power Socket US",
+    "Sun", "Table", "Television", "Television Off", "Thermometer", "Thermometer Alert",
+    "Thermometer High", "Thermometer Low", "Thermostat", "Home-Thermostat", "Thermostat Auto", "Thermometer Water",
+    "Timer", "Toilet", "Transmission Tower", "Trash Can", "Wall Outlet", "Wall Sconce",
+    "Washer", "Water", "Water Heater", "Water Percent", "Water Alert", "Weather Cloudy",
     "Weather Cloudy Alert", "Weather Dust", "Weather Fog", "Weather Hail", "Weather Hazy", "Weather Hurricane",
     "Weather Lightning", "Weather Lightning Rainy", "Weather Night", "Weather Night Cloudy", "Weather Partly Cloudy", "Weather Partly Lightning",
     "Weather Partly Rainy", "Weather Partly Snowy", "Weather Partly Snowy Rainy", "Weather Pouring", "Weather Rainy", "Weather Snowy",
@@ -211,6 +214,7 @@
     ".sp-sensor-badge{position:absolute;top:var(--sensor-top);right:var(--sensor-right);font-size:var(--sensor-fs);opacity:.5}" +
     ".sp-sensor-preview{display:flex;align-items:baseline;gap:1px;color:#fff}" +
     ".sp-sensor-value{font-size:var(--btn-icon);line-height:1;font-weight:300}" +
+    ".sp-forecast-value{font-size:calc(var(--btn-icon)*.72)}" +
     ".sp-sensor-unit{font-size:var(--btn-label);line-height:1;opacity:.7}" +
     ".sp-slider-preview{position:absolute;inset:0;border-radius:var(--r);overflow:hidden;pointer-events:none}" +
     ".sp-slider-track{width:100%;height:100%;position:relative}" +
@@ -1494,15 +1498,23 @@
   }
 
   function buttonConfigFields(b) {
+    var type = b && b.type || "";
+    var sensor = b && b.sensor || "";
+    var unit = b && b.unit || "";
+    var precision = b && b.precision || "";
+    if (!type && !sensor) {
+      unit = "";
+      precision = "";
+    }
     return trimConfigFields([
       b && b.entity || "",
       b && b.label || "",
       b && b.icon || "Auto",
       b && b.icon_on || "Auto",
-      b && b.sensor || "",
-      b && b.unit || "",
-      b && b.type || "",
-      b && b.precision || "",
+      sensor,
+      unit,
+      type,
+      precision,
     ]);
   }
 
@@ -1580,9 +1592,12 @@
 
   function subpageTypeCode(type) {
     var map = {
+      action: "A",
       calendar: "D",
+      timezone: "T",
       sensor: "S",
       weather: "W",
+      weather_forecast: "F",
       slider: "L",
       cover: "C",
       garage: "R",
@@ -1595,9 +1610,12 @@
 
   function subpageTypeFromCode(code) {
     var map = {
+      A: "action",
       D: "calendar",
+      T: "timezone",
       S: "sensor",
       W: "weather",
+      F: "weather_forecast",
       L: "slider",
       C: "cover",
       R: "garage",
@@ -3012,7 +3030,7 @@
         var b = c.buttons[bIdx];
         var iconName = resolveIcon(b);
         var label = b.label || b.entity || "Configure";
-        var color = (b.type === "sensor" || b.type === "weather" || b.type === "calendar")
+        var color = (b.type === "sensor" || b.type === "weather" || b.type === "weather_forecast" || b.type === "calendar" || b.type === "timezone")
           ? state.sensorColor : state.offColor;
         var previewTypeDef = BUTTON_TYPES[b.type || ""] || null;
         if (previewTypeDef && c.isSub && !previewTypeDef.allowInSubpage) previewTypeDef = null;
@@ -3289,10 +3307,10 @@
       });
     }
 
-    function makeIconPicker(pickerId, inputId, currentVal, onSelect) {
+    function makeIconPicker(pickerId, inputId, currentVal, onSelect, labelText) {
       var icf = document.createElement("div");
       icf.className = "sp-field";
-      icf.appendChild(fieldLabel("Icon", inputId));
+      icf.appendChild(fieldLabel(labelText || "Icon", inputId));
       var picker = document.createElement("div");
       picker.className = "sp-icon-picker";
       if (pickerId) picker.id = pickerId;
@@ -3367,7 +3385,7 @@
     if (typeDef && typeDef.renderSettings && (!c.isSub || typeDef.allowInSubpage)) {
       typeDef.renderSettings(panel, b, slot, typeHelpers);
     } else {
-      // Toggle (home or subpage): entity, icon, when-on
+      // Toggle fallback: entity, icons, sensor data
       var ef = document.createElement("div");
       ef.className = "sp-field";
       ef.appendChild(fieldLabel("Entity ID", idPrefix + "entity"));
@@ -3379,7 +3397,7 @@
       panel.appendChild(makeIconPicker(idPrefix + "icon-picker", idPrefix + "icon", b.icon || "Auto", function (opt) {
         b.icon = opt;
         saveField("icon", opt);
-      }));
+      }, "Off Icon"));
 
       // When-on section
       var hasIconOn = b.icon_on && b.icon_on !== "Auto";
@@ -3387,7 +3405,7 @@
       var whenOnEnabled = hasIconOn || hasSensor || !!b._whenOnActive;
       var whenOnMode = b._whenOnMode || (hasSensor ? "sensor" : "icon");
 
-      var whenOnToggle = toggleRow("When Entity On", idPrefix + "whenon-toggle", whenOnEnabled);
+      var whenOnToggle = toggleRow("Show sensor data when on", idPrefix + "whenon-toggle", whenOnEnabled);
       panel.appendChild(whenOnToggle.row);
 
       var whenOnCond = condField();
@@ -3397,11 +3415,11 @@
       seg.className = "sp-segment";
       var btnIcon = document.createElement("button");
       btnIcon.type = "button";
-      btnIcon.textContent = "Replace Icon";
+      btnIcon.textContent = "On Icon";
       if (whenOnMode === "icon") btnIcon.classList.add("active");
       var btnSensor = document.createElement("button");
       btnSensor.type = "button";
-      btnSensor.textContent = "Sensor Data";
+      btnSensor.textContent = "Numeric";
       if (whenOnMode === "sensor") btnSensor.classList.add("active");
       seg.appendChild(btnIcon);
       seg.appendChild(btnSensor);
@@ -3410,7 +3428,7 @@
       // Icon-on section
       var iconOnSection = condField();
       if (whenOnMode === "icon") iconOnSection.classList.add("sp-visible");
-      var ionLabel = fieldLabel("Icon When On", idPrefix + "icon-on");
+      var ionLabel = fieldLabel("On Icon", idPrefix + "icon-on");
       iconOnSection.appendChild(ionLabel);
       var iconOnVal = hasIconOn ? b.icon_on : "Auto";
       var iconOnPicker = document.createElement("div");
@@ -3433,11 +3451,6 @@
       var sensorSection = condField();
       if (whenOnMode === "sensor") sensorSection.classList.add("sp-visible");
 
-      var sensorHint = document.createElement("div");
-      sensorHint.className = "sp-field-hint";
-      sensorHint.textContent = "Show sensor value instead of icon when on";
-      sensorSection.appendChild(sensorHint);
-
       var sf = document.createElement("div");
       sf.className = "sp-field";
       sf.appendChild(fieldLabel("Sensor Entity", idPrefix + "sensor"));
@@ -3449,33 +3462,29 @@
       uf.className = "sp-field";
       uf.appendChild(fieldLabel("Unit", idPrefix + "unit"));
       var unitInp = textInput(idPrefix + "unit", b.unit, "e.g. %");
-      unitInp.className = "sp-input sp-input--narrow";
+      unitInp.className = "sp-input";
       uf.appendChild(unitInp);
       sensorSection.appendChild(uf);
 
       var pf = document.createElement("div");
       pf.className = "sp-field";
       pf.appendChild(fieldLabel("Unit Precision", idPrefix + "precision"));
-      var precSeg = document.createElement("div");
-      precSeg.className = "sp-segment";
+      var precisionSelect = document.createElement("select");
+      precisionSelect.className = "sp-select";
+      precisionSelect.id = idPrefix + "precision";
       var precOpts = [["0", "10"], ["1", "10.2"], ["2", "10.21"]];
       for (var pi = 0; pi < precOpts.length; pi++) {
-        (function (val, label) {
-          var btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = label;
-          if ((b.precision || "0") === val) btn.classList.add("active");
-          btn.addEventListener("click", function () {
-            b.precision = val === "0" ? "" : val;
-            saveField("precision", b.precision);
-            var btns = precSeg.querySelectorAll("button");
-            for (var j = 0; j < btns.length; j++) btns[j].classList.remove("active");
-            btn.classList.add("active");
-          });
-          precSeg.appendChild(btn);
-        })(precOpts[pi][0], precOpts[pi][1]);
+        var opt = document.createElement("option");
+        opt.value = precOpts[pi][0];
+        opt.textContent = precOpts[pi][1];
+        precisionSelect.appendChild(opt);
       }
-      pf.appendChild(precSeg);
+      precisionSelect.value = b.precision || "0";
+      precisionSelect.addEventListener("change", function () {
+        b.precision = this.value === "0" ? "" : this.value;
+        saveField("precision", b.precision);
+      });
+      pf.appendChild(precisionSelect);
       sensorSection.appendChild(pf);
       whenOnCond.appendChild(sensorSection);
 
@@ -3495,8 +3504,7 @@
         if (mode === "icon") {
           sensorInp.value = "";
           unitInp.value = "";
-          var pbs = precSeg.querySelectorAll("button");
-          for (var j = 0; j < pbs.length; j++) pbs[j].classList.toggle("active", j === 0);
+          precisionSelect.value = "0";
           b.sensor = "";
           b.unit = "";
           b.precision = "";
@@ -3526,8 +3534,7 @@
           whenOnCond.classList.remove("sp-visible");
           sensorInp.value = "";
           unitInp.value = "";
-          var pbs2 = precSeg.querySelectorAll("button");
-          for (var j2 = 0; j2 < pbs2.length; j2++) pbs2[j2].classList.toggle("active", j2 === 0);
+          precisionSelect.value = "0";
           b.sensor = "";
           b.unit = "";
           b.precision = "";

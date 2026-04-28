@@ -25,6 +25,10 @@ These are configured from the **Settings** tab in the [Setup](/features/setup) u
 
 The update usually takes a minute or two. The display may show a loading screen briefly during the restart.
 
+## When New Cards Appear
+
+Some features, especially new card types, need both the web setup page and the panel firmware. If the setup page shows a new card type but the panel does not display it correctly after you apply the configuration, check for a firmware update and install the latest version.
+
 ## Checking Updates from Home Assistant
 
 You can also manage updates from Home Assistant. The **Auto Update** toggle, **Update Frequency** selector, and **Check for Update** button all appear as entities that you can control from the Home Assistant dashboard or use in automations.

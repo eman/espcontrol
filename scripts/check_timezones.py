@@ -147,8 +147,14 @@ def main() -> int:
     if extra:
         errors.append(f"Unused firmware timezone rows: {', '.join(extra)}")
 
-    if posix_table.get("Asia/Almaty") != "<+05>-5":
-        errors.append("Asia/Almaty must use UTC+5 POSIX rule <+05>-5")
+    quoted_numeric = sorted(
+        tz_id for tz_id, posix in posix_table.items() if "<" in posix or ">" in posix
+    )
+    if quoted_numeric:
+        errors.append(
+            "Firmware POSIX strings must avoid quoted numeric timezone names: "
+            + ", ".join(quoted_numeric)
+        )
 
     expected_pauses = expected_casablanca_pauses()
     if casablanca_pauses != expected_pauses:

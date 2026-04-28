@@ -10,6 +10,10 @@ A trigger card is a momentary card with no on/off state. When tapped, it flashes
 
 Trigger cards are useful for things like starting scenes, sending notifications, activating scripts, or anything else you'd start with a single tap.
 
+::: tip Running an existing script directly
+If you already have a Home Assistant script and just want a card to run it, use an [Action](/card-types/actions) card with **Run Script**. Trigger cards are best when you want to build a Home Assistant automation around a custom panel event.
+:::
+
 ![Trigger card with a tap gesture icon labelled Doorbell](/images/card-button.png)
 
 ## Setting Up a Trigger Card
