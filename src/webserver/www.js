@@ -3438,11 +3438,6 @@
       var sensorSection = condField();
       if (whenOnMode === "sensor") sensorSection.classList.add("sp-visible");
 
-      var sensorHint = document.createElement("div");
-      sensorHint.className = "sp-field-hint";
-      sensorHint.textContent = "Show sensor value instead of icon when on";
-      sensorSection.appendChild(sensorHint);
-
       var sf = document.createElement("div");
       sf.className = "sp-field";
       sf.appendChild(fieldLabel("Sensor Entity", idPrefix + "sensor"));
