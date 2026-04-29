@@ -25,3 +25,7 @@ wifi:
     ssid: "${friendly_name}"
 
 captive_portal:
+
+web_server:
+  js_url: ""
+  js_include: "../docs/public/webserver/seeed-sensecap-indicator/www.js"

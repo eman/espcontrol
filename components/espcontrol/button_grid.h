@@ -99,7 +99,7 @@ struct ParsedCfg {
   std::string icon_on;     // 3  icon name for on state (blank = no swap)
   std::string sensor;      // 4  sensor entity, or action name for Action cards
   std::string unit;        // 5  unit suffix for sensor display
-  std::string type;        // 6  button type: "" (toggle), action, sensor, calendar, timezone, weather_forecast, slider, cover, garage, push, internal, subpage
+  std::string type;        // 6  button type: "" (toggle), action, sensor, sensor_subpage, calendar, timezone, weather_forecast, slider, cover, garage, push, internal, subpage
   std::string precision;   // 7  decimal places for sensors; "text" = text sensor mode
 };
 
@@ -1670,7 +1670,7 @@ inline void handle_button_click(const std::string &cfg, int slot_num,
     snprintf(slot_buf, sizeof(slot_buf), "%d", slot_num);
     kv2.value = decltype(kv2.value)(slot_buf);
     esphome::api::global_api_server->send_homeassistant_action(req);
-  } else if (p.type == "subpage") {
+  } else if (p.type == "subpage" || p.type == "sensor_subpage") {
     lv_obj_t *sub_scr = (lv_obj_t *)lv_obj_get_user_data(btn_obj);
     if (sub_scr)
       lv_scr_load_anim(sub_scr, LV_SCR_LOAD_ANIM_NONE, 0, 0, false);
@@ -2284,6 +2284,16 @@ inline void grid_phase1(
       setup_sensor_card(s, p, has_sensor_color, sensor_val);
       continue;
     }
+    if (p.type == "sensor_subpage") {
+      if (p.precision == "text") {
+        setup_text_sensor_card(s, p, has_sensor_color, sensor_val);
+      } else {
+        if (p.sensor.empty()) continue;
+        setup_sensor_card(s, p, has_sensor_color, sensor_val);
+      }
+      lv_obj_add_flag(s.btn, LV_OBJ_FLAG_CLICKABLE);
+      continue;
+    }
     if (p.type == "calendar") {
       setup_calendar_card(s, p, has_sensor_color, sensor_val);
       continue;
@@ -2399,6 +2409,18 @@ inline void grid_phase2(
       subscribe_sensor_value(s.sensor_lbl, p.sensor, parse_precision(p.precision));
       if (p.label.empty())
         subscribe_friendly_name(s.text_lbl, p.sensor);
+      continue;
+    }
+    if (p.type == "sensor_subpage") {
+      if (!p.sensor.empty()) {
+        if (p.precision == "text")
+          subscribe_text_sensor_value(s.text_lbl, p.sensor);
+        else {
+          subscribe_sensor_value(s.sensor_lbl, p.sensor, parse_precision(p.precision));
+          if (p.label.empty())
+            subscribe_friendly_name(s.text_lbl, p.sensor);
+        }
+      }
       continue;
     }
     if (p.type == "calendar") {
@@ -2544,7 +2566,7 @@ inline void grid_phase2(
 
   for (int si = 0; si < NS; si++) {
     ParsedCfg p = parse_cfg(slots[si].config->state);
-    if (p.type != "subpage") continue;
+    if (p.type != "subpage" && p.type != "sensor_subpage") continue;
     bool sp_indicator = p.sensor == "indicator";
 
     bool sp_has_icon_on = !p.icon_on.empty() && p.icon_on != "Auto";
@@ -2559,7 +2581,11 @@ inline void grid_phase2(
       optional_text_state(sp_ext_configs, si) +
       optional_text_state(sp_ext2_configs, si) +
       optional_text_state(sp_ext3_configs, si);
-    if (sp_cfg.empty()) continue;
+    if (sp_cfg.empty()) {
+      if (p.type == "sensor_subpage")
+        lv_obj_clear_flag(slots[si].btn, LV_OBJ_FLAG_CLICKABLE);
+      continue;
+    }
 
     auto sp_btns = parse_subpage_config(sp_cfg);
     if (sp_btns.empty()) continue;
