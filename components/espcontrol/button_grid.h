@@ -249,7 +249,7 @@ struct WeatherForecastCardRef {
 };
 
 inline WeatherForecastCardRef *weather_forecast_card_refs() {
-  static WeatherForecastCardRef refs[MAX_GRID_SLOTS + MAX_SUBPAGE_ITEMS];
+  static WeatherForecastCardRef refs[MAX_GRID_SLOTS];
   return refs;
 }
 
@@ -303,7 +303,7 @@ inline void register_weather_forecast_card(lv_obj_t *value_lbl, lv_obj_t *unit_l
                                            lv_obj_t *label_lbl,
                                            const std::string &entity_id) {
   int &count = weather_forecast_card_count();
-  if (count >= MAX_GRID_SLOTS + MAX_SUBPAGE_ITEMS) {
+  if (count >= MAX_GRID_SLOTS) {
     ESP_LOGW("weather_forecast", "Too many forecast cards; skipping updates");
     return;
   }
@@ -846,7 +846,7 @@ struct CalendarCardRef {
 };
 
 inline CalendarCardRef *calendar_card_refs() {
-  static CalendarCardRef refs[MAX_GRID_SLOTS + MAX_SUBPAGE_ITEMS];
+  static CalendarCardRef refs[MAX_GRID_SLOTS];
   return refs;
 }
 
@@ -888,7 +888,7 @@ inline void reset_calendar_cards() {
 inline void register_calendar_card(lv_obj_t *value_lbl, lv_obj_t *unit_lbl,
                                    lv_obj_t *label_lbl, bool show_time) {
   int &count = calendar_card_count();
-  if (count >= MAX_GRID_SLOTS + MAX_SUBPAGE_ITEMS) {
+  if (count >= MAX_GRID_SLOTS) {
     ESP_LOGW("calendar", "Too many calendar cards; skipping date updates");
     return;
   }
@@ -1067,7 +1067,7 @@ struct TimezoneCardRef {
 };
 
 inline TimezoneCardRef *timezone_card_refs() {
-  static TimezoneCardRef refs[MAX_GRID_SLOTS + MAX_SUBPAGE_ITEMS];
+  static TimezoneCardRef refs[MAX_GRID_SLOTS];
   return refs;
 }
 
@@ -1144,7 +1144,7 @@ inline void register_timezone_card(lv_obj_t *value_lbl, lv_obj_t *unit_lbl,
                                    const std::string &timezone,
                                    const std::string &label) {
   int &count = timezone_card_count();
-  if (count >= MAX_GRID_SLOTS + MAX_SUBPAGE_ITEMS) {
+  if (count >= MAX_GRID_SLOTS) {
     ESP_LOGW("timezone", "Too many timezone cards; skipping time updates");
     return;
   }
